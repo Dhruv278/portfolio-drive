@@ -8,11 +8,12 @@ import { DUSK_SPAN, DUSK_START, usedModels } from '@/content/route'
 import { Car } from './Car'
 import { ChaseCamera } from './ChaseCamera'
 import { DebugStats } from './DebugStats'
-import { Billboards, Hills, Pier, PierPosts, Water } from './Extras'
+import { Billboards, Hills, Pier, PierPosts } from './Extras'
+import { Birds, Clouds, Water } from './Living'
 import { Road } from './Road'
 import { roadCurve } from './roadCurve'
 import { Scenery } from './Scenery'
-import { DriveClock, readRoadT, useIsMobile } from './useDriveFrame'
+import { DriveClock, IdleLoop, readRoadT, useIsMobile } from './useDriveFrame'
 
 // Start every model download the moment the scene bundle arrives, not when each item first renders.
 for (const m of usedModels()) useGLTF.preload(`/models/${m}.glb`)
@@ -116,10 +117,13 @@ function World({ stats, onReady }: { stats: boolean; onReady: () => void }) {
     <>
       {stats && <DebugStats />}
       <DriveClock />
+      <IdleLoop />
       <Atmosphere mobile={mobile} />
       <ChaseCamera />
       <Road />
       <Water />
+      <Clouds />
+      <Birds />
       <Hills />
       <PierPosts />
       <Pier />

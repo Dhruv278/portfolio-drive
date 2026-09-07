@@ -53,6 +53,30 @@ export function DriveClock() {
   return null
 }
 
+// Keeps the world alive (clouds, birds, water, windmills) at a modest rate while the visitor is
+// present: tab visible, some interaction in the last while, and no reduced-motion preference.
+// After that it sleeps and the canvas stops rendering until the next scroll or pointer move.
+export function IdleLoop({ fps = 24, sleepAfterMs = 25_000 }: { fps?: number; sleepAfterMs?: number }) {
+  const invalidate = useThree((s) => s.invalidate)
+  useEffect(() => {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    let last = performance.now()
+    const bump = () => {
+      last = performance.now()
+    }
+    const events = ['scroll', 'pointermove', 'pointerdown', 'keydown', 'touchstart', 'wheel'] as const
+    events.forEach((e) => addEventListener(e, bump, { passive: true }))
+    const id = setInterval(() => {
+      if (document.visibilityState === 'visible' && performance.now() - last < sleepAfterMs) invalidate()
+    }, 1000 / fps)
+    return () => {
+      clearInterval(id)
+      events.forEach((e) => removeEventListener(e, bump))
+    }
+  }, [invalidate, fps, sleepAfterMs])
+  return null
+}
+
 export function useIsMobile(): boolean {
   return useThree((s) => s.size.width) < 720
 }

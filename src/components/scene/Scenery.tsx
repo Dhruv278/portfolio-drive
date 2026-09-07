@@ -56,7 +56,9 @@ function Placed({ p, lat }: { p: Placement; lat: number }) {
   }, [scene, p])
   const pose = useMemo(() => poseAt(p.t, p.lateral * lat), [p.t, p.lateral, lat])
 
-  useFrame(() => {
+  const spins = /windmill/.test(p.model)
+
+  useFrame(({ clock }) => {
     const g = group.current
     if (!g) return
     const { t, reduced } = readRoadT()
@@ -66,6 +68,11 @@ function Placed({ p, lat }: { p: Placement; lat: number }) {
     const x = k.current
     const e = x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2
     g.scale.y = Math.max(0.001, e)
+    if (spins && !reduced) {
+      // the kit's windmill keeps its sails in a node called "blades"
+      const blades = g.getObjectByName('blades')
+      if (blades) blades.rotation.x = clock.elapsedTime * 0.9 + p.t * 20
+    }
   })
 
   return (

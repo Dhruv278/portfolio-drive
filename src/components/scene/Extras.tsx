@@ -3,7 +3,7 @@
 // Things the kits do not cover, built from primitives: water, hills, pier, pier posts, billboards.
 import { useMemo } from 'react'
 import { Quaternion, Vector3 } from 'three'
-import { BILLBOARDS, HILLS, PIER_POSTS, WATER } from '@/content/route'
+import { BILLBOARDS, HILLS, PIER_POSTS } from '@/content/route'
 import { poseAt, roadCurve } from './roadCurve'
 import { COLORS } from './Road'
 
@@ -22,19 +22,6 @@ function Cyl({ r, h, c, x = 0, y = 0, z = 0, seg = 10 }: { r: number; h: number;
       <cylinderGeometry args={[r, r, h, seg]} />
       <meshLambertMaterial color={c} />
     </mesh>
-  )
-}
-
-export function Water() {
-  return (
-    <>
-      {WATER.map((w, i) => (
-        <mesh key={i} rotation-x={-Math.PI / 2} position={[w.x, 0.01, w.z]}>
-          <planeGeometry args={[w.w, w.d]} />
-          <meshLambertMaterial color={COLORS.water} />
-        </mesh>
-      ))}
-    </>
   )
 }
 

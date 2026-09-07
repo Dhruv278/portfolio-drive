@@ -27,6 +27,25 @@ test.describe('The Drive', () => {
     await expect(odo).toContainText('Stop 6 of 6')
   })
 
+  test('projects carry skill chips and the skills board is grouped', async ({ page }) => {
+    await page.goto('/?scene=off')
+    expect(await page.locator('#platforms .chip').count()).toBeGreaterThan(20)
+    expect(await page.locator('#products .card .chip').count()).toBeGreaterThan(10)
+    expect(await page.locator('#how .skillgroup').count()).toBeGreaterThanOrEqual(8)
+    await expect(page.locator('#how .skillgroup h3').first()).toHaveText('Languages')
+  })
+
+  test('stops reveal as the car arrives and stay revealed', async ({ page }) => {
+    await page.goto('/?scene=off')
+    await expect(page.locator('section#start')).toHaveAttribute('data-active', 'true')
+    await expect(page.locator('section#platforms')).toHaveAttribute('data-active', 'false')
+    const total = await page.evaluate(() => document.documentElement.scrollHeight - innerHeight)
+    await page.evaluate((y) => window.scrollTo(0, y), Math.round(total * 0.6))
+    await expect(page.locator('section#platforms')).toHaveAttribute('data-active', 'true')
+    await page.evaluate(() => window.scrollTo(0, 0))
+    await expect(page.locator('section#platforms')).toHaveAttribute('data-active', 'true')
+  })
+
   test('resume PDF and resume page are reachable', async ({ page, request }) => {
     await page.goto('/')
     const href = await page.locator('.hud.top a.btn.primary').getAttribute('href')

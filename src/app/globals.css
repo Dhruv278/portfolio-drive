@@ -212,15 +212,26 @@ section.stop {
 }
 section.stop .panel {
   position: sticky;
-  top: 11vh;
+  top: 9vh;
   margin-left: auto;
   margin-right: 6vw;
-  width: min(480px, 86vw);
+  width: min(500px, 86vw);
+  max-height: 82vh;
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--shadow) transparent;
   background: var(--paper);
-  padding: 26px 28px 24px;
+  padding: 24px 26px 22px;
   box-shadow:
     0 3px 0 var(--shadow),
     0 18px 40px rgba(30, 42, 56, 0.1);
+}
+.panel::-webkit-scrollbar {
+  width: 8px;
+}
+.panel::-webkit-scrollbar-thumb {
+  background: var(--shadow);
+  border-radius: 4px;
 }
 section.stop.hero .panel {
   margin-left: 6vw;
@@ -310,29 +321,102 @@ h2 {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin-top: 14px;
+  margin-top: 12px;
 }
 .chip {
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 500;
-  padding: 3px 9px;
+  padding: 2px 8px;
   border: 1.5px solid var(--ink);
   background: var(--paper);
+  line-height: 1.5;
 }
 .chip.blue {
   border-color: var(--cobalt);
   color: var(--cobalt);
+}
+.platforms .chips {
+  margin-top: 6px;
+}
+.platforms .chip {
+  font-size: 11px;
+  padding: 1px 7px;
+  border-width: 1px;
+  color: var(--ink-2);
+}
+.card {
+  border: 1.5px solid var(--ink);
+  padding: 12px;
+  background: #fff;
+}
+.skillboard {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 14px;
+  margin-top: 4px;
+}
+.skillgroup h3 {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--cobalt);
+  margin: 0 0 4px;
+}
+.skillgroup .chips {
+  margin-top: 0;
+  gap: 4px;
+}
+.skillgroup .chip {
+  font-size: 11px;
+  padding: 1px 7px;
+  border-width: 1px;
+}
+.habits {
+  margin-top: 14px;
+  font-size: 13.5px;
+  color: var(--ink-2);
+  border-top: 1px solid var(--paper-2);
+  padding-top: 10px;
+}
+.habits b {
+  color: var(--ink);
+}
+
+/* ---------- Reveal: only sections marked inactive by JS are held back ---------- */
+section.stop[data-active='false'] .panel {
+  opacity: 0;
+  transform: translateY(26px);
+}
+section.stop .panel {
+  transition:
+    opacity 0.55s ease,
+    transform 0.65s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+section.stop[data-active='false'] .panel li,
+section.stop[data-active='false'] .panel .chip,
+section.stop[data-active='false'] .panel .card,
+section.stop[data-active='false'] .panel .skillgroup,
+section.stop[data-active='false'] .contact a {
+  opacity: 0;
+  transform: translateY(10px);
+}
+section.stop .panel li,
+section.stop .panel .chip,
+section.stop .panel .card,
+section.stop .panel .skillgroup,
+section.stop .contact a {
+  transition:
+    opacity 0.4s ease,
+    transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition-delay: calc(0.12s + var(--i, 0) * 55ms);
 }
 .mini {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
   margin-top: 6px;
-}
-.mini > div {
-  border: 1.5px solid var(--ink);
-  padding: 12px;
-  background: #fff;
 }
 .mini h3 {
   font-family: var(--font-display);
@@ -354,8 +438,10 @@ h2 {
   grid-template-columns: 22px 1fr;
   gap: 10px;
   align-items: start;
-  padding: 8px 0;
+  padding: 7px 0;
   border-top: 1px solid var(--paper-2);
+  font-size: 13.5px;
+  line-height: 1.45;
 }
 .platforms li:first-child {
   border-top: 0;
@@ -452,8 +538,20 @@ h2 {
   }
   .track i,
   .hint,
-  .scene-root {
+  .scene-root,
+  section.stop .panel,
+  section.stop .panel li,
+  section.stop .panel .chip,
+  section.stop .panel .card,
+  section.stop .panel .skillgroup,
+  section.stop .contact a {
     transition: none;
+    transform: none;
+  }
+}
+@media (max-width: 720px) {
+  .skillboard {
+    grid-template-columns: 1fr;
   }
 }
 

@@ -1,21 +1,25 @@
 // Single source of truth for every word on the site and the resume page.
 // Rules inherited from the resume work: problem-first, no commit counts, no freelance or client
 // wording, US spelling, no em dashes or semicolons. A unit test enforces the banned-word list.
+// Project write-ups and tech stacks were pulled from the earlier portfolio site's data file and
+// trimmed to what the code on disk supports.
 
 export type Link = { label: string; value: string; href: string }
 
 export type Bullet = { lead: string; text: string }
 
-export type Card = { title: string; body: string }
+export type Card = { title: string; body: string; chips: string[] }
 
-export type Platform = { title: string; body: string }
+export type Platform = { title: string; body: string; chips: string[] }
+
+export type SkillGroup = { label: string; items: string[] }
 
 export type StopContent =
   | { kind: 'hero'; id: string; name: string; eyebrow: string; lede: string; meta: string }
-  | { kind: 'bullets'; id: string; name: string; eyebrow: string; heading: string; intro: string; bullets: Bullet[]; chips: string[] }
-  | { kind: 'cards'; id: string; name: string; eyebrow: string; heading: string; cards: Card[]; chips: string[] }
+  | { kind: 'bullets'; id: string; name: string; eyebrow: string; heading: string; intro: string; bullets: Bullet[]; stack: string[]; chips: string[] }
+  | { kind: 'cards'; id: string; name: string; eyebrow: string; heading: string; cards: Card[] }
   | { kind: 'platforms'; id: string; name: string; eyebrow: string; heading: string; platforms: Platform[] }
-  | { kind: 'paragraphs'; id: string; name: string; eyebrow: string; heading: string; paragraphs: Bullet[] }
+  | { kind: 'skills'; id: string; name: string; eyebrow: string; heading: string; groups: SkillGroup[]; habits: string }
   | { kind: 'contact'; id: string; name: string; eyebrow: string; heading: string; links: Link[]; wheel: string }
 
 export const identity = {
@@ -38,6 +42,19 @@ export const milestones = [
   { label: 'The Coding Studio, 2024 to 2025', t: 0.115, side: 1 },
   { label: 'OTPless, 2023', t: 0.15, side: -1 },
 ] as const
+
+export const skillGroups: SkillGroup[] = [
+  { label: 'Languages', items: ['TypeScript', 'JavaScript', 'SQL'] },
+  { label: 'Frontend', items: ['React', 'Next.js', 'Redux', 'TanStack Query', 'Tailwind CSS', 'Material UI', 'shadcn/ui', 'Framer Motion', 'React Three Fiber'] },
+  { label: 'Backend', items: ['Node.js', 'NestJS', 'Express', 'REST', 'WebSockets', 'Server-Sent Events', 'BullMQ', 'Kafka', 'tRPC', 'Payload CMS'] },
+  { label: 'Data', items: ['PostgreSQL', 'MongoDB', 'MySQL', 'Redis', 'Prisma', 'Mongoose', 'TypeORM', 'Pinecone'] },
+  { label: 'AI and LLM', items: ['Gemini', 'Claude', 'OpenAI', 'OpenRouter', 'Prompt versioning', 'LLM evaluation', 'RAG with citations', 'Guardrails', 'Model Context Protocol', 'Agent orchestration', 'n8n', 'LangChain'] },
+  { label: 'Cloud and DevOps', items: ['AWS S3', 'EC2', 'ECS', 'Lambda', 'SES', 'Kubernetes on EKS', 'Docker', 'GitHub Actions', 'Prometheus', 'Grafana'] },
+  { label: 'Testing', items: ['Jest', 'Vitest', 'Playwright', 'Postman'] },
+  { label: 'Security and auth', items: ['JWT', 'OAuth', 'Better-Auth', 'NextAuth', 'TOTP 2FA', 'Passkeys', 'Argon2id', 'Multi-tenant isolation', 'PHI handling'] },
+  { label: 'Payments and integrations', items: ['Stripe', 'Razorpay', 'Twilio', 'Zoho', 'SendGrid', 'Mapbox'] },
+  { label: 'Product and leadership', items: ['Roadmap', 'Specifications', 'Prioritization', 'Cross-functional delivery', 'QA and acceptance cycles', 'Stakeholder demos', 'Code review', 'Claude Code', 'Codex', 'Cursor'] },
+]
 
 export const stops: StopContent[] = [
   {
@@ -62,6 +79,7 @@ export const stops: StopContent[] = [
       { lead: 'Took Chi,', text: 'the in-product AI assistant, from prototype to release candidate through three QA rounds and 28 defects.' },
       { lead: 'Cut', text: 'medication rows missing a start date from 53% to 26% in a replay evaluation, with no fabricated drugs or citations.' },
     ],
+    stack: ['NestJS', 'MongoDB', 'Gemini 2.5', 'Claude', 'BullMQ', 'Redis', 'Socket.io', 'React', 'AWS S3', 'Kubernetes on EKS', 'Better-Auth', 'Prometheus'],
     chips: ['Before this', 'The Coding Studio, 2024 to 2025', 'OTPless, 2023'],
   },
   {
@@ -73,41 +91,63 @@ export const stops: StopContent[] = [
     cards: [
       {
         title: 'AgentFlow',
-        body: 'Teams of specialized agents run as a dependency graph and stream to the browser. Free, Pro and bring-your-own-key plans, keys encrypted with AES-256-GCM, a failed step halts the run.',
+        body: 'Teams of specialized agents (researcher, writer, reviewer, coder) run as a dependency graph and stream to the browser over SSE. Free, Pro and bring-your-own-key plans, keys encrypted with AES-256-GCM, plan limits enforced in the service layer, and a failed step halts the run.',
+        chips: ['NestJS', 'Next.js 14', 'Prisma', 'PostgreSQL', 'Redis', 'BullMQ', 'Stripe', 'OpenRouter', 'SSE'],
       },
       {
         title: 'Short-video pipeline',
-        body: 'A 59-node n8n workflow researches, scripts, voices, renders and uploads unattended. Three quality tiers from $0.57 to $3.41 a video.',
+        body: 'A 59-node n8n workflow researches a trend, writes the script, generates images and voiceover, renders and uploads to YouTube unattended. Three quality tiers (FLUX, Wan, Kling) from $0.57 to $3.41 a video, with provider fallbacks so one outage does not stop a render.',
+        chips: ['n8n', 'Claude', 'Replicate', 'ElevenLabs', 'Shotstack', 'YouTube API'],
       },
     ],
-    chips: ['NestJS', 'Next.js', 'Prisma', 'Redis', 'Stripe', 'n8n', 'Claude'],
   },
   {
     kind: 'platforms',
     id: 'platforms',
     name: 'Delivered platforms',
     eyebrow: 'Stop 4 of 6. Delivered platforms, 2024 to 2026',
-    heading: 'Five platforms, five problems.',
+    heading: 'Six platforms, six problems.',
     platforms: [
-      { title: 'Wholesale quotation platform.', body: 'Island wholesalers stopped traveling shop to shop: retailers request quotes, prices stay private, drivers confirm by QR scan.' },
-      { title: 'Deposit-return recycling.', body: 'Government sets prices, collectors pay the public, finance settles verified claims, every step audited.' },
-      { title: 'License lifecycle.', body: 'An aviation regulator off paper: apply, inspect, pay, issue, renew, with PDF certificates and cron renewals.' },
-      { title: 'Incentive engine.', body: 'Disputed spreadsheet payouts replaced by a configurable slab engine with a full audit trail.' },
-      { title: 'Exchange backend.', body: 'Real-time order matching for BTC, ETH, TRON and XRP with KYC and settlement jobs.' },
+      {
+        title: 'Wholesale quotation platform.',
+        body: 'Island wholesalers stopped traveling shop to shop: retailers request quotes, prices stay private per quote, payment and installment options are set per island, drivers confirm delivery by QR scan.',
+        chips: ['NestJS', 'Prisma', 'PostgreSQL', 'Next.js', 'TanStack Query'],
+      },
+      {
+        title: 'Deposit-return recycling.',
+        body: 'Government sets products and prices, collectors pay the public for returns, finance settles verified claims, every step permissioned and audited.',
+        chips: ['NestJS 11', 'Prisma 7', 'PostgreSQL', 'Next.js 16', 'Zod'],
+      },
+      {
+        title: 'License lifecycle.',
+        body: 'An aviation regulator off paper: apply, inspect, pay, issue, renew. Three license types, PDF certificates, cron-driven renewal notices, four permission roles.',
+        chips: ['Express 5', 'Prisma 6', 'PostgreSQL', 'Next.js 15', 'node-cron', 'jsPDF', 'AWS S3'],
+      },
+      {
+        title: 'Incentive engine.',
+        body: 'Disputed spreadsheet payouts replaced by a configurable slab engine fed by attendance and customer feedback, 16 data models, soft deletes and a full audit trail across locations.',
+        chips: ['Express 5', 'Prisma 6', 'PostgreSQL', 'Next.js 16', 'Joi', 'AWS S3'],
+      },
+      {
+        title: 'Food-surplus marketplace.',
+        body: 'Two-sided marketplace connecting surplus-food sellers with buyers. Dual payment rails, real-time order updates, map-based discovery, seller and admin dashboards.',
+        chips: ['Next.js 14', 'Payload CMS', 'tRPC', 'MongoDB', 'Stripe', 'Razorpay', 'Mapbox', 'Socket.io'],
+      },
+      {
+        title: 'Exchange backend.',
+        body: 'Real-time order matching over WebSocket for BTC, ETH, TRON and XRP, KYC document workflows, funded deposits and cron-based settlement.',
+        chips: ['Express', 'MySQL', 'Socket.io', 'web3.js', 'bitcoinjs-lib', 'tronweb'],
+      },
     ],
   },
   {
-    kind: 'paragraphs',
+    kind: 'skills',
     id: 'how',
-    name: 'How I work',
-    eyebrow: 'Stop 5 of 6. How I work',
-    heading: 'Specs first, then code, then QA rounds.',
-    paragraphs: [
-      { lead: 'Stack.', text: 'TypeScript end to end. NestJS, Express, Node.js. Next.js, React. PostgreSQL, MongoDB, Redis. AWS, Kubernetes on EKS, Docker, GitHub Actions.' },
-      { lead: 'AI.', text: 'LLM pipelines on Gemini and Claude, RAG with source citations, prompt versioning and evaluation, Model Context Protocol servers, multi-agent systems.' },
-      { lead: 'Tooling.', text: 'Claude Code, Codex and Cursor every day, and I write the prompts and tooling the team builds on.' },
-      { lead: 'Habits.', text: 'Written specifications before code. Tenant scoping and rate limits by default. A QA round is not done until the tracker says so.' },
-    ],
+    name: 'Skills',
+    eyebrow: 'Stop 5 of 6. Skills and how I work',
+    heading: 'Everything here has shipped to production.',
+    groups: skillGroups,
+    habits: 'Written specifications before code. Tenant scoping and rate limits by default. Claude Code, Codex and Cursor every day, and I write the prompts and tooling the team builds on. A QA round is not done until the tracker says so.',
   },
   {
     kind: 'contact',
@@ -194,6 +234,7 @@ export const resume = {
       { title: 'Deposit-return recycling platform', body: '(NestJS, Prisma, PostgreSQL, Next.js). Government sets products and prices, collectors pay the public for returns, finance settles verified claims, every step permissioned and audited.' },
       { title: 'Regulatory license lifecycle platform', body: '(Express, Prisma, PostgreSQL, Next.js). Moved an aviation regulator off paper: apply, inspect, pay, issue and renew stages, PDF certificates, cron-driven renewal notices, four roles.' },
       { title: 'Incentive calculation engine', body: '(Express, Prisma, PostgreSQL, Next.js). Quarterly payouts were computed by hand and disputed. Configurable slab-based engine fed by attendance and customer feedback, with a full audit trail.' },
+      { title: 'Food-surplus marketplace', body: '(Next.js 14, Payload CMS, tRPC, MongoDB, Stripe and Razorpay, Mapbox). Two-sided marketplace connecting surplus-food sellers with buyers, with dual payment rails, real-time order updates and map-based discovery.' },
       { title: 'Multi-blockchain exchange backend', body: '(Express, MySQL, Socket.io). Real-time order matching for BTC, ETH, TRON and XRP, KYC workflows, cron-based settlement.' },
     ],
   },

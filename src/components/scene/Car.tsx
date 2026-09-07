@@ -1,12 +1,12 @@
 'use client'
 
 import { useGLTF } from '@react-three/drei'
-import { useFrame } from '@react-three/fiber'
+import { useFrame, useThree } from '@react-three/fiber'
 import { useMemo, useRef } from 'react'
 import { AdditiveBlending, Box3, CanvasTexture, DoubleSide, Group, Material, Mesh, MeshBasicMaterial, MeshLambertMaterial, MeshStandardMaterial, NearestFilter, Object3D, SRGBColorSpace, Vector3 } from 'three'
 import { CAR_LENGTH, CAR_MODEL, DUSK_SPAN, DUSK_START } from '@/content/route'
 import { recolorRedCells } from '@/lib/recolor'
-import { roadCurve } from './roadCurve'
+import { roadCurve, UP } from './roadCurve'
 import { readRoadT } from './useDriveFrame'
 
 const MODEL_URL = `/models/${CAR_MODEL}.glb`
@@ -14,6 +14,10 @@ const COBALT: [number, number, number] = [47, 91, 234]
 const BEAM_LENGTH = 11
 const BEAM_RADIUS = 1.7
 const BEAM_MAX_OPACITY = 0.26
+// Exhaust: a small pool of puffs recycled while the car moves.
+const PUFFS = 12
+const PUFF_EVERY = 0.09 // seconds between puffs at speed
+const PUFF_LIFE = 1.1 // seconds
 
 useGLTF.preload(MODEL_URL)
 
@@ -46,9 +50,10 @@ function recolorMaterial(mat: MeshStandardMaterial): Material {
 
 export function Car() {
   const { scene } = useGLTF(MODEL_URL) as unknown as LoadedGltf
+  const invalidate = useThree((s) => s.invalidate)
   const car = useRef<Group>(null)
   const chassis = useRef<Group>(null)
-  const state = useRef({ prevT: 0, prevSpeed: 0, spin: 0, steer: 0, roll: 0, pitch: 0 })
+  const state = useRef({ prevT: 0, prevSpeed: 0, spin: 0, steer: 0, roll: 0, pitch: 0, lastPuff: 0, next: 0 })
   const wheels = useRef<Object3D[]>([])
   const frontWheels = useRef<Object3D[]>([])
   const lampMat = useRef<MeshStandardMaterial>(null)
@@ -57,6 +62,8 @@ export function Car() {
   // the scene's light count and force every material to recompile mid-drive.
   const beamL = useRef<MeshBasicMaterial>(null)
   const beamR = useRef<MeshBasicMaterial>(null)
+  const puffs = useRef<(Mesh | null)[]>([])
+  const puffLife = useRef<number[]>(Array.from({ length: PUFFS }, () => 0))
 
   // Clone, fit to length, base on the ground, repaint.
   const { model, halfW, front, back, lampY } = useMemo(() => {
@@ -86,9 +93,9 @@ export function Car() {
     return { model: m, halfW: size.x / 2, front: box.max.z, back: box.min.z, lampY: size.y * 0.38 }
   }, [scene])
 
-  const tmp = useMemo(() => ({ pos: new Vector3(), tan: new Vector3(), tanAhead: new Vector3(), look: new Vector3() }), [])
+  const tmp = useMemo(() => ({ pos: new Vector3(), tan: new Vector3(), tanAhead: new Vector3(), look: new Vector3(), right: new Vector3() }), [])
 
-  useFrame(() => {
+  useFrame(({ clock }, delta) => {
     const g = car.current
     const ch = chassis.current
     if (!g || !ch) return
@@ -110,6 +117,7 @@ export function Car() {
     const curve = roadCurve()
     curve.getPointAt(t, tmp.pos)
     curve.getTangentAt(t, tmp.tan).setY(0).normalize()
+    tmp.right.crossVectors(UP, tmp.tan).normalize()
     g.position.copy(tmp.pos)
     g.position.y = 0.03
     tmp.look.copy(tmp.pos).add(tmp.tan)
@@ -135,30 +143,79 @@ export function Car() {
     if (beamR.current) beamR.current.opacity = beam
     if (lampMat.current) lampMat.current.emissiveIntensity = 0.5 + dusk * 1.8
     if (tailMat.current) tailMat.current.emissiveIntensity = 0.6 + dusk * 1.2
+
+    // Exhaust. Spawn behind the right rear while moving, age every live puff, keep frames coming
+    // until the last one has faded.
+    if (!reduced) {
+      const now = clock.elapsedTime
+      if (Math.abs(speed) > 0.00005 && now - st.lastPuff > PUFF_EVERY) {
+        st.lastPuff = now
+        const i = st.next
+        st.next = (st.next + 1) % PUFFS
+        const p = puffs.current[i]
+        if (p) {
+          p.position.copy(tmp.pos).addScaledVector(tmp.tan, -2.3).addScaledVector(tmp.right, -0.55)
+          p.position.y = 0.45
+          p.scale.setScalar(0.6)
+          p.visible = true
+          puffLife.current[i] = 1
+        }
+      }
+      let alive = false
+      for (let i = 0; i < PUFFS; i++) {
+        const p = puffs.current[i]
+        if (!p || puffLife.current[i] <= 0) continue
+        puffLife.current[i] -= delta / PUFF_LIFE
+        const life = puffLife.current[i]
+        if (life <= 0) {
+          p.visible = false
+          continue
+        }
+        alive = true
+        p.position.y += delta * 1.4
+        p.scale.setScalar(0.6 + (1 - life) * 1.5)
+        ;(p.material as MeshBasicMaterial).opacity = life * 0.55
+      }
+      if (alive) invalidate()
+    }
   })
 
   return (
-    <group ref={car}>
-      <group ref={chassis}>
-        <primitive object={model} />
-        {[1, -1].map((sx) => (
-          <group key={sx}>
-            <mesh position={[sx * (halfW - 0.45), lampY, front + 0.02]}>
-              <boxGeometry args={[0.34, 0.14, 0.06]} />
-              <meshStandardMaterial ref={sx === 1 ? lampMat : undefined} color="#FFF3C4" emissive="#FFE9A8" emissiveIntensity={0.5} roughness={0.4} />
-            </mesh>
-            <mesh position={[sx * (halfW - 0.45), lampY + 0.1, back - 0.02]}>
-              <boxGeometry args={[0.32, 0.12, 0.05]} />
-              <meshStandardMaterial ref={sx === 1 ? tailMat : undefined} color="#D9463F" emissive="#B0231D" emissiveIntensity={0.6} roughness={0.4} />
-            </mesh>
-            {/* cone apex sits on the lamp, base lands on the road ahead */}
-            <mesh position={[sx * (halfW - 0.45), lampY - 0.35, front + BEAM_LENGTH / 2]} rotation={[-Math.PI / 2 + 0.06, 0, 0]}>
-              <coneGeometry args={[BEAM_RADIUS, BEAM_LENGTH, 14, 1, true]} />
-              <meshBasicMaterial ref={sx === 1 ? beamL : beamR} color="#FFF1C8" transparent opacity={0} depthWrite={false} blending={AdditiveBlending} side={DoubleSide} fog={false} toneMapped={false} />
-            </mesh>
-          </group>
-        ))}
+    <>
+      <group ref={car}>
+        <group ref={chassis}>
+          <primitive object={model} />
+          {[1, -1].map((sx) => (
+            <group key={sx}>
+              <mesh position={[sx * (halfW - 0.45), lampY, front + 0.02]}>
+                <boxGeometry args={[0.34, 0.14, 0.06]} />
+                <meshStandardMaterial ref={sx === 1 ? lampMat : undefined} color="#FFF3C4" emissive="#FFE9A8" emissiveIntensity={0.5} roughness={0.4} />
+              </mesh>
+              <mesh position={[sx * (halfW - 0.45), lampY + 0.1, back - 0.02]}>
+                <boxGeometry args={[0.32, 0.12, 0.05]} />
+                <meshStandardMaterial ref={sx === 1 ? tailMat : undefined} color="#D9463F" emissive="#B0231D" emissiveIntensity={0.6} roughness={0.4} />
+              </mesh>
+              {/* cone apex sits on the lamp, base lands on the road ahead */}
+              <mesh position={[sx * (halfW - 0.45), lampY - 0.35, front + BEAM_LENGTH / 2]} rotation={[-Math.PI / 2 + 0.06, 0, 0]}>
+                <coneGeometry args={[BEAM_RADIUS, BEAM_LENGTH, 14, 1, true]} />
+                <meshBasicMaterial ref={sx === 1 ? beamL : beamR} color="#FFF1C8" transparent opacity={0} depthWrite={false} blending={AdditiveBlending} side={DoubleSide} fog={false} toneMapped={false} />
+              </mesh>
+            </group>
+          ))}
+        </group>
       </group>
-    </group>
+      {Array.from({ length: PUFFS }, (_, i) => (
+        <mesh
+          key={i}
+          ref={(el) => {
+            puffs.current[i] = el
+          }}
+          visible={false}
+        >
+          <sphereGeometry args={[0.22, 6, 5]} />
+          <meshBasicMaterial color="#ffffff" transparent opacity={0} depthWrite={false} />
+        </mesh>
+      ))}
+    </>
   )
 }

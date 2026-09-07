@@ -19,7 +19,7 @@ export function useScrollProgress(stopSelector = 'section.stop', endSelector = '
       const sections = [...document.querySelectorAll<HTMLElement>(stopSelector)].map((el) => ({ top: el.offsetTop, height: el.offsetHeight }))
       const end = document.querySelector<HTMLElement>(endSelector)
       maxScroll = Math.max(1, (end ? end.offsetTop : document.body.scrollHeight) - innerHeight * 0.35)
-      setZones(measureZones(sections, maxScroll))
+      setZones(measureZones(sections, maxScroll, innerHeight))
     }
     measure()
 

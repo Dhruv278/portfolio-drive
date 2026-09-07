@@ -52,8 +52,18 @@ The owner asked for more data, project skills, new animation, and pointed at his
 - Stop five is a skills board: ten groups, chips for each, one how-I-work line. The same words as the resume with a few additions the code on disk supports (React Three Fiber, Vitest, tRPC, Payload CMS, Razorpay, Twilio, Zoho, Mapbox).
 - Reveal: a small client component marks the current and previously seen stops active. CSS slides the panel in and staggers bullets, chips, cards and skill groups. Sections without the attribute stay fully visible, so no JavaScript means no hidden content. Reduced motion disables all of it.
 - Living world: exhaust puffs while moving, windmill sails turn, water ripples, seven clouds drift, five birds circle above the car. An idle loop requests frames at 24 per second while the tab is visible and the visitor has interacted in the last 25 seconds, then sleeps.
-- Panels cap at 82 percent of the viewport and scroll internally, since the platforms and skills panels outgrew the screen.
 - End-to-end suite: 30 passed across five engines, including two new tests for chips and the reveal.
+
+## Addendum: clipped panel heading
+
+Reported with a screenshot: the MedChron heading was cut off at the top of its panel.
+
+- Cause: the previous round capped panels at 82 percent of the window and let them scroll inside. A mouse wheel over a panel then scrolled the panel's inside before the page, so the heading slid out of the box while the car stayed put. Inner scrolling on a desktop panel is a mistake, not a tuning problem, and is gone.
+- Panels now fit the window where they can: 540 pixels wide, the platforms and skills panels 720 wide with two columns, and the skills board packed with CSS columns so a one-row group leaves no hole beside a three-row neighbour. On a 742 pixel tall window every panel fits under the HUD.
+- Panels that still outgrow a small window stay pinned under the HUD, then slide up to show their end while the car is still parked. Each section carries a 70 percent viewport spacer after its panel, so a section grows with a tall panel, and the scroll model now measures in viewport heights: the car parks 0.36 viewports after a section's top passes and leaves with 0.88 viewports of the section remaining. A taller section therefore keeps the car parked longer, which the unit test asserts.
+- Phones keep the bottom sheet, which scrolls inside like a maps sheet. It now carries a grab bar so it reads as one, and sits above the odometer instead of under it.
+- In windows narrower than 1140 pixels the odometer drops the stop name so the board panels clear it, and the board panels cap their width to the space right of it.
+- New end-to-end test walks the scroll through a stop and asserts the panel is fully on screen at least once while the odometer names that stop, and that the tallest panel's end comes on screen before the car leaves.
 
 ## Not done, carried to session 2
 

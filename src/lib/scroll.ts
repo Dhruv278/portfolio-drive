@@ -4,18 +4,25 @@
 export type Zone = { a: number; b: number }
 export type SectionRect = { top: number; height: number }
 
-// Fraction of a section's height where the idle zone is centred, and its half-width.
-const ZONE_CENTER = 0.34
-const ZONE_HALF = 0.13
+// The car has parked this many viewport heights after a section's top reaches the top of the
+// window. By then the section's panel is pinned under the HUD and revealed.
+const ARRIVE = 0.36
+// The car leaves when this much of the viewport is left of the section. A panel taller than the
+// window slides up out of its sticky position over the last part of its section, so a section that
+// grows with a tall panel keeps the car parked until that panel's end has been on screen.
+const LEAVE = 0.88
+// A section shorter than ARRIVE + LEAVE viewports still gets a plateau this long.
+const MIN_PLATEAU = 0.2
 // The odometer flips to the next stop slightly before its zone starts.
 const STOP_LEAD = 0.03
 
-export function measureZones(sections: SectionRect[], maxScroll: number): Zone[] {
+export function measureZones(sections: SectionRect[], maxScroll: number, viewportHeight: number): Zone[] {
   const max = Math.max(1, maxScroll)
+  const vh = Math.max(1, viewportHeight)
   return sections.map((s) => {
-    const center = s.top + s.height * ZONE_CENTER
-    const half = s.height * ZONE_HALF
-    return { a: Math.max(0, (center - half) / max), b: Math.min(1, (center + half) / max) }
+    const a = s.top + ARRIVE * vh
+    const b = s.top + Math.max(s.height - LEAVE * vh, (ARRIVE + MIN_PLATEAU) * vh)
+    return { a: Math.min(1, Math.max(0, a / max)), b: Math.min(1, Math.max(0, b / max)) }
   })
 }
 

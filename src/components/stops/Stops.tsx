@@ -78,7 +78,7 @@ function Cards({ stop }: { stop: Extract<StopContent, { kind: 'cards' }> }) {
 
 function Platforms({ stop }: { stop: Extract<StopContent, { kind: 'platforms' }> }) {
   return (
-    <div className="panel">
+    <div className="panel wide">
       <p className="eyebrow">{stop.eyebrow}</p>
       <h2>{stop.heading}</h2>
       <ul className="platforms">
@@ -98,7 +98,7 @@ function Platforms({ stop }: { stop: Extract<StopContent, { kind: 'platforms' }>
 
 function Skills({ stop }: { stop: Extract<StopContent, { kind: 'skills' }> }) {
   return (
-    <div className="panel skills">
+    <div className="panel skills wide">
       <p className="eyebrow">{stop.eyebrow}</p>
       <h2>{stop.heading}</h2>
       <div className="skillboard">

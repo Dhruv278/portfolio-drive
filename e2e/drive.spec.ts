@@ -46,6 +46,42 @@ test.describe('The Drive', () => {
     await expect(page.locator('section#platforms')).toHaveAttribute('data-active', 'true')
   })
 
+  test('a panel is fully on screen while the car is parked at its stop', async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name === 'phone', 'phones use a bottom sheet that scrolls inside')
+    await page.goto('/?scene=off')
+    // Walk the scroll through a section and record what the panel looked like while the odometer
+    // named that stop. A wheel over the panel must move the page, never the panel's inside.
+    const probe = (id: string, label: string) =>
+      page.evaluate(
+        async ([id, label]) => {
+          const sec = document.querySelector<HTMLElement>(`section#${id}`)!
+          const panel = sec.querySelector<HTMLElement>('.panel')!
+          const odo = document.querySelector('[data-testid="odometer"]')!
+          const settle = () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)))
+          const out = { parked: 0, fullyVisible: false, endVisible: false, overflow: getComputedStyle(panel).overflowY }
+          for (let y = sec.offsetTop - innerHeight; y <= sec.offsetTop + sec.offsetHeight; y += 40) {
+            window.scrollTo(0, y)
+            await settle()
+            if (!odo.textContent?.includes(label)) continue
+            out.parked++
+            const r = panel.getBoundingClientRect()
+            if (r.bottom <= innerHeight + 0.5) out.endVisible = true
+            if (r.top >= -0.5 && r.bottom <= innerHeight + 0.5) out.fullyVisible = true
+          }
+          return out
+        },
+        [id, label] as const,
+      )
+    const medchron = await probe('medchron', 'Stop 2 of 6')
+    expect(medchron.overflow).toBe('visible')
+    expect(medchron.parked).toBeGreaterThan(5)
+    expect(medchron.fullyVisible).toBe(true)
+    // The platforms panel is the tallest. Its end must come on screen before the car leaves.
+    const platforms = await probe('platforms', 'Stop 4 of 6')
+    expect(platforms.overflow).toBe('visible')
+    expect(platforms.endVisible).toBe(true)
+  })
+
   test('resume PDF and resume page are reachable', async ({ page, request }) => {
     await page.goto('/')
     const href = await page.locator('.hud.top a.btn.primary').getAttribute('href')

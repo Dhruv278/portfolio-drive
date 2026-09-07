@@ -33,7 +33,8 @@ export function Hud() {
       <div className="hud bottom">
         <div className="odometer" aria-live="polite" data-testid="odometer">
           <b>
-            Stop {stopIndex + 1} of {stops.length}, {stop.name}
+            Stop {stopIndex + 1} of {stops.length}
+            <span className="stopname">, {stop.name}</span>
           </b>
           <div className="track" aria-hidden="true">
             <i style={{ width: `${(scroll * 100).toFixed(1)}%` }} />

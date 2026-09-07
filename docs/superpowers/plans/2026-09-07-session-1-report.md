@@ -44,6 +44,17 @@ Reported: laggy drive, road needs stripes, marks vanish on scroll, must work in 
 - Browsers: WebGL 2 is required (Three.js r163 and later), otherwise the plain fallback renders. Playwright now runs Firefox and WebKit projects alongside Chromium, phone and no-WebGL. All pass.
 - Loading: every model preloads as soon as the scene bundle arrives, the odometer shows a percentage, the canvas fades in when compilation is complete, and models carry immutable cache headers.
 
+## Addendum: content and animation round
+
+The owner asked for more data, project skills, new animation, and pointed at his Vercel address. That address is the earlier freelancer portfolio, which stays as it is. Its data file was the content source.
+
+- Tech chips on MedChron, on both own products and on all six delivered platforms. The food-surplus marketplace joins the platforms from the old site. Testimonials and Upwork figures stay out under the no-freelance rule, the Cloudflare generator stays out because that repository is not his, and the CasePro MCP layer stays out because the git history shows one commit.
+- Stop five is a skills board: ten groups, chips for each, one how-I-work line. The same words as the resume with a few additions the code on disk supports (React Three Fiber, Vitest, tRPC, Payload CMS, Razorpay, Twilio, Zoho, Mapbox).
+- Reveal: a small client component marks the current and previously seen stops active. CSS slides the panel in and staggers bullets, chips, cards and skill groups. Sections without the attribute stay fully visible, so no JavaScript means no hidden content. Reduced motion disables all of it.
+- Living world: exhaust puffs while moving, windmill sails turn, water ripples, seven clouds drift, five birds circle above the car. An idle loop requests frames at 24 per second while the tab is visible and the visitor has interacted in the last 25 seconds, then sleeps.
+- Panels cap at 82 percent of the viewport and scroll internally, since the platforms and skills panels outgrew the screen.
+- End-to-end suite: 30 passed across five engines, including two new tests for chips and the reveal.
+
 ## Not done, carried to session 2
 
 - Vercel deploy. The CLI needs an interactive login the owner must run.

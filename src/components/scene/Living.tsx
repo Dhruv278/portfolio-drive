@@ -49,14 +49,15 @@ export function Water() {
 
 // ---------- clouds ----------
 type Cloud = { x: number; y: number; z: number; s: number; speed: number }
+// Low enough to sit in the band of sky the chase camera shows, far enough out to read as distant.
 const CLOUDS: Cloud[] = [
-  { x: -60, y: 52, z: -40, s: 1.0, speed: 0.9 },
-  { x: 40, y: 58, z: -120, s: 1.4, speed: 0.7 },
-  { x: 110, y: 50, z: -210, s: 0.9, speed: 1.1 },
-  { x: -80, y: 56, z: -280, s: 1.2, speed: 0.8 },
-  { x: 60, y: 62, z: -360, s: 1.5, speed: 0.6 },
-  { x: -30, y: 54, z: -440, s: 1.0, speed: 1.0 },
-  { x: 90, y: 57, z: -520, s: 1.3, speed: 0.75 },
+  { x: -60, y: 30, z: -70, s: 1.0, speed: 0.9 },
+  { x: 40, y: 34, z: -150, s: 1.4, speed: 0.7 },
+  { x: 110, y: 28, z: -230, s: 0.9, speed: 1.1 },
+  { x: -80, y: 33, z: -310, s: 1.2, speed: 0.8 },
+  { x: 60, y: 36, z: -390, s: 1.5, speed: 0.6 },
+  { x: -30, y: 31, z: -470, s: 1.0, speed: 1.0 },
+  { x: 90, y: 34, z: -560, s: 1.3, speed: 0.75 },
 ]
 const CLOUD_SPAN = 240 // clouds wrap around this x range so they never run out
 
@@ -111,8 +112,9 @@ export function Clouds() {
 
 // ---------- birds ----------
 const BIRDS = 5
-const FLOCK_RADIUS = 30
-const FLOCK_HEIGHT = 22
+const FLOCK_RADIUS = 22
+const FLOCK_HEIGHT = 12
+const FLOCK_AHEAD = 30 // the flock circles a point this far ahead of the car, inside the camera's view
 
 function Bird({ register }: { register: (g: Group | null, wings: (Mesh | null)[]) => void }) {
   const wings = useRef<(Mesh | null)[]>([])
@@ -149,13 +151,14 @@ export function Birds() {
     const { t, reduced } = readRoadT()
     if (reduced) return
     const time = clock.elapsedTime
-    roadCurve().getPointAt(t, centre)
+    const curve = roadCurve()
+    curve.getPointAt(Math.min(1, t + 0.06), centre)
     birds.current.forEach((b, i) => {
       const phase = (i / BIRDS) * Math.PI * 2
       const a = time * 0.22 + phase
       const r = FLOCK_RADIUS + Math.sin(time * 0.5 + i) * 4
       const x = centre.x + Math.cos(a) * r
-      const z = centre.z - 20 + Math.sin(a) * r * 0.6
+      const z = centre.z - FLOCK_AHEAD * 0.2 + Math.sin(a) * r * 0.6
       const y = FLOCK_HEIGHT + Math.sin(time * 0.9 + i * 1.7) * 1.6
       const prevX = b.g.position.x
       const prevZ = b.g.position.z

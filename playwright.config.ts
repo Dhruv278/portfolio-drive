@@ -1,6 +1,8 @@
 import { defineConfig, devices } from '@playwright/test'
 
-const PORT = process.env.PORT ?? '3100'
+// A deliberately unusual port. reuseExistingServer is off so a stray server on this port fails the
+// run loudly instead of the suite silently testing someone else's app.
+const PORT = process.env.E2E_PORT ?? '3777'
 const baseURL = `http://127.0.0.1:${PORT}`
 
 export default defineConfig({
@@ -18,7 +20,7 @@ export default defineConfig({
   webServer: {
     command: `npx next start -p ${PORT}`,
     url: baseURL,
-    reuseExistingServer: true,
+    reuseExistingServer: false,
     timeout: 120_000,
   },
   projects: [

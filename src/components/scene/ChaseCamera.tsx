@@ -7,7 +7,9 @@ import { useDrive } from '@/store/drive'
 import { roadCurve, UP } from './roadCurve'
 import { readRoadT, useIsMobile } from './useDriveFrame'
 
-const DESKTOP = { back: 14.5, side: -6.5, up: 8.2, lookSide: 1.5, lookAhead: 11, lookY: 0.6 }
+// Look target raised so the horizon sits about 15 percent down from the top of the frame: enough
+// sky for clouds and birds to live in, while the car and road keep the lower two thirds.
+const DESKTOP = { back: 15.5, side: -6.5, up: 8.6, lookSide: 1.5, lookAhead: 14, lookY: 2.2 }
 const PHONE = { back: 12.5, side: -1.6, up: 12.5, lookSide: 0.3, lookAhead: 1.5, lookY: -4.5 }
 const PHONE_HERO = { back: 14, side: -1.6, up: 8.5, lookSide: 0.3, lookAhead: 9, lookY: 0.4 }
 

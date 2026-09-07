@@ -51,13 +51,13 @@ export function Water() {
 type Cloud = { x: number; y: number; z: number; s: number; speed: number }
 // Low enough to sit in the band of sky the chase camera shows, far enough out to read as distant.
 const CLOUDS: Cloud[] = [
-  { x: -60, y: 30, z: -70, s: 1.0, speed: 0.9 },
-  { x: 40, y: 34, z: -150, s: 1.4, speed: 0.7 },
-  { x: 110, y: 28, z: -230, s: 0.9, speed: 1.1 },
-  { x: -80, y: 33, z: -310, s: 1.2, speed: 0.8 },
-  { x: 60, y: 36, z: -390, s: 1.5, speed: 0.6 },
-  { x: -30, y: 31, z: -470, s: 1.0, speed: 1.0 },
-  { x: 90, y: 34, z: -560, s: 1.3, speed: 0.75 },
+  { x: -60, y: 15, z: -70, s: 1.1, speed: 0.9 },
+  { x: 40, y: 18, z: -150, s: 1.5, speed: 0.7 },
+  { x: 110, y: 14, z: -230, s: 1.0, speed: 1.1 },
+  { x: -80, y: 17, z: -310, s: 1.3, speed: 0.8 },
+  { x: 60, y: 20, z: -390, s: 1.6, speed: 0.6 },
+  { x: -30, y: 16, z: -470, s: 1.1, speed: 1.0 },
+  { x: 90, y: 18, z: -560, s: 1.4, speed: 0.75 },
 ]
 const CLOUD_SPAN = 240 // clouds wrap around this x range so they never run out
 
@@ -113,7 +113,7 @@ export function Clouds() {
 // ---------- birds ----------
 const BIRDS = 5
 const FLOCK_RADIUS = 22
-const FLOCK_HEIGHT = 12
+const FLOCK_HEIGHT = 10.5
 const FLOCK_AHEAD = 30 // the flock circles a point this far ahead of the car, inside the camera's view
 
 function Bird({ register }: { register: (g: Group | null, wings: (Mesh | null)[]) => void }) {

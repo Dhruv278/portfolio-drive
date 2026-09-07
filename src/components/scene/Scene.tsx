@@ -1,8 +1,8 @@
 'use client'
 
-import { PerformanceMonitor, Preload, useGLTF, useProgress } from '@react-three/drei'
-import { Canvas, useFrame } from '@react-three/fiber'
-import { Suspense, useRef, useState } from 'react'
+import { useGLTF, useProgress } from '@react-three/drei'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
+import { Suspense, useEffect, useRef, useState } from 'react'
 import { Color, DirectionalLight, Fog, HemisphereLight, Vector3 } from 'three'
 import { DUSK_SPAN, DUSK_START, usedModels } from '@/content/route'
 import { Car } from './Car'
@@ -23,10 +23,11 @@ const FOG_DAY = new Color('#E6EDF1')
 const FOG_DUSK = new Color('#F4E0CE')
 const carPos = new Vector3() // module-level scratch, never handed to React
 
-// Render resolution: start moderate, step down if the frame rate sags, step back up when it recovers.
-const DPR_HIGH_DESKTOP = 1.5
-const DPR_HIGH_PHONE = 1.25
-const DPR_LOW = 1
+// Render resolution, capped below the device ratio. Integrated GPUs pay per pixel.
+const DPR_DESKTOP = 1.5
+const DPR_PHONE = 1.25
+// If shader compilation takes longer than this after the models arrive, fade in anyway.
+const COMPILE_TIMEOUT_MS = 4000
 
 function Atmosphere({ mobile }: { mobile: boolean }) {
   const bg = useRef<Color>(null)
@@ -74,12 +75,46 @@ function Atmosphere({ mobile }: { mobile: boolean }) {
   )
 }
 
-function World({ onDecline, onIncline, stats }: { onDecline: () => void; onIncline: () => void; stats: boolean }) {
+// Once every model has arrived, compile all shaders and upload all textures off the main thread's
+// critical path (KHR_parallel_shader_compile where available), then report ready. The synchronous
+// alternative froze the page for two seconds on integrated graphics.
+function CompileWhenLoaded({ onReady }: { onReady: () => void }) {
+  const gl = useThree((s) => s.gl)
+  const scene = useThree((s) => s.scene)
+  const camera = useThree((s) => s.camera)
+  const invalidate = useThree((s) => s.invalidate)
+  const { active, progress } = useProgress()
+  const started = useRef(false)
+
+  useEffect(() => {
+    if (started.current || active || progress < 100) return
+    started.current = true
+    let done = false
+    const finish = () => {
+      if (done) return
+      done = true
+      invalidate()
+      onReady()
+    }
+    const timer = setTimeout(finish, COMPILE_TIMEOUT_MS)
+    // Let React commit the last resolved models before compiling the graph.
+    const raf = requestAnimationFrame(() => {
+      gl.compileAsync(scene, camera).then(finish, finish)
+    })
+    return () => {
+      clearTimeout(timer)
+      cancelAnimationFrame(raf)
+    }
+  }, [gl, scene, camera, invalidate, active, progress, onReady])
+
+  return null
+}
+
+function World({ stats, onReady }: { stats: boolean; onReady: () => void }) {
   const mobile = useIsMobile()
   return (
     <>
       {stats && <DebugStats />}
-      <PerformanceMonitor onDecline={onDecline} onIncline={onIncline} flipflops={3} />
       <DriveClock />
       <Atmosphere mobile={mobile} />
       <ChaseCamera />
@@ -92,9 +127,8 @@ function World({ onDecline, onIncline, stats }: { onDecline: () => void; onIncli
       <Suspense fallback={null}>
         <Car />
         <Scenery />
-        {/* Upload textures and compile shaders before the first visible frame, so nothing stutters in. */}
-        <Preload all />
       </Suspense>
+      <CompileWhenLoaded onReady={onReady} />
     </>
   )
 }
@@ -102,25 +136,19 @@ function World({ onDecline, onIncline, stats }: { onDecline: () => void; onIncli
 export function Scene() {
   const mobile = typeof window !== 'undefined' && window.innerWidth < 720
   const stats = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('stats') === '1'
-  const high = mobile ? DPR_HIGH_PHONE : DPR_HIGH_DESKTOP
-  const [dpr, setDpr] = useState(high)
-  const { active, progress } = useProgress()
-  // Fade the canvas in once every model has arrived, and stay ready afterwards even if the
-  // loader reports new activity later. Derived state latched during render, no effect needed.
-  const done = !active && progress >= 100
-  const [latched, setLatched] = useState(done)
-  if (done && !latched) setLatched(true)
-  const ready = latched || done
+  const dpr = Math.min(typeof window !== 'undefined' ? window.devicePixelRatio : 1, mobile ? DPR_PHONE : DPR_DESKTOP)
+  const [ready, setReady] = useState(false)
 
   return (
     <div className={`scene-root${ready ? ' ready' : ''}`} aria-hidden="true" data-testid="scene" data-ready={ready}>
       <Canvas
+        frameloop="demand"
         dpr={dpr}
         shadows={mobile ? false : 'percentage'}
         gl={{ antialias: true, powerPreference: 'high-performance' }}
         camera={{ fov: mobile ? 54 : 36, near: 0.1, far: 400, position: [0, 8, 14] }}
       >
-        <World onDecline={() => setDpr(DPR_LOW)} onIncline={() => setDpr(high)} stats={stats} />
+        <World stats={stats} onReady={() => setReady(true)} />
       </Canvas>
     </div>
   )

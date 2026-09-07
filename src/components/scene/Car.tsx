@@ -2,8 +2,8 @@
 
 import { useGLTF } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
-import { useEffect, useMemo, useRef, useState, type RefObject } from 'react'
-import { Box3, CanvasTexture, Group, Material, Mesh, MeshLambertMaterial, MeshStandardMaterial, NearestFilter, Object3D, SRGBColorSpace, SpotLight, Vector3 } from 'three'
+import { useMemo, useRef } from 'react'
+import { AdditiveBlending, Box3, CanvasTexture, DoubleSide, Group, Material, Mesh, MeshBasicMaterial, MeshLambertMaterial, MeshStandardMaterial, NearestFilter, Object3D, SRGBColorSpace, Vector3 } from 'three'
 import { CAR_LENGTH, CAR_MODEL, DUSK_SPAN, DUSK_START } from '@/content/route'
 import { recolorRedCells } from '@/lib/recolor'
 import { roadCurve } from './roadCurve'
@@ -11,7 +11,9 @@ import { readRoadT } from './useDriveFrame'
 
 const MODEL_URL = `/models/${CAR_MODEL}.glb`
 const COBALT: [number, number, number] = [47, 91, 234]
-const NIGHT_THRESHOLD = 0.25 // dusk fraction at which the headlights switch on
+const BEAM_LENGTH = 11
+const BEAM_RADIUS = 1.7
+const BEAM_MAX_OPACITY = 0.26
 
 useGLTF.preload(MODEL_URL)
 
@@ -46,15 +48,15 @@ export function Car() {
   const { scene } = useGLTF(MODEL_URL) as unknown as LoadedGltf
   const car = useRef<Group>(null)
   const chassis = useRef<Group>(null)
-  const state = useRef({ prevT: 0, prevSpeed: 0, spin: 0, steer: 0, roll: 0, pitch: 0, night: false })
+  const state = useRef({ prevT: 0, prevSpeed: 0, spin: 0, steer: 0, roll: 0, pitch: 0 })
   const wheels = useRef<Object3D[]>([])
   const frontWheels = useRef<Object3D[]>([])
   const lampMat = useRef<MeshStandardMaterial>(null)
   const tailMat = useRef<MeshStandardMaterial>(null)
-  const beams = useRef<SpotLight[]>([])
-  // Headlight spotlights only exist at dusk. Two live spotlights make every material in the scene
-  // more expensive, so they are mounted when needed rather than dimmed.
-  const [night, setNight] = useState(false)
+  // Headlight beams are unlit translucent cones that fade in at dusk. Real spotlights would change
+  // the scene's light count and force every material to recompile mid-drive.
+  const beamL = useRef<MeshBasicMaterial>(null)
+  const beamR = useRef<MeshBasicMaterial>(null)
 
   // Clone, fit to length, base on the ground, repaint.
   const { model, halfW, front, back, lampY } = useMemo(() => {
@@ -128,12 +130,9 @@ export function Car() {
     for (const w of wheels.current) w.rotation.x = st.spin
 
     const dusk = Math.min(1, Math.max(0, (t - DUSK_START) / DUSK_SPAN))
-    const isNight = dusk > NIGHT_THRESHOLD
-    if (isNight !== st.night) {
-      st.night = isNight
-      setNight(isNight)
-    }
-    for (const b of beams.current) b.intensity = (dusk - NIGHT_THRESHOLD) * 160
+    const beam = Math.max(0, dusk - 0.2) * BEAM_MAX_OPACITY
+    if (beamL.current) beamL.current.opacity = beam
+    if (beamR.current) beamR.current.opacity = beam
     if (lampMat.current) lampMat.current.emissiveIntensity = 0.5 + dusk * 1.8
     if (tailMat.current) tailMat.current.emissiveIntensity = 0.6 + dusk * 1.2
   })
@@ -152,34 +151,14 @@ export function Car() {
               <boxGeometry args={[0.32, 0.12, 0.05]} />
               <meshStandardMaterial ref={sx === 1 ? tailMat : undefined} color="#D9463F" emissive="#B0231D" emissiveIntensity={0.6} roughness={0.4} />
             </mesh>
-            {night && <Headlight sx={sx} halfW={halfW} lampY={lampY} front={front} beams={beams} />}
+            {/* cone apex sits on the lamp, base lands on the road ahead */}
+            <mesh position={[sx * (halfW - 0.45), lampY - 0.35, front + BEAM_LENGTH / 2]} rotation={[-Math.PI / 2 + 0.06, 0, 0]}>
+              <coneGeometry args={[BEAM_RADIUS, BEAM_LENGTH, 14, 1, true]} />
+              <meshBasicMaterial ref={sx === 1 ? beamL : beamR} color="#FFF1C8" transparent opacity={0} depthWrite={false} blending={AdditiveBlending} side={DoubleSide} fog={false} toneMapped={false} />
+            </mesh>
           </group>
         ))}
       </group>
     </group>
-  )
-}
-
-function Headlight({ sx, halfW, lampY, front, beams }: { sx: number; halfW: number; lampY: number; front: number; beams: RefObject<SpotLight[]> }) {
-  const light = useRef<SpotLight>(null)
-  const target = useMemo(() => {
-    const o = new Object3D()
-    o.position.set(sx * 0.9, 0.1, 12)
-    return o
-  }, [sx])
-  useEffect(() => {
-    const l = light.current
-    if (!l) return
-    l.target = target
-    beams.current.push(l)
-    return () => {
-      beams.current = beams.current.filter((b) => b !== l)
-    }
-  }, [target, beams])
-  return (
-    <>
-      <spotLight ref={light} position={[sx * (halfW - 0.45), lampY, front]} color="#FFF1C8" intensity={0} distance={38} angle={0.42} penumbra={0.55} decay={1.3} />
-      <primitive object={target} />
-    </>
   )
 }

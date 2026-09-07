@@ -33,6 +33,17 @@ Plan: `2026-09-07-session-1-plan.md`. Spec: `../specs/2026-09-07-the-drive-desig
 - Headless Chromium renders WebGL in software and starves the page, so the scroll e2e test runs with `?scene=off`.
 - The React Compiler lint forbids mutating hook-derived values in frame loops. Refs mutated directly, declarative background and fog, and module-level scratch objects satisfy it.
 
+## Addendum: owner review round two
+
+Reported: laggy drive, road needs stripes, marks vanish on scroll, must work in all browsers, improve loading.
+
+- Measured first. Dev tab ran at 33 fps and production at 32 fps on Intel Iris Xe. A renderer counter readout (`?stats=1`) showed only 55 thousand triangles and about 250 draw calls, so geometry was not the cost. A performance trace showed a 2 second synchronous shader compile from drei's `Preload` right after load, and the GPU process at 93 percent because the scene rendered continuously while idle.
+- Fixes: on-demand rendering driven by the eased drive clock (nothing renders when nothing moves), asynchronous shader compilation gated behind the fade-in, Lambert materials for all kit models, shadow map halved and small props no longer cast, headlight spotlights replaced by additive beam cones (real lights changed the light count at dusk and recompiled every material, a 1.2 second stall), resolution capped at 1.5 desktop and 1.25 phone.
+- Result on the same machine: renderer 45 to 58 fps while driving, zero frames while idle, shader programs down from 17 to 9.
+- Road: solid white edge lines and wider, brighter centre dashes. The dash instanced mesh recomputes its bounding sphere after placement and skips frustum culling. It had been culled once the camera left the origin, which is why the marks vanished.
+- Browsers: WebGL 2 is required (Three.js r163 and later), otherwise the plain fallback renders. Playwright now runs Firefox and WebKit projects alongside Chromium, phone and no-WebGL. All pass.
+- Loading: every model preloads as soon as the scene bundle arrives, the odometer shows a percentage, the canvas fades in when compilation is complete, and models carry immutable cache headers.
+
 ## Not done, carried to session 2
 
 - Vercel deploy. The CLI needs an interactive login the owner must run.

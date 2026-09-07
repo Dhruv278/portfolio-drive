@@ -65,6 +65,16 @@ Reported with a screenshot: the MedChron heading was cut off at the top of its p
 - In windows narrower than 1140 pixels the odometer drops the stop name so the board panels clear it, and the board panels cap their width to the space right of it.
 - New end-to-end test walks the scroll through a stop and asserts the panel is fully on screen at least once while the odometer names that stop, and that the tallest panel's end comes on screen before the car leaves.
 
+## Addendum: mobile check
+
+The owner asked whether the site is properly responsive. Measured on six device profiles through the headed debug Chrome (Galaxy S8 360, iPhone SE 320, iPhone 14 390, Pixel 7 412, iPhone 14 landscape 750 by 340, iPad Mini 768 portrait): no horizontal overflow anywhere, panels never off screen, resume page fine. Three defects found and fixed:
+
+- On a 320 px screen the top bar wrapped to two rows and covered the hero eyebrow. Screens up to 430 px now get a compact one-row bar, buttons never wrap, and the resume page shortens "Back to the drive" to "Back". The hero panel sits at max(12vh, 74px).
+- In landscape (height up to 480 px) the desktop layout applied with the hero under the top bar and the odometer over the buttons. The HUD now forms one top strip (wordmark, odometer, actions), panels start at 84 px, the hero shrinks, the hint hides.
+- Buttons were 38 px tall. Coarse pointers get 44 px targets.
+
+The phone layout is now defined once: portrait screens up to 900 px wide (CSS media query and `MOBILE_QUERY` / `isMobileSize` in `src/lib/layout.ts`, which the scene uses for camera, dpr and shadows). Portrait tablets therefore get the bottom sheet; landscape phones get the desktop layout with the short-screen rules. Chips are 12 px on phones. A phone-project e2e test asserts one HUD row, no overlap with the hero, 44 px controls and no horizontal overflow.
+
 ## Not done, carried to session 2
 
 - Vercel deploy. The CLI needs an interactive login the owner must run.

@@ -13,6 +13,7 @@ import { Birds, Clouds, Water } from './Living'
 import { Road } from './Road'
 import { roadCurve } from './roadCurve'
 import { Scenery } from './Scenery'
+import { MOBILE_QUERY } from '@/lib/layout'
 import { DriveClock, IdleLoop, readRoadT, useIsMobile } from './useDriveFrame'
 
 // Start every model download the moment the scene bundle arrives, not when each item first renders.
@@ -137,15 +138,26 @@ function World({ stats, onReady }: { stats: boolean; onReady: () => void }) {
   )
 }
 
+// Client only (SceneMount renders this with ssr: false), so window is available at render.
 export function Scene() {
-  const mobile = typeof window !== 'undefined' && window.innerWidth < 720
-  const stats = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('stats') === '1'
-  const dpr = Math.min(typeof window !== 'undefined' ? window.devicePixelRatio : 1, mobile ? DPR_PHONE : DPR_DESKTOP)
+  const [mobile, setMobile] = useState(() => window.matchMedia(MOBILE_QUERY).matches)
+  const stats = new URLSearchParams(window.location.search).get('stats') === '1'
+  const dpr = Math.min(window.devicePixelRatio, mobile ? DPR_PHONE : DPR_DESKTOP)
   const [ready, setReady] = useState(false)
+
+  // Rotating a phone crosses the layout query. Shadows, resolution and field of view are fixed at
+  // Canvas creation, so the Canvas remounts with a new key instead of running with stale settings.
+  useEffect(() => {
+    const mq = window.matchMedia(MOBILE_QUERY)
+    const onChange = () => setMobile(mq.matches)
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
+  }, [])
 
   return (
     <div className={`scene-root${ready ? ' ready' : ''}`} aria-hidden="true" data-testid="scene" data-ready={ready}>
       <Canvas
+        key={mobile ? 'phone' : 'desktop'}
         frameloop="demand"
         dpr={dpr}
         shadows={mobile ? false : 'percentage'}

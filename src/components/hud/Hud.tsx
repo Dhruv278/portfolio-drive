@@ -10,6 +10,10 @@ export function Hud() {
   useScrollProgress()
   const scroll = useDrive((s) => s.scroll)
   const stopIndex = useDrive((s) => s.stopIndex)
+  const zones = useDrive((s) => s.zones)
+  const zone = zones[stopIndex]
+  // True while the car is parked at the current stop. Read by the e2e suite.
+  const parked = !!zone && scroll >= zone.a && scroll <= zone.b
   const webglOk = useDrive((s) => s.webglOk)
   const { active, progress } = useProgress()
   const stop = stops[stopIndex]
@@ -31,7 +35,7 @@ export function Hud() {
         </div>
       </div>
       <div className="hud bottom">
-        <div className="odometer" aria-live="polite" data-testid="odometer">
+        <div className="odometer" aria-live="polite" data-testid="odometer" data-parked={parked ? 'true' : 'false'}>
           <b>
             Stop {stopIndex + 1} of {stops.length}
             <span className="stopname">, {stop.name}</span>

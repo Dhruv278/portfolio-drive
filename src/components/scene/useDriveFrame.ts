@@ -4,6 +4,7 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { useEffect } from 'react'
 import { roadT } from '@/lib/scroll'
 import { T_END, T_STOPS } from '@/content/route'
+import { isMobileSize } from '@/lib/layout'
 import { useDrive } from '@/store/drive'
 
 // Browsers deliver scroll in steps. The drive state is damped toward the scroll target every frame,
@@ -78,5 +79,5 @@ export function IdleLoop({ fps = 24, sleepAfterMs = 25_000 }: { fps?: number; sl
 }
 
 export function useIsMobile(): boolean {
-  return useThree((s) => s.size.width) < 720
+  return useThree((s) => isMobileSize(s.size.width, s.size.height))
 }

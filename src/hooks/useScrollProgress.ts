@@ -18,8 +18,11 @@ export function useScrollProgress(stopSelector = 'section.stop', endSelector = '
     const measure = () => {
       const sections = [...document.querySelectorAll<HTMLElement>(stopSelector)].map((el) => ({ top: el.offsetTop, height: el.offsetHeight }))
       const end = document.querySelector<HTMLElement>(endSelector)
-      maxScroll = Math.max(1, (end ? end.offsetTop : document.body.scrollHeight) - innerHeight * 0.35)
-      setZones(measureZones(sections, maxScroll, innerHeight))
+      // The page's own viewport unit: #end is 40vh in CSS, so the model stays in step with the
+      // sticky and min-height rules even when a phone's browser bar changes innerHeight.
+      const vh = end && end.offsetHeight > 0 ? end.offsetHeight / 0.4 : innerHeight
+      maxScroll = Math.max(1, document.documentElement.scrollHeight - innerHeight)
+      setZones(measureZones(sections, maxScroll, vh))
     }
     measure()
 
@@ -38,8 +41,13 @@ export function useScrollProgress(stopSelector = 'section.stop', endSelector = '
     }
     addEventListener('scroll', onScroll, { passive: true })
     addEventListener('resize', onResize)
+    // Sections grow with their panels, so late fonts or images move the zones without a resize.
+    const ro = new ResizeObserver(onResize)
+    const main = document.querySelector('main')
+    if (main) ro.observe(main)
     tick()
     return () => {
+      ro.disconnect()
       removeEventListener('scroll', onScroll)
       removeEventListener('resize', onResize)
       mq.removeEventListener('change', onMq)

@@ -48,38 +48,60 @@ test.describe('The Drive', () => {
 
   test('a panel is fully on screen while the car is parked at its stop', async ({ page }, testInfo) => {
     test.skip(testInfo.project.name === 'phone', 'phones use a bottom sheet that scrolls inside')
+    // Walk the scroll through a section and record the panel at every sample where the scroll
+    // model says the car is parked (data-parked on the odometer). A wheel over the panel must move
+    // the page, never the panel's inside.
+    const probe = (id: string) =>
+      page.evaluate(async (id) => {
+        const sec = document.querySelector<HTMLElement>(`section#${id}`)!
+        const panel = sec.querySelector<HTMLElement>('.panel')!
+        const odo = document.querySelector<HTMLElement>('[data-testid="odometer"]')!
+        const settle = () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)))
+        const out = { parked: 0, allVisible: true, endVisible: false, topAtArrival: NaN, overflow: getComputedStyle(panel).overflowY }
+        for (let y = sec.offsetTop - innerHeight; y <= sec.offsetTop + sec.offsetHeight; y += 40) {
+          window.scrollTo(0, y)
+          await settle()
+          if (odo.dataset.parked !== 'true') continue
+          const r = panel.getBoundingClientRect()
+          if (out.parked === 0) out.topAtArrival = r.top
+          out.parked++
+          if (r.bottom <= innerHeight + 0.5) out.endVisible = true
+          if (!(r.top >= -0.5 && r.bottom <= innerHeight + 0.5)) out.allVisible = false
+        }
+        return out
+      }, id)
+
     await page.goto('/?scene=off')
-    // Walk the scroll through a section and record what the panel looked like while the odometer
-    // named that stop. A wheel over the panel must move the page, never the panel's inside.
-    const probe = (id: string, label: string) =>
-      page.evaluate(
-        async ([id, label]) => {
-          const sec = document.querySelector<HTMLElement>(`section#${id}`)!
-          const panel = sec.querySelector<HTMLElement>('.panel')!
-          const odo = document.querySelector('[data-testid="odometer"]')!
-          const settle = () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)))
-          const out = { parked: 0, fullyVisible: false, endVisible: false, overflow: getComputedStyle(panel).overflowY }
-          for (let y = sec.offsetTop - innerHeight; y <= sec.offsetTop + sec.offsetHeight; y += 40) {
-            window.scrollTo(0, y)
-            await settle()
-            if (!odo.textContent?.includes(label)) continue
-            out.parked++
-            const r = panel.getBoundingClientRect()
-            if (r.bottom <= innerHeight + 0.5) out.endVisible = true
-            if (r.top >= -0.5 && r.bottom <= innerHeight + 0.5) out.fullyVisible = true
-          }
-          return out
-        },
-        [id, label] as const,
-      )
-    const medchron = await probe('medchron', 'Stop 2 of 6')
+    const medchron = await probe('medchron')
     expect(medchron.overflow).toBe('visible')
     expect(medchron.parked).toBeGreaterThan(5)
-    expect(medchron.fullyVisible).toBe(true)
-    // The platforms panel is the tallest. Its end must come on screen before the car leaves.
-    const platforms = await probe('platforms', 'Stop 4 of 6')
+    expect(medchron.allVisible).toBe(true)
+
+    // A short window, where the tallest panel no longer fits: its heading is on screen when the car
+    // arrives, and it slides up to show its end before the car leaves.
+    await page.setViewportSize({ width: 1000, height: 600 })
+    await page.goto('/?scene=off')
+    const platforms = await probe('platforms')
     expect(platforms.overflow).toBe('visible')
+    expect(platforms.parked).toBeGreaterThan(3)
+    expect(platforms.topAtArrival).toBeGreaterThanOrEqual(0)
     expect(platforms.endVisible).toBe(true)
+  })
+
+  test('phone: top bar stays clear of the hero and controls are touch sized', async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== 'phone', 'phone layout only')
+    await page.goto('/?scene=off')
+    const m = await page.evaluate(() => {
+      const hud = document.querySelector('.hud.top')!.getBoundingClientRect()
+      const hero = document.querySelector('section#start .panel')!.getBoundingClientRect()
+      const buttons = [...document.querySelectorAll<HTMLElement>('.hud.top a, section#start .btn')].map((b) => b.getBoundingClientRect().height)
+      const overflow = document.documentElement.scrollWidth - innerWidth
+      return { hudBottom: hud.bottom, heroTop: hero.top, hudRows: hud.height, minButton: Math.min(...buttons), overflow }
+    })
+    expect(m.overflow).toBe(0)
+    expect(m.hudRows).toBeLessThan(60) // one row of controls
+    expect(m.hudBottom).toBeLessThanOrEqual(m.heroTop)
+    expect(m.minButton).toBeGreaterThanOrEqual(44)
   })
 
   test('resume PDF and resume page are reachable', async ({ page, request }) => {

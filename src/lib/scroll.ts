@@ -4,13 +4,18 @@
 export type Zone = { a: number; b: number }
 export type SectionRect = { top: number; height: number }
 
+// Layout constants the model depends on. They must match globals.css: the sticky offset of a
+// desktop panel (top: 9vh) and the spacer after it (section.stop::after, 70vh). A panel stays
+// pinned for (spacer - sticky top) viewports, so the car must arrive within that window.
+export const STICKY_TOP_VH = 0.09
+export const SPACER_VH = 0.7
 // The car has parked this many viewport heights after a section's top reaches the top of the
 // window. By then the section's panel is pinned under the HUD and revealed.
-const ARRIVE = 0.36
+export const ARRIVE = 0.36
 // The car leaves when this much of the viewport is left of the section. A panel taller than the
 // window slides up out of its sticky position over the last part of its section, so a section that
 // grows with a tall panel keeps the car parked until that panel's end has been on screen.
-const LEAVE = 0.88
+export const LEAVE = 0.88
 // A section shorter than ARRIVE + LEAVE viewports still gets a plateau this long.
 const MIN_PLATEAU = 0.2
 // The odometer flips to the next stop slightly before its zone starts.

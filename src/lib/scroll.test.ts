@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { currentStop, measureZones, roadT, type Zone } from './scroll'
+import { ARRIVE, currentStop, measureZones, roadT, SPACER_VH, STICKY_TOP_VH, type Zone } from './scroll'
 
 const T_STOPS = [0.035, 0.21, 0.39, 0.57, 0.75, 0.955]
 const T_END = 0.972
@@ -33,6 +33,12 @@ describe('measureZones', () => {
     // the car parks 0.36 viewports in and leaves with 0.88 viewports of the section left
     expect(grown[1].a * maxScroll).toBeCloseTo(H + 0.36 * VH, 6)
     expect(grown[1].b * maxScroll).toBeCloseTo(H + (H + 600) - 0.88 * VH, 6)
+  })
+
+  it('parks the car while a tall panel is still pinned', () => {
+    // A panel taller than the window stays pinned for (spacer - sticky top) viewports after the
+    // section top passes. Arrival must fall inside that window or the heading is already sliding.
+    expect(ARRIVE).toBeLessThanOrEqual(SPACER_VH - STICKY_TOP_VH)
   })
 
   it('gives a short section a minimum plateau', () => {

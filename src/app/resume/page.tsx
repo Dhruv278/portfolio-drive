@@ -16,7 +16,7 @@ export default function ResumePage() {
         </Link>
         <div className="actions">
           <Link className="btn" href="/">
-            Back to the drive
+            Back<span className="long"> to the drive</span>
           </Link>
           <a className="btn primary" href={identity.resumePdf} download>
             PDF

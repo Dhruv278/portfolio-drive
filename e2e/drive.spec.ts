@@ -49,6 +49,18 @@ test.describe('The Drive', () => {
   test('mounts the 3D scene when WebGL is available', async ({ page }, testInfo) => {
     test.skip(testInfo.project.name === 'no-webgl', 'WebGL disabled in this project')
     await page.goto('/')
-    await expect(page.getByTestId('scene').locator('canvas')).toBeVisible({ timeout: 20_000 })
+    const chromium = testInfo.project.name === 'desktop' || testInfo.project.name === 'phone'
+    if (chromium) {
+      await expect(page.getByTestId('scene').locator('canvas')).toBeVisible({ timeout: 20_000 })
+      // every model arrives and the canvas fades in
+      await expect(page.getByTestId('scene')).toHaveAttribute('data-ready', 'true', { timeout: 60_000 })
+      await expect(page.getByTestId('loadstatus')).toHaveText('')
+    } else {
+      // Firefox and WebKit headless builds differ in WebGL 2 support. Either outcome must leave the
+      // content intact: the scene mounts, or the fallback note shows. Never a blank page or a crash.
+      const outcome = page.getByTestId('scene').locator('canvas').or(page.getByTestId('nogl'))
+      await expect(outcome.first()).toBeVisible({ timeout: 30_000 })
+    }
+    await expect(page.locator('section.stop')).toHaveCount(6)
   })
 })

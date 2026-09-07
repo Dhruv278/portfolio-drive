@@ -5,14 +5,20 @@ import { useEffect, useState } from 'react'
 import { useDrive } from '@/store/drive'
 import { Fallback } from './Fallback'
 
-// The 3D layer is loaded only on the client, after hydration, and only when WebGL is available.
+// The 3D layer is loaded only on the client, after hydration, and only when WebGL 2 is available.
+// Three.js r163 and later need WebGL 2, so a WebGL 1-only browser (Safari before 15, old Android
+// WebViews) gets the plain content and the fallback note instead of a crash.
 // `?scene=off` skips it entirely (used by the end-to-end tests and handy on weak machines).
 const Scene = dynamic(() => import('./Scene').then((m) => m.Scene), { ssr: false, loading: () => null })
 
-function probeWebgl(): boolean {
+function probeWebgl2(): boolean {
   try {
     const c = document.createElement('canvas')
-    return !!(c.getContext('webgl2') || c.getContext('webgl'))
+    const gl = c.getContext('webgl2', { failIfMajorPerformanceCaveat: false })
+    if (!gl) return false
+    const lose = gl.getExtension('WEBGL_lose_context')
+    lose?.loseContext()
+    return true
   } catch {
     return false
   }
@@ -28,7 +34,7 @@ export function SceneMount() {
   const [off] = useState(sceneSwitchedOff)
 
   useEffect(() => {
-    if (!off) setWebglOk(probeWebgl())
+    if (!off) setWebglOk(probeWebgl2())
   }, [off, setWebglOk])
 
   if (off || webglOk === null) return null

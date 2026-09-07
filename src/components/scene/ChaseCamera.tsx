@@ -14,7 +14,7 @@ const PHONE_HERO = { back: 14, side: -1.6, up: 8.5, lookSide: 0.3, lookAhead: 9,
 export function ChaseCamera() {
   const mobile = useIsMobile()
   const first = useRef(true)
-  const v = useMemo(() => ({ pos: new Vector3(), tan: new Vector3(), right: new Vector3(), desired: new Vector3(), look: new Vector3(), camPos: new Vector3(), camLook: new Vector3() }), [])
+  const v = useMemo(() => ({ pos: new Vector3(), tan: new Vector3(), right: new Vector3(), desired: new Vector3(), look: new Vector3(), camPos: new Vector3(), camLook: new Vector3(), lift: new Vector3() }), [])
 
   useFrame(({ camera }) => {
     const { s, t, reduced } = readRoadT()
@@ -26,8 +26,8 @@ export function ChaseCamera() {
     curve.getPointAt(t, v.pos)
     curve.getTangentAt(t, v.tan).setY(0).normalize()
     v.right.crossVectors(UP, v.tan).normalize()
-    v.desired.copy(v.pos).addScaledVector(v.tan, -c.back).addScaledVector(v.right, c.side).add(new Vector3(0, c.up, 0))
-    v.look.copy(v.pos).addScaledVector(v.tan, c.lookAhead).addScaledVector(v.right, c.lookSide).add(new Vector3(0, c.lookY, 0))
+    v.desired.copy(v.pos).addScaledVector(v.tan, -c.back).addScaledVector(v.right, c.side).add(v.lift.set(0, c.up, 0))
+    v.look.copy(v.pos).addScaledVector(v.tan, c.lookAhead).addScaledVector(v.right, c.lookSide).add(v.lift.set(0, c.lookY, 0))
 
     if (first.current || reduced) {
       v.camPos.copy(v.desired)

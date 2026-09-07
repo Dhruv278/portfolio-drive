@@ -1,5 +1,6 @@
 'use client'
 
+import { useProgress } from '@react-three/drei'
 import Link from 'next/link'
 import { identity, stops } from '@/content/profile'
 import { useScrollProgress } from '@/hooks/useScrollProgress'
@@ -9,7 +10,10 @@ export function Hud() {
   useScrollProgress()
   const scroll = useDrive((s) => s.scroll)
   const stopIndex = useDrive((s) => s.stopIndex)
+  const webglOk = useDrive((s) => s.webglOk)
+  const { active, progress } = useProgress()
   const stop = stops[stopIndex]
+  const loading = webglOk === true && (active || progress < 100)
 
   return (
     <>
@@ -33,6 +37,9 @@ export function Hud() {
           </b>
           <div className="track" aria-hidden="true">
             <i style={{ width: `${(scroll * 100).toFixed(1)}%` }} />
+          </div>
+          <div className="loadstatus" data-testid="loadstatus">
+            {loading ? `Loading the drive, ${Math.round(progress)}%` : ''}
           </div>
         </div>
         <div className={`hint${scroll > 0.02 ? ' gone' : ''}`} aria-hidden={scroll > 0.02}>

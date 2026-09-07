@@ -1,22 +1,32 @@
 'use client'
 
+import { PerformanceMonitor, Preload, useGLTF, useProgress } from '@react-three/drei'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { Suspense, useRef } from 'react'
+import { Suspense, useRef, useState } from 'react'
 import { Color, DirectionalLight, Fog, HemisphereLight, Vector3 } from 'three'
-import { DUSK_SPAN, DUSK_START } from '@/content/route'
+import { DUSK_SPAN, DUSK_START, usedModels } from '@/content/route'
 import { Car } from './Car'
 import { ChaseCamera } from './ChaseCamera'
+import { DebugStats } from './DebugStats'
 import { Billboards, Hills, Pier, PierPosts, Water } from './Extras'
 import { Road } from './Road'
 import { roadCurve } from './roadCurve'
 import { Scenery } from './Scenery'
 import { DriveClock, readRoadT, useIsMobile } from './useDriveFrame'
 
+// Start every model download the moment the scene bundle arrives, not when each item first renders.
+for (const m of usedModels()) useGLTF.preload(`/models/${m}.glb`)
+
 const SKY_DAY = new Color('#DCEAF4')
 const SKY_DUSK = new Color('#F3D9C4')
 const FOG_DAY = new Color('#E6EDF1')
 const FOG_DUSK = new Color('#F4E0CE')
 const carPos = new Vector3() // module-level scratch, never handed to React
+
+// Render resolution: start moderate, step down if the frame rate sags, step back up when it recovers.
+const DPR_HIGH_DESKTOP = 1.5
+const DPR_HIGH_PHONE = 1.25
+const DPR_LOW = 1
 
 function Atmosphere({ mobile }: { mobile: boolean }) {
   const bg = useRef<Color>(null)
@@ -50,24 +60,26 @@ function Atmosphere({ mobile }: { mobile: boolean }) {
         intensity={2.2}
         color="#FFF6E8"
         castShadow={!mobile}
-        shadow-mapSize={[2048, 2048]}
+        shadow-mapSize={[1024, 1024]}
         shadow-camera-near={1}
         shadow-camera-far={200}
-        shadow-camera-left={-70}
-        shadow-camera-right={70}
-        shadow-camera-top={70}
-        shadow-camera-bottom={-70}
+        shadow-camera-left={-60}
+        shadow-camera-right={60}
+        shadow-camera-top={60}
+        shadow-camera-bottom={-60}
         shadow-bias={-0.0006}
-        shadow-normalBias={0.02}
+        shadow-normalBias={0.03}
       />
     </>
   )
 }
 
-function World() {
+function World({ onDecline, onIncline, stats }: { onDecline: () => void; onIncline: () => void; stats: boolean }) {
   const mobile = useIsMobile()
   return (
     <>
+      {stats && <DebugStats />}
+      <PerformanceMonitor onDecline={onDecline} onIncline={onIncline} flipflops={3} />
       <DriveClock />
       <Atmosphere mobile={mobile} />
       <ChaseCamera />
@@ -79,23 +91,36 @@ function World() {
       <Billboards />
       <Suspense fallback={null}>
         <Car />
+        <Scenery />
+        {/* Upload textures and compile shaders before the first visible frame, so nothing stutters in. */}
+        <Preload all />
       </Suspense>
-      <Scenery />
     </>
   )
 }
 
 export function Scene() {
   const mobile = typeof window !== 'undefined' && window.innerWidth < 720
+  const stats = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('stats') === '1'
+  const high = mobile ? DPR_HIGH_PHONE : DPR_HIGH_DESKTOP
+  const [dpr, setDpr] = useState(high)
+  const { active, progress } = useProgress()
+  // Fade the canvas in once every model has arrived, and stay ready afterwards even if the
+  // loader reports new activity later. Derived state latched during render, no effect needed.
+  const done = !active && progress >= 100
+  const [latched, setLatched] = useState(done)
+  if (done && !latched) setLatched(true)
+  const ready = latched || done
+
   return (
-    <div className="scene-root" aria-hidden="true" data-testid="scene">
+    <div className={`scene-root${ready ? ' ready' : ''}`} aria-hidden="true" data-testid="scene" data-ready={ready}>
       <Canvas
-        dpr={[1, mobile ? 1.25 : 1.75]}
-        shadows={!mobile}
+        dpr={dpr}
+        shadows={mobile ? false : 'percentage'}
         gl={{ antialias: true, powerPreference: 'high-performance' }}
-        camera={{ fov: mobile ? 54 : 36, near: 0.1, far: 500, position: [0, 8, 14] }}
+        camera={{ fov: mobile ? 54 : 36, near: 0.1, far: 400, position: [0, 8, 14] }}
       >
-        <World />
+        <World onDecline={() => setDpr(DPR_LOW)} onIncline={() => setDpr(high)} stats={stats} />
       </Canvas>
     </div>
   )

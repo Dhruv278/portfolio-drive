@@ -58,6 +58,17 @@ a {
   position: fixed;
   inset: 0;
   z-index: 0;
+  opacity: 0;
+  transition: opacity 0.7s ease;
+}
+.scene-root.ready {
+  opacity: 1;
+}
+.loadstatus {
+  font-size: 11px;
+  color: var(--ink-2);
+  margin-top: 4px;
+  min-height: 14px;
 }
 .scene-root canvas {
   display: block;
@@ -440,7 +451,8 @@ h2 {
     transform: none;
   }
   .track i,
-  .hint {
+  .hint,
+  .scene-root {
     transition: none;
   }
 }

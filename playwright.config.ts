@@ -10,7 +10,10 @@ export default defineConfig({
   timeout: 60_000,
   expect: { timeout: 10_000 },
   fullyParallel: false,
-  retries: 0,
+  // Five engines share one machine. Two workers and one retry absorb the cold-start of a browser
+  // that lands while another project is software-rendering WebGL.
+  workers: 2,
+  retries: 1,
   reporter: [['list']],
   use: {
     baseURL,
@@ -26,6 +29,10 @@ export default defineConfig({
   projects: [
     { name: 'desktop', use: { ...devices['Desktop Chrome'], viewport: { width: 1400, height: 900 } } },
     { name: 'phone', use: { ...devices['Pixel 7'] } },
+    // Other engines: Firefox (Gecko) and Safari's engine (WebKit). Headless WebGL support varies
+    // between them, so the scene test accepts either the canvas or the fallback there.
+    { name: 'firefox', use: { ...devices['Desktop Firefox'], viewport: { width: 1400, height: 900 } } },
+    { name: 'webkit', use: { ...devices['Desktop Safari'], viewport: { width: 1400, height: 900 } } },
     {
       name: 'no-webgl',
       use: {

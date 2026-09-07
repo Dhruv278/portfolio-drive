@@ -8,9 +8,9 @@ import { roadCurve } from './roadCurve'
 
 export const COLORS = {
   ground: '#E3E6D6',
-  road: '#9EA4AC',
+  road: '#8E949C',
   kerb: '#D8DCE0',
-  dash: '#F6F2EA',
+  line: '#FFFFFF',
   water: '#BBD7E6',
   wood: '#C9B48F',
   ink: '#1E2A38',
@@ -19,11 +19,17 @@ export const COLORS = {
   leafDark: '#6A9C57',
 } as const
 
+// Solid edge lines sit just inside the kerbs. Centre dashes are wider and brighter than the first draft.
+const EDGE_INSET = 0.6
+const EDGE_WIDTH = 0.18
+
 export function Road() {
   const curve = roadCurve()
   const road = useMemo(() => buildRoadGeometry(curve, ROAD_HALF_WIDTH, ROAD_SEGMENTS), [curve])
   const kerbL = useMemo(() => buildKerbGeometry(curve, ROAD_HALF_WIDTH, KERB_WIDTH, 1, ROAD_SEGMENTS), [curve])
   const kerbR = useMemo(() => buildKerbGeometry(curve, ROAD_HALF_WIDTH, KERB_WIDTH, -1, ROAD_SEGMENTS), [curve])
+  const edgeL = useMemo(() => buildKerbGeometry(curve, ROAD_HALF_WIDTH - EDGE_INSET, EDGE_WIDTH, 1, ROAD_SEGMENTS, 0.045), [curve])
+  const edgeR = useMemo(() => buildKerbGeometry(curve, ROAD_HALF_WIDTH - EDGE_INSET, EDGE_WIDTH, -1, ROAD_SEGMENTS, 0.045), [curve])
   const dashes = useMemo(() => dashMatrices(curve, DASH_COUNT), [curve])
   const inst = useRef<InstancedMesh>(null)
 
@@ -32,6 +38,9 @@ export function Road() {
     if (!m) return
     dashes.forEach((mat, i) => m.setMatrixAt(i, mat))
     m.instanceMatrix.needsUpdate = true
+    // The culling sphere is computed lazily on the first frame, before these matrices exist, and
+    // would otherwise sit at the origin and hide every dash once the camera drives away.
+    m.computeBoundingSphere()
   }, [dashes])
 
   return (
@@ -49,9 +58,15 @@ export function Road() {
       <mesh geometry={kerbR}>
         <meshLambertMaterial color={COLORS.kerb} side={DoubleSide} />
       </mesh>
-      <instancedMesh ref={inst} args={[undefined, undefined, DASH_COUNT]}>
-        <boxGeometry args={[0.22, 0.02, 1.4]} />
-        <meshLambertMaterial color={COLORS.dash} />
+      <mesh geometry={edgeL}>
+        <meshBasicMaterial color={COLORS.line} side={DoubleSide} />
+      </mesh>
+      <mesh geometry={edgeR}>
+        <meshBasicMaterial color={COLORS.line} side={DoubleSide} />
+      </mesh>
+      <instancedMesh ref={inst} args={[undefined, undefined, DASH_COUNT]} frustumCulled={false}>
+        <boxGeometry args={[0.32, 0.02, 1.6]} />
+        <meshBasicMaterial color={COLORS.line} />
       </instancedMesh>
     </group>
   )

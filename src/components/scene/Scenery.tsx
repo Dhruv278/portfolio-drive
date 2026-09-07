@@ -3,14 +3,19 @@
 import { useGLTF } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import { Suspense, useMemo, useRef } from 'react'
-import { Box3, Group, Mesh, Vector3 } from 'three'
+import { Box3, Group, Material, Mesh, Vector3 } from 'three'
 import { buildPlacements, REVEAL_LEAD, type Fit, type Placement } from '@/content/route'
+import { lambertFor } from './materials'
 import { poseAt } from './roadCurve'
 import { readRoadT, useIsMobile } from './useDriveFrame'
 
 type LoadedGltf = { scene: Group }
 
+// Only things taller than this cast a shadow. Fence posts, rocks and small props do not need one.
+const SHADOW_MIN_HEIGHT = 3
+
 // Clone a loaded model and size it to the fit spec, footprint centred, base on the ground.
+// Swaps PBR materials for Lambert and limits shadow casting, both for integrated GPUs.
 export function fitModel(src: Group, fit: Fit): Group {
   const m = src.clone(true)
   const box = new Box3().setFromObject(m)
@@ -24,10 +29,14 @@ export function fitModel(src: Group, fit: Fit): Group {
   box.setFromObject(m)
   const center = box.getCenter(new Vector3())
   m.position.set(-center.x, -box.min.y, -center.z)
+  const tall = size.y * s >= SHADOW_MIN_HEIGHT
   m.traverse((o) => {
     if ((o as Mesh).isMesh) {
-      o.castShadow = true
-      o.receiveShadow = true
+      const mesh = o as Mesh
+      // Tall things cast and receive. Self-shadowing is what gives the low-poly trees their depth.
+      mesh.castShadow = tall
+      mesh.receiveShadow = tall
+      mesh.material = lambertFor(mesh.material as Material)
     }
   })
   return m

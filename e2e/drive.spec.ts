@@ -10,7 +10,9 @@ test.describe('The Drive', () => {
   })
 
   test('odometer follows the scroll through every stop', async ({ page }) => {
-    await page.goto('/')
+    // Headless Chrome renders WebGL in software, which starves the page thread and makes this
+    // scroll loop time out. The HTML layer is what is under test here, so the scene is switched off.
+    await page.goto('/?scene=off')
     const odo = page.getByTestId('odometer')
     await expect(odo).toContainText('Stop 1 of 6')
     const total = await page.evaluate(() => document.documentElement.scrollHeight - innerHeight)

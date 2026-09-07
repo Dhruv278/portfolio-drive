@@ -126,13 +126,16 @@ export const WATER = [
   { x: 0, z: -560, w: 260, d: 140 },
 ]
 
-export const HILLS: { x: number; z: number; r: number; h: number; dark: boolean }[] = [
-  { x: 40, z: -390, r: 22, h: 9, dark: false },
-  { x: 62, z: -420, r: 30, h: 12, dark: true },
-  { x: -30, z: -400, r: 26, h: 10, dark: true },
-  { x: -52, z: -360, r: 20, h: 7, dark: false },
-  { x: 70, z: -350, r: 24, h: 8, dark: false },
+// Hills are placed relative to the road so they can never sit on it. route.test.ts checks the
+// clearance against the sampled curve, since the road bends toward and away from them.
+export const HILLS: { t: number; lateral: number; r: number; h: number; dark: boolean }[] = [
+  { t: 0.66, lateral: 56, r: 24, h: 8, dark: false },
+  { t: 0.7, lateral: -50, r: 22, h: 9, dark: false },
+  { t: 0.745, lateral: 64, r: 30, h: 12, dark: true },
+  { t: 0.78, lateral: -54, r: 26, h: 10, dark: true },
+  { t: 0.82, lateral: 50, r: 20, h: 7, dark: false },
 ]
+export const HILL_CLEARANCE = 4 // metres between a hill's edge and the kerb, at minimum
 
 export const CAR_MODEL = 'car/sedan'
 export const CAR_LENGTH = 4.4

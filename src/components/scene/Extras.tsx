@@ -42,7 +42,7 @@ export function Hills() {
   return (
     <>
       {HILLS.map((h, i) => (
-        <mesh key={i} position={[h.x, 0, h.z]} scale={[1, h.h / h.r, 1]} castShadow receiveShadow>
+        <mesh key={i} position={poseAt(h.t, h.lateral).position} scale={[1, h.h / h.r, 1]} castShadow receiveShadow>
           <sphereGeometry args={[h.r, 9, 6, 0, Math.PI * 2, 0, Math.PI / 2]} />
           <meshLambertMaterial color={h.dark ? COLORS.leafDark : COLORS.leaf} flatShading />
         </mesh>

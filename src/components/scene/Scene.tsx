@@ -10,7 +10,7 @@ import { Billboards, Hills, Pier, PierPosts, Water } from './Extras'
 import { Road } from './Road'
 import { roadCurve } from './roadCurve'
 import { Scenery } from './Scenery'
-import { readRoadT, useIsMobile } from './useDriveFrame'
+import { DriveClock, readRoadT, useIsMobile } from './useDriveFrame'
 
 const SKY_DAY = new Color('#DCEAF4')
 const SKY_DUSK = new Color('#F3D9C4')
@@ -68,6 +68,7 @@ function World() {
   const mobile = useIsMobile()
   return (
     <>
+      <DriveClock />
       <Atmosphere mobile={mobile} />
       <ChaseCamera />
       <Road />

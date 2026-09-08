@@ -35,7 +35,7 @@ export function Hud() {
         </div>
       </div>
       <div className="hud bottom">
-        <div className="odometer" aria-live="polite" data-testid="odometer" data-parked={parked ? 'true' : 'false'}>
+        <div className="odometer" aria-live="polite" data-testid="odometer" data-stop={stopIndex} data-parked={parked ? 'true' : 'false'}>
           <b>
             Stop {stopIndex + 1} of {stops.length}
             <span className="stopname">, {stop.name}</span>

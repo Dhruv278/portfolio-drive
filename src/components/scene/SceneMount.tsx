@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic'
 import { useEffect, useState } from 'react'
+import { probeGpu } from '@/lib/gpu'
 import { useDrive } from '@/store/drive'
 import { Fallback } from './Fallback'
 
@@ -10,19 +11,6 @@ import { Fallback } from './Fallback'
 // WebViews) gets the plain content and the fallback note instead of a crash.
 // `?scene=off` skips it entirely (used by the end-to-end tests and handy on weak machines).
 const Scene = dynamic(() => import('./Scene').then((m) => m.Scene), { ssr: false, loading: () => null })
-
-function probeWebgl2(): boolean {
-  try {
-    const c = document.createElement('canvas')
-    const gl = c.getContext('webgl2', { failIfMajorPerformanceCaveat: false })
-    if (!gl) return false
-    const lose = gl.getExtension('WEBGL_lose_context')
-    lose?.loseContext()
-    return true
-  } catch {
-    return false
-  }
-}
 
 function sceneSwitchedOff(): boolean {
   return typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('scene') === 'off'
@@ -34,7 +22,7 @@ export function SceneMount() {
   const [off] = useState(sceneSwitchedOff)
 
   useEffect(() => {
-    if (!off) setWebglOk(probeWebgl2())
+    if (!off) setWebglOk(probeGpu().webgl2)
   }, [off, setWebglOk])
 
   if (off || webglOk === null) return null

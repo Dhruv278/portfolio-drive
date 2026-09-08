@@ -17,9 +17,9 @@ test.describe('The Drive', () => {
     await expect(odo).toContainText('Stop 1 of 6')
     const total = await page.evaluate(() => document.documentElement.scrollHeight - innerHeight)
     const seen = new Set<string>()
-    for (let i = 0; i <= 20; i++) {
-      await page.evaluate((y) => window.scrollTo(0, y), Math.round((total * i) / 20))
-      await page.waitForTimeout(60)
+    for (let i = 0; i <= 30; i++) {
+      await page.evaluate((y) => window.scrollTo(0, y), Math.round((total * i) / 30))
+      await page.waitForTimeout(120)
       const m = (await odo.textContent())?.match(/Stop (\d) of 6/)
       if (m) seen.add(m[1])
     }
@@ -49,8 +49,8 @@ test.describe('The Drive', () => {
   test('a panel is fully on screen while the car is parked at its stop', async ({ page }, testInfo) => {
     test.skip(testInfo.project.name === 'phone', 'phones use a bottom sheet that scrolls inside')
     // Walk the scroll through a section and record the panel at every sample where the scroll
-    // model says the car is parked (data-parked on the odometer). A wheel over the panel must move
-    // the page, never the panel's inside.
+    // model says the car is parked at this stop (data-stop and data-parked on the odometer). A wheel
+    // over the panel must move the page, never the panel's inside.
     const probe = (id: string) =>
       page.evaluate(async (id) => {
         const sec = document.querySelector<HTMLElement>(`section#${id}`)!
@@ -61,7 +61,7 @@ test.describe('The Drive', () => {
         for (let y = sec.offsetTop - innerHeight; y <= sec.offsetTop + sec.offsetHeight; y += 40) {
           window.scrollTo(0, y)
           await settle()
-          if (odo.dataset.parked !== 'true') continue
+          if (odo.dataset.parked !== 'true' || odo.dataset.stop !== sec.dataset.stop) continue
           const r = panel.getBoundingClientRect()
           if (out.parked === 0) out.topAtArrival = r.top
           out.parked++

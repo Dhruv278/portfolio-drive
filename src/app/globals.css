@@ -574,8 +574,10 @@ section.stop .contact a {
     position: sticky;
     top: auto;
     bottom: 92px; /* clear of the odometer */
-    margin: 0 3vw;
-    width: 94vw;
+    /* Percentages, not vw: a classic scrollbar makes 100vw wider than the page and forces a
+       horizontal scroll in a narrow portrait desktop window. */
+    margin: 0 3%;
+    width: 94%;
     padding: 14px 18px 16px;
     max-height: 50vh;
     overflow: auto;
@@ -609,8 +611,8 @@ section.stop .contact a {
     position: sticky;
     top: max(12vh, 74px);
     bottom: auto;
-    margin: 0 5vw;
-    width: 90vw;
+    margin: 0 5%;
+    width: 90%;
     max-height: none;
     overflow: visible;
   }

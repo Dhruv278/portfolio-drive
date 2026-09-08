@@ -1,10 +1,11 @@
 'use client'
 
-import { useGLTF } from '@react-three/drei'
+import { ContactShadows, useGLTF } from '@react-three/drei'
 import { useFrame, useThree } from '@react-three/fiber'
 import { useMemo, useRef } from 'react'
-import { AdditiveBlending, Box3, CanvasTexture, DoubleSide, Group, Material, Mesh, MeshBasicMaterial, MeshLambertMaterial, MeshStandardMaterial, NearestFilter, Object3D, SRGBColorSpace, Vector3 } from 'three'
+import { AdditiveBlending, Box3, CanvasTexture, DoubleSide, Group, Material, Mesh, MeshBasicMaterial, MeshStandardMaterial, NearestFilter, Object3D, SRGBColorSpace, Vector3 } from 'three'
 import { CAR_LENGTH, CAR_MODEL, DUSK_SPAN, DUSK_START } from '@/content/route'
+import { flags } from '@/lib/flags'
 import { recolorRedCells } from '@/lib/recolor'
 import { roadCurve, UP } from './roadCurve'
 import { readRoadT } from './useDriveFrame'
@@ -23,7 +24,7 @@ useGLTF.preload(MODEL_URL)
 
 type LoadedGltf = { scene: Group }
 
-// Build a cobalt Lambert copy of the kit's palette material. Runs once per source material.
+// Build a cobalt PBR copy of the kit's palette material. Runs once per source material.
 function recolorMaterial(mat: MeshStandardMaterial): Material {
   const img = mat.map?.image as CanvasImageSource & { width?: number; height?: number }
   const w = img?.width ?? 0
@@ -45,7 +46,7 @@ function recolorMaterial(mat: MeshStandardMaterial): Material {
   tex.colorSpace = SRGBColorSpace
   tex.magFilter = NearestFilter
   tex.minFilter = mat.map.minFilter
-  return new MeshLambertMaterial({ map: tex, color: mat.color })
+  return new MeshStandardMaterial({ map: tex, color: mat.color, roughness: 0.38, metalness: 0.12 })
 }
 
 export function Car() {
@@ -183,6 +184,8 @@ export function Car() {
   return (
     <>
       <group ref={car}>
+        {/* Ground contact: a blurred top-down depth of the car, re-rendered only when a frame is requested. */}
+        {flags.contact && <ContactShadows position={[0, 0.005, 0]} scale={7} blur={2.4} far={1.5} opacity={0.5} resolution={256} frames={Infinity} color="#0a1020" />}
         <group ref={chassis}>
           <primitive object={model} />
           {[1, -1].map((sx) => (

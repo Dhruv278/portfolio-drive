@@ -89,3 +89,16 @@ npm run dev              # then open http://localhost:3000
 npm run test:run         # unit tests
 npm run build && npm run test:e2e
 ```
+
+## Addendum: realistic world, stage 1 (8 September 2026)
+
+The owner said the trees, buildings and car do not look real and chose "realistic world, staged" (spec: `../specs/2026-09-07-realistic-world-design.md`). Stage 1 is real light, real road and ground, effects where the GPU allows.
+
+- Light: Poly Haven `autumn_field_puresky` 1k as the environment map and, unblurred, as the visible sky. Neutral tone mapping set at Canvas creation. Sun, hemisphere, environment and sky intensities ease at dusk through uniforms only. Kloofendal partly cloudy and clear variants were tried and looked grey; the autumn sky read as a real blue day.
+- Surfaces: the road is one draw call with a strip texture painted in Canvas 2D at load (asphalt tiled to world scale, edge lines, centre dashes, tyre wear, aged paint) plus asphalt normal and roughness maps. The dash instanced mesh and the four line meshes are gone. Ground: `leafy_grass` colour, normal and roughness, with a 2048 colour map of sixteen flipped and rotated copies under a soft light-and-shade wash so the repeat sits at 28 m. Kerbs: `concrete_pavement_02`. Hills wear the grass. Water: standard material with the sky reflection and a drifting normal map. Car paint is a standard material with a contact shadow under the car. Clouds are drei sprite clouds with a self-hosted texture.
+- Context loss, the lesson of the day: mounting drei's `Environment` with the HDR lost the WebGL context every time on Intel Iris Xe, in a fresh browser too. Prefiltering the HDR, recompiling every PBR material with the environment, the shadow pass and the first frame all landed in one frame. The same work split across frames, in the warm-up before the fade-in (decode, prefilter, assign, `compileAsync`, one rendered frame), never lost the context. Rule: the environment must exist before shaders compile, and heavy GPU set-up gets its own frames.
+- Effects: N8AO at half resolution and performance quality plus SMAA and a vignette measured 23 fps driving against 40 without, at dpr 1 on the owner's laptop. The chain stays in the code but runs only when the WebGL renderer string is not integrated graphics (`src/lib/gpu.ts`), or when forced with `?fx=1`. Desktop dpr cap is 1.25 now, as the spec budget states.
+- Measured after the change, dpr 1, 1280 by 800, no effects: 34 to 37 fps driving across the stops, 15 to 28 idle at the 24 fps idle loop, ready in 8 to 11 s on the dev server, no console errors. Assets: models 2.3 MB, textures 2.9 MB, sky 1.1 MB; a unit test caps the total at 10 MB.
+- Also fixed on the way: loader progress is read through a subscription, not a hook, which removed a React setState-in-render error raised from inside drei's loaders; textures preload with the models; the renderer, scene and camera are exposed on `window.__drive` with `?stats=1` for in-page diagnosis.
+- Still to do in stage 1: the realistic CC-BY car. Downloading from Sketchfab needs the owner's account. Candidates are listed in the spec. Stage 2 replaces trees, buildings and hills.
+

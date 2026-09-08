@@ -6,6 +6,7 @@ import { Quaternion, Vector3 } from 'three'
 import { BILLBOARDS, HILLS, PIER_POSTS } from '@/content/route'
 import { poseAt, roadCurve } from './roadCurve'
 import { COLORS } from './Road'
+import { useSurfaces } from './surfaces'
 
 function Box({ w, h, d, c, x = 0, y = 0, z = 0 }: { w: number; h: number; d: number; c: string; x?: number; y?: number; z?: number }) {
   return (
@@ -25,13 +26,21 @@ function Cyl({ r, h, c, x = 0, y = 0, z = 0, seg = 10 }: { r: number; h: number;
   )
 }
 
+// Rounded hills in the same grass as the ground. Replaced by displaced terrain in stage 2.
 export function Hills() {
+  const s = useSurfaces()
+  const map = useMemo(() => {
+    const t = s.grassDiff.clone()
+    t.repeat.set(6, 3)
+    t.needsUpdate = true
+    return t
+  }, [s.grassDiff])
   return (
     <>
       {HILLS.map((h, i) => (
         <mesh key={i} position={poseAt(h.t, h.lateral).position} scale={[1, h.h / h.r, 1]} castShadow receiveShadow>
-          <sphereGeometry args={[h.r, 9, 6, 0, Math.PI * 2, 0, Math.PI / 2]} />
-          <meshLambertMaterial color={h.dark ? COLORS.leafDark : COLORS.leaf} flatShading />
+          <sphereGeometry args={[h.r, 18, 12, 0, Math.PI * 2, 0, Math.PI / 2]} />
+          <meshStandardMaterial map={map} normalMap={s.grassNor} roughness={1} metalness={0} color={h.dark ? '#b9c4a6' : '#d4dcc4'} />
         </mesh>
       ))}
     </>

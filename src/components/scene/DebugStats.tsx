@@ -2,20 +2,24 @@
 
 import { useFrame } from '@react-three/fiber'
 import { useRef } from 'react'
-import { Vector2 } from 'three'
+import * as THREE from 'three'
+import { Camera, Scene as ThreeScene, Vector2, WebGLRenderer } from 'three'
 
 const size = new Vector2()
 
 declare global {
   interface Window {
     __driveStats?: { fps: number; ms: number; calls: number; triangles: number; geometries: number; textures: number; programs: number; dpr: number; width: number; height: number }
+    // Renderer, scene and camera for in-page inspection. Only with ?stats=1.
+    __drive?: { gl: WebGLRenderer; scene: ThreeScene; camera: Camera; THREE: typeof THREE }
   }
 }
 
 // Mounted only with ?stats=1. Publishes renderer counters once a second for measurement scripts.
 export function DebugStats() {
   const acc = useRef({ frames: 0, t: 0 })
-  useFrame(({ gl, clock }) => {
+  useFrame(({ gl, scene, camera, clock }) => {
+    if (!window.__drive) window.__drive = { gl, scene, camera, THREE }
     const a = acc.current
     a.frames++
     const now = clock.elapsedTime

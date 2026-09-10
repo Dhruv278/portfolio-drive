@@ -18,7 +18,8 @@ import { Scenery } from './Scenery'
 import { flags } from '@/lib/flags'
 import { gpuInfo } from '@/lib/gpu'
 import { MOBILE_QUERY } from '@/lib/layout'
-import { DriveClock, IdleLoop, readRoadT, useIsMobile } from './useDriveFrame'
+import { useDrive } from '@/store/drive'
+import { DriveClock, IdleLoop, readRoadT, startIntro, useIsMobile } from './useDriveFrame'
 
 // Start every model download the moment the scene bundle arrives, not when each item first renders.
 for (const m of usedModels()) useGLTF.preload(`/models/${m}.glb`)
@@ -112,6 +113,14 @@ function CompileWhenLoaded({ onReady }: { onReady: () => void }) {
     const finish = () => {
       if (done) return
       done = true
+      const store = useDrive.getState()
+      // Play the intro once, only if the visitor has not scrolled yet and does not prefer reduced motion.
+      if (flags.intro && !store.reducedMotion && store.scroll <= 0.002) {
+        startIntro(performance.now())
+        store.setIntro('playing')
+      } else {
+        store.setIntro('skipped')
+      }
       get().invalidate()
       onReady()
     }
@@ -195,6 +204,7 @@ export function Scene() {
   const fx = !mobile && (flags.fx ?? !gpuInfo.lowEnd)
   const dpr = Math.min(window.devicePixelRatio, mobile ? DPR_PHONE : DPR_DESKTOP)
   const [ready, setReady] = useState(false)
+  const intro = useDrive((s) => s.intro)
 
   // Rotating a phone crosses the layout query. Shadows, resolution and field of view are fixed at
   // Canvas creation, so the Canvas remounts with a new key instead of running with stale settings.
@@ -206,7 +216,7 @@ export function Scene() {
   }, [])
 
   return (
-    <div className={`scene-root${ready ? ' ready' : ''}`} aria-hidden="true" data-testid="scene" data-ready={ready}>
+    <div className={`scene-root${ready ? ' ready' : ''}`} aria-hidden="true" data-testid="scene" data-ready={ready} data-intro={intro}>
       <Canvas
         key={mobile ? 'phone' : 'desktop'}
         frameloop="demand"

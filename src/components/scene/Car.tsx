@@ -8,7 +8,7 @@ import { CAR_LENGTH, CAR_MODEL, DUSK_SPAN, DUSK_START } from '@/content/route'
 import { flags } from '@/lib/flags'
 import { recolorRedCells } from '@/lib/recolor'
 import { roadCurve, UP } from './roadCurve'
-import { readRoadT } from './useDriveFrame'
+import { readIntro, readRoadT } from './useDriveFrame'
 
 const MODEL_URL = `/models/${CAR_MODEL}.glb`
 const COBALT: [number, number, number] = [47, 91, 234]
@@ -139,11 +139,14 @@ export function Car() {
     for (const w of wheels.current) w.rotation.x = st.spin
 
     const dusk = Math.min(1, Math.max(0, (t - DUSK_START) / DUSK_SPAN))
-    const beam = Math.max(0, dusk - 0.2) * BEAM_MAX_OPACITY
+    // Lamps come on at dusk, and during the intro as the door opens.
+    const intro = readIntro()
+    const lit = Math.max(dusk, intro.active ? Math.min(1, intro.door * 1.5) : 0)
+    const beam = Math.max(0, lit - 0.2) * BEAM_MAX_OPACITY
     if (beamL.current) beamL.current.opacity = beam
     if (beamR.current) beamR.current.opacity = beam
-    if (lampMat.current) lampMat.current.emissiveIntensity = 0.5 + dusk * 1.8
-    if (tailMat.current) tailMat.current.emissiveIntensity = 0.6 + dusk * 1.2
+    if (lampMat.current) lampMat.current.emissiveIntensity = 0.5 + lit * 1.8
+    if (tailMat.current) tailMat.current.emissiveIntensity = 0.6 + lit * 1.2
 
     // Exhaust. Spawn behind the right rear while moving, age every live puff, keep frames coming
     // until the last one has faded.

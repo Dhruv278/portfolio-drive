@@ -2,6 +2,7 @@
 
 import { useFrame, useThree } from '@react-three/fiber'
 import { useEffect } from 'react'
+import { introPhase } from '@/lib/pieceMath'
 import { roadT } from '@/lib/scroll'
 import { T_END, T_STOPS } from '@/content/route'
 import { isMobileSize } from '@/lib/layout'
@@ -10,16 +11,50 @@ import { useDrive } from '@/store/drive'
 // Browsers deliver scroll in steps. The drive state is damped toward the scroll target every frame,
 // time-based so it feels the same at 60 and 144 Hz. One DriveClock advances it before anything reads it.
 const drive = { s: 0, t: 0, targetS: 0, targetT: 0, reduced: false, primed: false }
+
+// The first-load intro: door, car roll-out, camera swing. Module state read by the camera, the car
+// and the garage door inside their frame loops. Ends by time, or at once when the visitor scrolls.
+const intro = { active: false, start: 0, door: 0, car: 0, camera: 0 }
+
+export function startIntro(now: number) {
+  intro.active = true
+  intro.start = now
+}
+
+export function cancelIntro() {
+  if (!intro.active) return
+  intro.active = false
+  intro.door = intro.car = intro.camera = 1
+  useDrive.getState().setIntro('skipped')
+}
+
+export function readIntro(): { active: boolean; door: number; car: number; camera: number } {
+  return intro
+}
 const RESPONSE = 7 // higher is snappier, lower is floatier
 const EPS_T = 1e-5
 const EPS_S = 1e-4
 
 // Returns true when the eased state has caught up with the scroll target.
-export function stepDrive(delta: number): boolean {
+export function stepDrive(delta: number, now = performance.now()): boolean {
   const { scroll, zones, reducedMotion } = useDrive.getState()
   drive.targetS = scroll
   drive.targetT = zones.length ? roadT(scroll, zones, T_STOPS, T_END) : 0
   drive.reduced = reducedMotion
+  if (intro.active) {
+    const ph = introPhase((now - intro.start) / 1000)
+    intro.door = ph.door
+    intro.car = ph.car
+    intro.camera = ph.camera
+    drive.s = drive.targetS
+    drive.t = T_STOPS[0] * ph.car
+    drive.primed = true
+    if (ph.done) {
+      intro.active = false
+      useDrive.getState().setIntro('done')
+    }
+    return false
+  }
   if (!drive.primed || reducedMotion) {
     drive.s = drive.targetS
     drive.t = drive.targetT
@@ -46,9 +81,16 @@ export function readRoadT(): { s: number; t: number; reduced: boolean } {
 // When nothing moves, nothing renders, and the GPU idles.
 export function DriveClock() {
   const invalidate = useThree((s) => s.invalidate)
-  useEffect(() => useDrive.subscribe(() => invalidate()), [invalidate])
+  useEffect(
+    () =>
+      useDrive.subscribe((s, prev) => {
+        if (s.scroll !== prev.scroll && s.scroll > 0.002) cancelIntro()
+        invalidate()
+      }),
+    [invalidate],
+  )
   useFrame((_, delta) => {
-    const settled = stepDrive(delta)
+    const settled = stepDrive(delta, performance.now())
     if (!settled) invalidate()
   }, -10)
   return null

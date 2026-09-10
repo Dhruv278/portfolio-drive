@@ -66,7 +66,8 @@ describe('roadT', () => {
       expect(t).toBeGreaterThanOrEqual(prev - 1e-9)
       prev = t
     }
-    expect(roadT(0, zones, T_STOPS, T_END)).toBeCloseTo(0, 6)
+    // the page top is the first stop, not the road's origin
+    expect(roadT(0, zones, T_STOPS, T_END)).toBeCloseTo(T_STOPS[0], 6)
     expect(roadT(1, zones, T_STOPS, T_END)).toBeCloseTo(T_END, 6)
   })
 

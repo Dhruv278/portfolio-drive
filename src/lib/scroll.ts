@@ -36,6 +36,8 @@ export function roadT(s: number, zones: Zone[], tStops: number[], tEnd: number):
   let prevT = 0
   for (let i = 0; i < zones.length; i++) {
     const { a, b } = zones[i]
+    // The page top is the first stop: the car waits there (the garage behind it) until the drive begins.
+    if (i === 0 && s < a) return tStops[0]
     if (s < a) return prevT + (tStops[i] - prevT) * ((s - prevB) / Math.max(1e-6, a - prevB))
     if (s <= b) return tStops[i]
     prevB = b

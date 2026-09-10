@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ARRIVE, currentStop, measureZones, roadT, SPACER_VH, STICKY_TOP_VH, type Zone } from './scroll'
+import { ARRIVE, currentStop, measureZones, parkedStop, roadT, SPACER_VH, STICKY_TOP_VH, type Zone } from './scroll'
 
 const T_STOPS = [0.035, 0.21, 0.39, 0.57, 0.75, 0.955]
 const T_END = 0.972
@@ -89,5 +89,16 @@ describe('currentStop', () => {
   it('switches to the next stop a little before its zone begins', () => {
     expect(currentStop(zones[2].a - 0.02, zones)).toBe(2)
     expect(currentStop(zones[2].a - 0.05, zones)).toBe(1)
+  })
+})
+
+describe('parkedStop', () => {
+  const zones = measureZones(rects, maxScroll, VH)
+  it('names the stop whose plateau contains the scroll fraction, else -1', () => {
+    expect(parkedStop((zones[1].a + zones[1].b) / 2, zones)).toBe(1)
+    expect(parkedStop(zones[1].a, zones)).toBe(1)
+    expect(parkedStop(zones[1].b, zones)).toBe(1)
+    expect(parkedStop((zones[1].b + zones[2].a) / 2, zones)).toBe(-1)
+    expect(parkedStop(0, zones)).toBe(zones[0].a === 0 ? 0 : -1)
   })
 })

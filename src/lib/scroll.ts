@@ -49,3 +49,9 @@ export function currentStop(s: number, zones: Zone[]): number {
   for (let i = 0; i < zones.length; i++) if (s >= zones[i].a - STOP_LEAD) best = i
   return best
 }
+
+// Index of the stop whose plateau contains the scroll fraction, or -1 while driving between stops.
+export function parkedStop(s: number, zones: Zone[]): number {
+  for (let i = 0; i < zones.length; i++) if (s >= zones[i].a && s <= zones[i].b) return i
+  return -1
+}

@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { CatmullRomCurve3, Vector3 } from 'three'
-import { ARRIVAL_POSES, BILLBOARDS, buildPlacements, CAR_LENGTH, GARAGE, HILL_CLEARANCE, HILLS, KERB_WIDTH, MEDCHRON, ROAD_HALF_WIDTH, ROAD_POINTS, T_END, T_STOPS, usedModels } from './route'
+import { ARRIVAL_POSES, BILLBOARDS, buildPlacements, CAR_LENGTH, GARAGE, HILL_CLEARANCE, HILLS, INTRO_BACK, KERB_WIDTH, MEDCHRON, ROAD_HALF_WIDTH, ROAD_POINTS, T_END, T_STOPS, usedModels } from './route'
 
 function hillCentre(t: number, lateral: number, curve: CatmullRomCurve3): Vector3 {
   const p = curve.getPointAt(t)
@@ -57,17 +57,21 @@ describe('route', () => {
     expect(MEDCHRON.signTs).toHaveLength(6)
     for (let i = 1; i < MEDCHRON.signTs.length; i++) expect(MEDCHRON.signTs[i]).toBeGreaterThan(MEDCHRON.signTs[i - 1])
     expect(MEDCHRON.signTs[0]).toBeGreaterThan(MEDCHRON.archT)
-    expect(MEDCHRON.signTs[5]).toBeLessThan(T_STOPS[1] + 0.035)
+    expect(MEDCHRON.signTs[5]).toBeLessThan(T_STOPS[1] + 0.045)
   })
 
   it('no longer ships the two Kenney buildings the records building replaces', () => {
     expect(usedModels()).not.toContain('commercial/building-e')
     expect(usedModels()).not.toContain('commercial/building-skyscraper-a')
+    expect(usedModels()).not.toContain('commercial/building-b')
   })
 
-  it('starts the garage door ahead of the car and the car inside the garage', () => {
-    expect(GARAGE.doorZ).toBeGreaterThan(CAR_LENGTH / 2)
-    expect(GARAGE.centerZ - GARAGE.depth / 2).toBeLessThan(-CAR_LENGTH / 2)
+  it('starts the car inside the garage with the door ahead of it, and the garage behind the road origin', () => {
+    const carFront = -INTRO_BACK + CAR_LENGTH / 2
+    const carBack = -INTRO_BACK - CAR_LENGTH / 2
+    expect(GARAGE.doorZ).toBeGreaterThan(carFront)
+    expect(GARAGE.centerZ - GARAGE.depth / 2).toBeLessThan(carBack)
+    expect(GARAGE.centerZ + GARAGE.depth / 2).toBeLessThanOrEqual(0)
   })
 
   it('is deterministic between calls', () => {

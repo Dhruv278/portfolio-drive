@@ -33,8 +33,8 @@ export function Post({ h, r = 0.08, x = 0, z = 0, color = PALETTE.ink }: { h: nu
 
 type SignProps = { texture: CanvasTexture; w: number; h: number; x?: number; y: number; z?: number; postHeight: number }
 
-// A painted board at height y on one post (narrow) or two (wide). Faces local -z, so a group
-// oriented with poseAt() shows it to the road.
+// A painted board at height y on one post (narrow) or two (wide). Faces local +z, which in a
+// poseAt() frame points at the road.
 export function Sign({ texture, w, h, x = 0, y, z = 0, postHeight }: SignProps) {
   const two = w > 1.2
   return (
@@ -47,7 +47,7 @@ export function Sign({ texture, w, h, x = 0, y, z = 0, postHeight }: SignProps) 
       ) : (
         <Post h={postHeight} />
       )}
-      <mesh position={[0, y, -0.06]} rotation={[0, Math.PI, 0]} castShadow>
+      <mesh position={[0, y, 0.06]} castShadow>
         <planeGeometry args={[w, h]} />
         <meshStandardMaterial map={texture} roughness={0.85} metalness={0} side={DoubleSide} />
       </mesh>
@@ -57,10 +57,10 @@ export function Sign({ texture, w, h, x = 0, y, z = 0, postHeight }: SignProps) 
 
 type ScreenProps = { texture: CanvasTexture; w: number; h: number; x?: number; y: number; z?: number; rotationY?: number }
 
-// A painted panel with a thin ink frame, mounted on a wall or a post by the caller. Faces local -z.
+// A painted panel with a thin ink frame, mounted on a wall or a post by the caller. Faces local +z.
 export function Screen({ texture, w, h, x = 0, y, z = 0, rotationY = 0 }: ScreenProps) {
   return (
-    <group position={[x, y, z]} rotation={[0, rotationY + Math.PI, 0]}>
+    <group position={[x, y, z]} rotation={[0, rotationY, 0]}>
       <mesh position={[0, 0, -0.03]}>
         <boxGeometry args={[w + 0.12, h + 0.12, 0.06]} />
         <meshStandardMaterial color={PALETTE.ink} roughness={0.5} metalness={0.4} />

@@ -66,16 +66,13 @@ export function buildPlacements(): Placement[] {
   // milestone signposts
   p.push({ t: 0.115, lateral: 8, model: 'nature/sign', fit: { h: 2.8 } })
   p.push({ t: 0.15, lateral: -8, model: 'nature/sign', fit: { h: 2.8 } })
-  treeRun(p, rand, 0.06, 14, 0.011, 8, 6, 4.5, 2.5)
+  treeRun(p, rand, 0.06, 10, 0.011, 8, 6, 4.5, 2.5)
 
   // stop 2: town
   p.push({ t: 0.232, lateral: -12, model: 'commercial/building-c', fit: { len: 8 } })
-  p.push({ t: 0.252, lateral: 18, model: 'commercial/building-b', fit: { len: 10 } })
   p.push({ t: 0.255, lateral: -14, model: 'suburban/building-type-e', fit: { len: 7 } })
   p.push({ t: 0.245, lateral: -9, model: 'nature/tree_detailed', fit: { h: 5 } })
-  p.push({ t: 0.2, lateral: 10, model: 'nature/tree_tall', fit: { h: 6 } })
   p.push({ t: 0.265, lateral: -10, model: 'nature/tree_fat', fit: { h: 5.5 } })
-  p.push({ t: 0.225, lateral: 9, model: 'nature/tree_pineRoundA', fit: { h: 5 } })
 
   // stop 3: workshop
   p.push({ t: 0.395, lateral: 16, model: 'industrial/building-a', fit: { len: 14 } })
@@ -145,32 +142,35 @@ export type CameraPose = { back: number; side: number; up: number; lookSide: num
 // Parked at a stop the camera rises and pulls back to frame the set piece on the +lateral side.
 export const ARRIVAL_POSES: CameraPose[] = [
   { back: 17, side: -8, up: 9.5, lookSide: 3, lookAhead: 10, lookY: 1.8 }, // start
-  { back: 19, side: -9, up: 11, lookSide: 6, lookAhead: 6, lookY: 2.4 }, // medchron: building, conveyor, signs
+  { back: 21, side: -12, up: 12, lookSide: 7.5, lookAhead: 13, lookY: 2.0 }, // medchron: building, conveyor, signs
   { back: 18, side: -9, up: 10.5, lookSide: 5, lookAhead: 6, lookY: 2.2 }, // products
   { back: 20, side: -8, up: 12, lookSide: 4, lookAhead: 8, lookY: 2.6 }, // platforms
   { back: 18, side: -9, up: 10.5, lookSide: 5, lookAhead: 6, lookY: 2.2 }, // skills
   { back: 17, side: -7, up: 10, lookSide: 2, lookAhead: 12, lookY: 2.0 }, // contact
 ]
-export const ARRIVAL_POSE_PHONE: CameraPose = { back: 13, side: -1.6, up: 14, lookSide: 0.3, lookAhead: 2, lookY: -4 }
+export const ARRIVAL_POSE_PHONE: CameraPose = { back: 12, side: -3, up: 13, lookSide: 4.5, lookAhead: 7, lookY: -2 }
 
 // The garage the car starts in, in the road frame at t = 0: local +z is forward along the road.
-export const GARAGE = { width: 7.6, depth: 12, height: 4.4, centerZ: 1, doorZ: 7, doorHeight: 3.6 }
-// Intro camera: in front of the door, low, looking at the door. Blends into the chase pose.
-export const INTRO_CAMERA: CameraPose = { back: -16, side: 2.5, up: 1.8, lookSide: 0, lookAhead: 7, lookY: 1.9 }
+// It stands behind the road's origin so the chase camera at the first stop is never inside it.
+export const GARAGE = { width: 7.6, depth: 12, height: 4.4, centerZ: -9, doorZ: -3, doorHeight: 3.6 }
+// During the intro the car begins this many metres behind the road origin, inside the garage.
+export const INTRO_BACK = 7
+// Intro camera: ahead of the door, low, looking back at it. Blends into the chase pose.
+export const INTRO_CAMERA: CameraPose = { back: -9.5, side: 3.2, up: 2.3, lookSide: -0.4, lookAhead: -3, lookY: 2.0 }
 
 // MedChron set piece, all on the camera side. Conveyor runs from the dock past the arch, then the
 // six chronology signposts stand along the road up to the stop.
 export const MEDCHRON = {
-  lateral: 15,
-  buildingT: 0.19,
-  buildingLen: 18,
-  conveyorLateral: 9,
-  conveyorStart: 0.183,
-  archT: 0.205,
-  conveyorEnd: 0.225,
-  signLateral: 8.5,
-  signTs: [0.208, 0.214, 0.22, 0.226, 0.232, 0.238],
-  boardT: 0.19,
+  lateral: 21,
+  buildingT: 0.228,
+  buildingLen: 16,
+  conveyorLateral: 10,
+  conveyorStart: 0.198,
+  archT: 0.214,
+  conveyorEnd: 0.236,
+  signLateral: 6.3,
+  signTs: [0.216, 0.2235, 0.231, 0.2385, 0.246, 0.2535],
+  boardT: 0.228,
 } as const
 
 // every model path the scene can request, used by the copy script and a test

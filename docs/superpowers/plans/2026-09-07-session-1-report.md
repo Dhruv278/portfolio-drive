@@ -102,3 +102,26 @@ The owner said the trees, buildings and car do not look real and chose "realisti
 - Also fixed on the way: loader progress is read through a subscription, not a hook, which removed a React setState-in-render error raised from inside drei's loaders; textures preload with the models; the renderer, scene and camera are exposed on `window.__drive` with `?stats=1` for in-page diagnosis.
 - Still to do in stage 1: the realistic CC-BY car. Downloading from Sketchfab needs the owner's account. Candidates are listed in the spec. Stage 2 replaces trees, buildings and hills.
 
+## Addendum: session A of the world tells the story (10 September 2026)
+
+Spec: `../specs/2026-09-10-world-tells-the-story-design.md`. Plan: `2026-09-10-session-a-garage-intro-medchron.md`. Delivered on branch `session-a`, merged to main.
+
+- The Canvas painter (`scene/paint.ts`): signs, cards, boards and the garage door in the paper, ink and cobalt language, text from `profile.ts`. Painting is queued and done one canvas per frame; the boards repaint once the web fonts load.
+- The piece toolkit (`scene/pieces/toolkit.tsx`): textured masses, posts, signs, screens and additive glow, with four CC0 wall and metal texture sets at 512 px (0.23 MB together).
+- The intro: the car starts inside a brick garage behind the road's origin with `DHRUV GOPANI` on the roller door. After the warm-up the door lifts, the headlights come on, the car rolls out to the first stop and the camera swings from the door into the chase, 3.5 s, ended at once by a scroll, skipped under reduced motion or with `?intro=0`.
+- The arrival camera: parked at a stop, the camera eases to a higher, wider pose from `ARRIVAL_POSES` that frames the set piece on the camera side, and back again when the car leaves.
+- MedChron: a records building with a loading dock, a `Medical Records` sign and a board that counts 53% to 26%, 0 to 28 defects and 3 QA rounds on arrival. A conveyor of instanced paper sheets runs from the dock through a cobalt scanner arch labelled `Extract and cite` and continues as paper cards. Five chronology signposts (date, provider, finding, page citation) and a closing `Cited chronology` card stand by the kerb, turned toward the approaching car. Three Kenney buildings and two trees at the stop are gone.
+- Measured on the dev server at dpr 1, 1280 by 800, no effects: 35 fps driving at the start and at the MedChron stop, 20 to 26 idle at the 24 fps idle loop, ready in 7.5 to 9 s. Draw calls 292 at the start, 332 at MedChron.
+- End-to-end on the production build: 39 passed across five engines, 1 flaky then passed, 20 skipped by design (engine-specific tests). Three new tests: the intro plays and ends, the intro skips when the visitor has scrolled, the garage, the MedChron piece and the car exist in the scene.
+
+### What went wrong and what it taught
+
+The WebGL context was lost on roughly a third of loads while this landed. Instrumented with per-step warm-up marks and a wrapper around `gl.render` (both on `window` with `?stats=1`), four causes surfaced, all fixed:
+
+1. Fiber requests a frame every time the scene graph changes, even with `frameloop="demand"`. When the loaded models committed, that frame drew the whole scene with every shader uncompiled: a 1.3 s stall. The Canvas now runs `frameloop="never"` until the warm-up reports ready.
+2. The warm-up started before React had committed the scenery, so it compiled and drew a third of the scene. It now waits for the scenery group to hold every placement and for the mesh count to stay still.
+3. Canvas 2D is GPU rasterised. Painting fifty boards plus the 2048 ground map and the road strip inside the commit task was enough GPU work to trip the Windows watchdog. Painting is queued and drained one canvas per frame.
+4. The first draw with each shader program still compiles driver-side variants on ANGLE, so drawing everything in one frame after `compileAsync` took 1.2 s. The warm-up uploads textures two per frame and draws one program group per frame (17 groups, longest 150 ms).
+
+Two more lessons: the fiber clock restarts from zero when the frameloop switches on, so anything timing across ready uses `performance.now()`. And a test harness that opens and closes WebGL contexts every few seconds makes the debug browser's GPU process lose contexts on its own; measurements need a fresh browser and ten seconds between runs. In the dev server this week `next/font` failed to fetch the Google fonts and fell back, so dev screenshots show the fallback face; the production build has the font files.
+

@@ -24,10 +24,10 @@ From Poly Haven (https://polyhaven.com), all CC0 1.0. Converted to 1k WebP for t
 | `textures/asphalt_*.webp` | https://polyhaven.com/a/aerial_asphalt_01 | 0.5 MB |
 | `textures/grass_*.webp` | https://polyhaven.com/a/leafy_grass | 1.0 MB |
 | `textures/concrete_*.webp` | https://polyhaven.com/a/concrete_pavement_02 | 0.7 MB |
-| `textures/pieces/brick_*.webp` | https://polyhaven.com/a/brick_wall_02 | 0.2 MB |
-| `textures/pieces/concrete_*.webp` | https://polyhaven.com/a/concrete_wall_008 | 0.2 MB |
-| `textures/pieces/corrugated_*.webp` | https://polyhaven.com/a/corrugated_iron_02 | 0.2 MB |
-| `textures/pieces/metal_*.webp` | https://polyhaven.com/a/metal_plate | 0.2 MB |
+| `textures/pieces/brick_*.webp` | https://polyhaven.com/a/brick_wall_02 | 0.14 MB |
+| `textures/pieces/concrete_*.webp` | https://polyhaven.com/a/concrete_wall_008 | 0.02 MB |
+| `textures/pieces/corrugated_*.webp` | https://polyhaven.com/a/corrugated_iron_02 | 0.02 MB |
+| `textures/pieces/metal_*.webp` | https://polyhaven.com/a/metal_plate | 0.06 MB |
 
 `textures/waternormals.webp` is `examples/textures/waternormals.jpg` from three.js (MIT, https://github.com/mrdoob/three.js), resized to 512.
 

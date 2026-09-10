@@ -56,6 +56,33 @@ export const skillGroups: SkillGroup[] = [
   { label: 'Product and leadership', items: ['Roadmap', 'Specifications', 'Prioritization', 'Cross-functional delivery', 'QA and acceptance cycles', 'Stakeholder demos', 'Code review', 'Claude Code', 'Codex', 'Cursor'] },
 ]
 
+export type ChronologyCard = { date: string; provider: string; finding: string; page: string }
+export type Counter = { label: string; from: number; to: number; suffix: string }
+
+// Words painted onto the 3D set pieces. Sample data is fictional and labelled as such on the board.
+export const setPieces = {
+  garage: { door: 'DHRUV GOPANI' },
+  medchron: {
+    building: 'Medical Records',
+    sample: 'Sample record, not a real patient',
+    arch: 'Extract and cite',
+    chronology: [
+      { date: '2024-03-02', provider: 'Riverside ER', finding: 'Rear-end collision, neck and low back pain', page: 'p. 14' },
+      { date: '2024-03-09', provider: 'Dr. Patel, Orthopedics', finding: 'Cervical strain, referred to physical therapy', page: 'p. 41' },
+      { date: '2024-03-20', provider: 'Northside Physical Therapy', finding: 'Visit 1 of 12, range of motion limited', page: 'p. 77' },
+      { date: '2024-05-14', provider: 'Open MRI Center', finding: 'C5 to C6 disc protrusion', page: 'p. 132' },
+      { date: '2024-06-03', provider: 'Dr. Patel, Orthopedics', finding: 'Epidural steroid injection', page: 'p. 168' },
+      { date: '2024-08-19', provider: 'Northside Physical Therapy', finding: 'Discharged, goals met', page: 'p. 214' },
+    ] as ChronologyCard[],
+    last: 'Cited chronology',
+    counters: [
+      { label: 'Medication rows without a start date', from: 53, to: 26, suffix: '%' },
+      { label: 'Defects worked through for Chi', from: 0, to: 28, suffix: '' },
+      { label: 'QA rounds', from: 0, to: 3, suffix: '' },
+    ] as Counter[],
+  },
+} as const
+
 export const stops: StopContent[] = [
   {
     kind: 'hero',
@@ -161,7 +188,7 @@ export const stops: StopContent[] = [
       { label: 'GitHub', value: identity.github.label, href: identity.github.href },
       { label: 'Resume', value: 'PDF, two pages', href: identity.resumePdf },
     ],
-    wheel: 'Take the wheel. A free-drive playground with project billboards and skill badges arrives in session three.',
+    wheel: 'The road ends here. The inbox does not.',
   },
 ]
 

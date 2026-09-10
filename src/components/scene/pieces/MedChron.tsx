@@ -93,9 +93,10 @@ export function MedChron() {
     }, [signTex, archTex, cardTex, lastTex, boardTex, md]),
   )
 
-  useFrame(({ clock }) => {
+  useFrame(() => {
     const { s, reduced } = readRoadT()
-    const now = clock.elapsedTime
+    // Wall time: the fiber clock restarts when the frameloop switches on at ready.
+    const now = performance.now() / 1000
 
     // Sheets ride the belt; past the arch they grow into paper cards.
     const inst = sheets.current

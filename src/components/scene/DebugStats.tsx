@@ -20,7 +20,7 @@ declare global {
 // Mounted only with ?stats=1. Publishes renderer counters once a second for measurement scripts.
 export function DebugStats() {
   const acc = useRef({ frames: 0, t: 0 })
-  useFrame(({ gl, scene, camera, clock }) => {
+  useFrame(({ gl, scene, camera }) => {
     if (!window.__drive) {
       window.__drive = { gl, scene, camera, THREE }
       // Time every render call and keep the eight slowest, with the counters that explain them.
@@ -40,7 +40,8 @@ export function DebugStats() {
     }
     const a = acc.current
     a.frames++
-    const now = clock.elapsedTime
+    // Wall time, not the fiber clock: that clock restarts when the frameloop switches on at ready.
+    const now = performance.now() / 1000
     if (now - a.t >= 1) {
       const fps = a.frames / (now - a.t)
       gl.getSize(size)

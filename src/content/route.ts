@@ -148,6 +148,8 @@ export const ARRIVAL_POSES: CameraPose[] = [
   { back: 18, side: -9, up: 10.5, lookSide: 5, lookAhead: 6, lookY: 2.2 }, // skills
   { back: 17, side: -7, up: 10, lookSide: 2, lookAhead: 12, lookY: 2.0 }, // contact
 ]
+// Home page hero: the car parked at the first stop, low and wide, road and sky behind it.
+export const HERO_POSE: CameraPose = { back: 14, side: -6, up: 6.2, lookSide: 2.5, lookAhead: 18, lookY: 2.8 }
 export const ARRIVAL_POSE_PHONE: CameraPose = { back: 12, side: -3, up: 13, lookSide: 4.5, lookAhead: 7, lookY: -2 }
 
 // The garage the car starts in, in the road frame at t = 0: local +z is forward along the road.

@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test'
 
 test.describe('The Drive', () => {
   test('renders six stops with the resume content', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/drive')
     await expect(page.locator('section.stop')).toHaveCount(6)
     await expect(page.getByRole('heading', { level: 1 })).toContainText('Dhruv')
     await expect(page.getByRole('heading', { name: /MedChron: medical records in/ })).toBeVisible()
@@ -12,7 +12,7 @@ test.describe('The Drive', () => {
   test('odometer follows the scroll through every stop', async ({ page }) => {
     // Headless Chrome renders WebGL in software, which starves the page thread and makes this
     // scroll loop time out. The HTML layer is what is under test here, so the scene is switched off.
-    await page.goto('/?scene=off')
+    await page.goto('/drive?scene=off')
     const odo = page.getByTestId('odometer')
     await expect(odo).toContainText('Stop 1 of 6')
     const total = await page.evaluate(() => document.documentElement.scrollHeight - innerHeight)
@@ -28,7 +28,7 @@ test.describe('The Drive', () => {
   })
 
   test('projects carry skill chips and the skills board is grouped', async ({ page }) => {
-    await page.goto('/?scene=off')
+    await page.goto('/drive?scene=off')
     expect(await page.locator('#platforms .chip').count()).toBeGreaterThan(20)
     expect(await page.locator('#products .card .chip').count()).toBeGreaterThan(10)
     expect(await page.locator('#how .skillgroup').count()).toBeGreaterThanOrEqual(8)
@@ -36,7 +36,7 @@ test.describe('The Drive', () => {
   })
 
   test('stops reveal as the car arrives and stay revealed', async ({ page }) => {
-    await page.goto('/?scene=off')
+    await page.goto('/drive?scene=off')
     await expect(page.locator('section#start')).toHaveAttribute('data-active', 'true')
     await expect(page.locator('section#platforms')).toHaveAttribute('data-active', 'false')
     const total = await page.evaluate(() => document.documentElement.scrollHeight - innerHeight)
@@ -71,7 +71,7 @@ test.describe('The Drive', () => {
         return out
       }, id)
 
-    await page.goto('/?scene=off')
+    await page.goto('/drive?scene=off')
     const medchron = await probe('medchron')
     expect(medchron.overflow).toBe('visible')
     expect(medchron.parked).toBeGreaterThan(5)
@@ -80,7 +80,7 @@ test.describe('The Drive', () => {
     // A short window, where the tallest panel no longer fits: its heading is on screen when the car
     // arrives, and it slides up to show its end before the car leaves.
     await page.setViewportSize({ width: 1000, height: 600 })
-    await page.goto('/?scene=off')
+    await page.goto('/drive?scene=off')
     const platforms = await probe('platforms')
     expect(platforms.overflow).toBe('visible')
     expect(platforms.parked).toBeGreaterThan(3)
@@ -90,7 +90,7 @@ test.describe('The Drive', () => {
 
   test('phone: top bar stays clear of the hero and controls are touch sized', async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== 'phone', 'phone layout only')
-    await page.goto('/?scene=off')
+    await page.goto('/drive?scene=off')
     const m = await page.evaluate(() => {
       const hud = document.querySelector('.hud.top')!.getBoundingClientRect()
       const hero = document.querySelector('section#start .panel')!.getBoundingClientRect()
@@ -106,7 +106,7 @@ test.describe('The Drive', () => {
 
   test('plays the intro once and ends within six seconds', async ({ page }, testInfo) => {
     test.skip(!['desktop', 'phone'].includes(testInfo.project.name), 'needs a real WebGL scene')
-    await page.goto('/?stats=1')
+    await page.goto('/drive?stats=1')
     const scene = page.getByTestId('scene')
     await expect(scene).toHaveAttribute('data-ready', 'true', { timeout: 60_000 })
     await expect(scene).toHaveAttribute('data-intro', /playing|done/)
@@ -117,7 +117,7 @@ test.describe('The Drive', () => {
 
   test('skips the intro when the visitor has already scrolled', async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== 'desktop', 'one engine is enough')
-    await page.goto('/?stats=1')
+    await page.goto('/drive?stats=1')
     await page.evaluate(() => window.scrollTo(0, 600))
     await expect(page.getByTestId('scene')).toHaveAttribute('data-ready', 'true', { timeout: 60_000 })
     await expect(page.getByTestId('scene')).toHaveAttribute('data-intro', 'skipped', { timeout: 8_000 })
@@ -125,7 +125,7 @@ test.describe('The Drive', () => {
 
   test('builds the garage and the MedChron set piece', async ({ page }, testInfo) => {
     test.skip(!['desktop', 'phone'].includes(testInfo.project.name), 'needs a real WebGL scene')
-    await page.goto('/?stats=1&intro=0')
+    await page.goto('/drive?stats=1&intro=0')
     await expect(page.getByTestId('scene')).toHaveAttribute('data-ready', 'true', { timeout: 60_000 })
     const names = await page.evaluate(() => {
       const d = (window as unknown as { __drive?: { scene: { getObjectByName: (n: string) => unknown } } }).__drive
@@ -134,8 +134,31 @@ test.describe('The Drive', () => {
     expect(names).toEqual([true, true, true])
   })
 
+  test('home: hero, proof strip, four case studies, six platforms, links', async ({ page }) => {
+    await page.goto('/?scene=off')
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('Dhruv')
+    await expect(page.getByRole('link', { name: 'Take the drive' })).toHaveAttribute('href', '/drive')
+    await expect(page.locator('article.case')).toHaveCount(4)
+    await expect(page.locator('.platform-rows li')).toHaveCount(6)
+    await expect(page.locator('#contact a[href^="mailto:"]')).toHaveCount(1)
+    // the proof strip counts up once it is in view
+    await page.locator('.proof').scrollIntoViewIfNeeded()
+    await expect(page.getByTestId('proof-value').first()).toHaveText('53% to 26%', { timeout: 5_000 })
+    await expect(page.getByTestId('proof-value').nth(1)).toHaveText('28')
+  })
+
+  test('home: the hero scene mounts, then stops rendering once scrolled away', async ({ page }, testInfo) => {
+    test.skip(!['desktop', 'phone'].includes(testInfo.project.name), 'needs a real WebGL scene')
+    await page.goto('/?stats=1&intro=0')
+    const scene = page.getByTestId('scene')
+    await expect(scene).toHaveAttribute('data-ready', 'true', { timeout: 60_000 })
+    await expect(scene).toHaveAttribute('data-running', 'true')
+    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight))
+    await expect(scene).toHaveAttribute('data-running', 'false', { timeout: 5_000 })
+  })
+
   test('resume PDF and resume page are reachable', async ({ page, request }) => {
-    await page.goto('/')
+    await page.goto('/drive')
     const href = await page.locator('.hud.top a.btn.primary').getAttribute('href')
     expect(href).toBe('/Dhruv_Gopani_Resume.pdf')
     const pdf = await request.get(href!)
@@ -148,14 +171,14 @@ test.describe('The Drive', () => {
 
   test('shows the fallback and all content when WebGL is unavailable', async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== 'no-webgl', 'only meaningful with WebGL disabled')
-    await page.goto('/')
+    await page.goto('/drive')
     await expect(page.getByTestId('nogl')).toBeVisible()
     await expect(page.locator('section.stop')).toHaveCount(6)
   })
 
   test('mounts the 3D scene when WebGL is available', async ({ page }, testInfo) => {
     test.skip(testInfo.project.name === 'no-webgl', 'WebGL disabled in this project')
-    await page.goto('/')
+    await page.goto('/drive')
     const chromium = testInfo.project.name === 'desktop' || testInfo.project.name === 'phone'
     if (chromium) {
       await expect(page.getByTestId('scene').locator('canvas')).toBeVisible({ timeout: 20_000 })

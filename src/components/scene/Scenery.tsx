@@ -5,7 +5,7 @@ import { useFrame } from '@react-three/fiber'
 import { Suspense, useMemo, useRef } from 'react'
 import { Box3, Group, Material, Mesh, Vector3 } from 'three'
 import { buildPlacements, REVEAL_LEAD, type Fit, type Placement } from '@/content/route'
-import { lambertFor } from './materials'
+import { lambertFor, tintedLambert } from './materials'
 import { poseAt } from './roadCurve'
 import { readRoadT, useIsMobile } from './useDriveFrame'
 
@@ -14,9 +14,13 @@ type LoadedGltf = { scene: Group }
 // Only things taller than this cast a shadow. Fence posts, rocks and small props do not need one.
 const SHADOW_MIN_HEIGHT = 3
 
+// The nature kit's palette is mint and peach. Multiplied by this it reads as green leaves and brown
+// trunks against the photographic ground.
+const NATURE_TINT = '#b4c46e'
+
 // Clone a loaded model and size it to the fit spec, footprint centred, base on the ground.
 // Swaps PBR materials for Lambert and limits shadow casting, both for integrated GPUs.
-export function fitModel(src: Group, fit: Fit): Group {
+export function fitModel(src: Group, fit: Fit, tint?: string): Group {
   const m = src.clone(true)
   const box = new Box3().setFromObject(m)
   const size = box.getSize(new Vector3())
@@ -36,7 +40,8 @@ export function fitModel(src: Group, fit: Fit): Group {
       // Tall things cast and receive. Self-shadowing is what gives the low-poly trees their depth.
       mesh.castShadow = tall
       mesh.receiveShadow = tall
-      mesh.material = lambertFor(mesh.material as Material)
+      const lambert = lambertFor(mesh.material as Material)
+      mesh.material = tint ? tintedLambert(lambert, tint) : lambert
     }
   })
   return m
@@ -48,7 +53,7 @@ function Placed({ p, lat }: { p: Placement; lat: number }) {
   const group = useRef<Group>(null)
   const k = useRef(0)
   const model = useMemo(() => {
-    const m = fitModel(scene, p.fit)
+    const m = fitModel(scene, p.fit, p.model.startsWith('nature/') ? NATURE_TINT : undefined)
     if (p.rot) m.rotation.y = p.rot
     if (p.dx) m.position.x += p.dx
     if (p.dz) m.position.z += p.dz

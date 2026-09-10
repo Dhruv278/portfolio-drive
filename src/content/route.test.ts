@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { CatmullRomCurve3, Vector3 } from 'three'
-import { BILLBOARDS, buildPlacements, HILL_CLEARANCE, HILLS, KERB_WIDTH, ROAD_HALF_WIDTH, ROAD_POINTS, T_END, T_STOPS, usedModels } from './route'
+import { ARRIVAL_POSES, BILLBOARDS, buildPlacements, CAR_LENGTH, GARAGE, HILL_CLEARANCE, HILLS, KERB_WIDTH, MEDCHRON, ROAD_HALF_WIDTH, ROAD_POINTS, T_END, T_STOPS, usedModels } from './route'
 
 function hillCentre(t: number, lateral: number, curve: CatmullRomCurve3): Vector3 {
   const p = curve.getPointAt(t)
@@ -39,6 +39,35 @@ describe('route', () => {
         h.r + ROAD_HALF_WIDTH + KERB_WIDTH + HILL_CLEARANCE,
       )
     }
+  })
+
+  it('has one arrival pose per stop that sits higher and wider than the chase', () => {
+    expect(ARRIVAL_POSES).toHaveLength(T_STOPS.length)
+    for (const p of ARRIVAL_POSES) {
+      expect(p.up).toBeGreaterThan(8.6)
+      expect(p.back).toBeGreaterThan(15.5)
+    }
+  })
+
+  it('keeps the MedChron piece clear of the tarmac and in order along the road', () => {
+    expect(MEDCHRON.conveyorLateral).toBeGreaterThan(ROAD_HALF_WIDTH + KERB_WIDTH + 1)
+    expect(MEDCHRON.signLateral).toBeGreaterThan(ROAD_HALF_WIDTH + KERB_WIDTH + 1)
+    expect(MEDCHRON.conveyorStart).toBeLessThan(MEDCHRON.archT)
+    expect(MEDCHRON.archT).toBeLessThan(MEDCHRON.conveyorEnd)
+    expect(MEDCHRON.signTs).toHaveLength(6)
+    for (let i = 1; i < MEDCHRON.signTs.length; i++) expect(MEDCHRON.signTs[i]).toBeGreaterThan(MEDCHRON.signTs[i - 1])
+    expect(MEDCHRON.signTs[0]).toBeGreaterThan(MEDCHRON.archT)
+    expect(MEDCHRON.signTs[5]).toBeLessThan(T_STOPS[1] + 0.035)
+  })
+
+  it('no longer ships the two Kenney buildings the records building replaces', () => {
+    expect(usedModels()).not.toContain('commercial/building-e')
+    expect(usedModels()).not.toContain('commercial/building-skyscraper-a')
+  })
+
+  it('starts the garage door ahead of the car and the car inside the garage', () => {
+    expect(GARAGE.doorZ).toBeGreaterThan(CAR_LENGTH / 2)
+    expect(GARAGE.centerZ - GARAGE.depth / 2).toBeLessThan(-CAR_LENGTH / 2)
   })
 
   it('is deterministic between calls', () => {

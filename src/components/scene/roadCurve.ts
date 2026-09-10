@@ -35,3 +35,17 @@ export function poseAt(t: number, lateral: number, out?: Pose): Pose {
   o.quaternion.copy(_q)
   return o
 }
+
+const FORWARD = new Vector3(0, 0, 1)
+export type Frame = { position: Vector3; quaternion: Quaternion; tangent: Vector3; right: Vector3 }
+
+// A frame on the road centre at t: local +z points along the road, local +x to the camera side.
+export function frameAt(t: number, out?: Frame): Frame {
+  const curve = roadCurve()
+  const o = out ?? { position: new Vector3(), quaternion: new Quaternion(), tangent: new Vector3(), right: new Vector3() }
+  curve.getPointAt(t, o.position)
+  curve.getTangentAt(t, o.tangent).setY(0).normalize()
+  o.right.crossVectors(UP, o.tangent).normalize()
+  o.quaternion.setFromUnitVectors(FORWARD, o.tangent)
+  return o
+}

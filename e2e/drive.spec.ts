@@ -104,6 +104,36 @@ test.describe('The Drive', () => {
     expect(m.minButton).toBeGreaterThanOrEqual(44)
   })
 
+  test('plays the intro once and ends within six seconds', async ({ page }, testInfo) => {
+    test.skip(!['desktop', 'phone'].includes(testInfo.project.name), 'needs a real WebGL scene')
+    await page.goto('/?stats=1')
+    const scene = page.getByTestId('scene')
+    await expect(scene).toHaveAttribute('data-ready', 'true', { timeout: 60_000 })
+    await expect(scene).toHaveAttribute('data-intro', /playing|done/)
+    await expect(scene).toHaveAttribute('data-intro', 'done', { timeout: 8_000 })
+    // the intro left the car at the first stop
+    await expect(page.getByTestId('odometer')).toContainText('Stop 1 of 6')
+  })
+
+  test('skips the intro when the visitor has already scrolled', async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== 'desktop', 'one engine is enough')
+    await page.goto('/?stats=1')
+    await page.evaluate(() => window.scrollTo(0, 600))
+    await expect(page.getByTestId('scene')).toHaveAttribute('data-ready', 'true', { timeout: 60_000 })
+    await expect(page.getByTestId('scene')).toHaveAttribute('data-intro', 'skipped', { timeout: 8_000 })
+  })
+
+  test('builds the garage and the MedChron set piece', async ({ page }, testInfo) => {
+    test.skip(!['desktop', 'phone'].includes(testInfo.project.name), 'needs a real WebGL scene')
+    await page.goto('/?stats=1&intro=0')
+    await expect(page.getByTestId('scene')).toHaveAttribute('data-ready', 'true', { timeout: 60_000 })
+    const names = await page.evaluate(() => {
+      const d = (window as unknown as { __drive?: { scene: { getObjectByName: (n: string) => unknown } } }).__drive
+      return ['piece-garage', 'piece-medchron', 'car'].map((n) => Boolean(d?.scene.getObjectByName(n)))
+    })
+    expect(names).toEqual([true, true, true])
+  })
+
   test('resume PDF and resume page are reachable', async ({ page, request }) => {
     await page.goto('/')
     const href = await page.locator('.hud.top a.btn.primary').getAttribute('href')

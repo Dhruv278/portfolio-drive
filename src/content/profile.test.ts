@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { bannedPatterns, identity, milestones, resume, stops } from './profile'
+import { bannedPatterns, identity, milestones, resume, setPieces, stops } from './profile'
 
 function collectStrings(value: unknown, out: string[] = []): string[] {
   if (typeof value === 'string') out.push(value)
@@ -9,7 +9,7 @@ function collectStrings(value: unknown, out: string[] = []): string[] {
 }
 
 describe('profile content', () => {
-  const all = collectStrings({ identity, milestones, stops, resume })
+  const all = collectStrings({ identity, milestones, stops, resume, setPieces })
 
   it('has six stops with unique ids in the agreed order', () => {
     expect(stops.map((s) => s.id)).toEqual(['start', 'medchron', 'products', 'platforms', 'how', 'contact'])
@@ -41,6 +41,13 @@ describe('profile content', () => {
       identity.github.href,
       identity.resumePdf,
     ])
+  })
+
+  it('gives the MedChron set piece six chronology cards with page citations and three counters', () => {
+    expect(setPieces.medchron.chronology).toHaveLength(6)
+    for (const c of setPieces.medchron.chronology) expect(c.page).toMatch(/^p\. \d+$/)
+    expect(setPieces.medchron.counters.map((c) => c.to)).toEqual([26, 28, 3])
+    expect(setPieces.garage.door).toBe('DHRUV GOPANI')
   })
 
   it('numbers the eyebrows two to six for the non-hero stops', () => {

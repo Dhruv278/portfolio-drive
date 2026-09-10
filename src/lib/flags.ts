@@ -11,5 +11,8 @@ export const flags = {
   contact: params?.get('contact') !== '0',
   clouds: params?.get('clouds') !== '0',
   pbr: params?.get('pbr') !== '0',
+  intro: params?.get('intro') !== '0',
+  garage: params?.get('garage') !== '0',
+  medchron: params?.get('medchron') !== '0',
   stats: params?.get('stats') === '1',
 }

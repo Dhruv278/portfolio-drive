@@ -3,8 +3,9 @@
 // Photographic surface textures (Poly Haven, CC0) and the painted road strip. UVs on the road and
 // kerb ribbons run 0..1 across and in metres along, so every repeat here is "tiles per metre".
 import { useTexture } from '@react-three/drei'
-import { CanvasTexture, RepeatWrapping, SRGBColorSpace, type Texture } from 'three'
+import { type CanvasTexture, RepeatWrapping, SRGBColorSpace, type Texture } from 'three'
 import { KERB_WIDTH, ROAD_HALF_WIDTH } from '@/content/route'
+import { makeTexture } from './paint'
 
 export const ROAD_WIDTH = ROAD_HALF_WIDTH * 2
 export const ASPHALT_TILE = ROAD_WIDTH // one asphalt tile spans the road, 6.4 m
@@ -70,12 +71,14 @@ export function buildGroundMap(grass: CanvasImageSource): CanvasTexture {
   const n = GROUND_MAP_TILES
   const size = 2048
   const cell = size / n
-  const c = document.createElement('canvas')
-  c.width = size
-  c.height = size
-  const ctx = c.getContext('2d')
-  const tex = new CanvasTexture(c)
-  if (!ctx) return tex
+  const tex = makeTexture(size, size, (ctx) => paintGround(ctx, grass, n, size, cell))
+  tex.wrapS = RepeatWrapping
+  tex.wrapT = RepeatWrapping
+  tex.repeat.set(1400 / (GRASS_TILE * n), 1400 / (GRASS_TILE * n))
+  return tex
+}
+
+function paintGround(ctx: CanvasRenderingContext2D, grass: CanvasImageSource, n: number, size: number, cell: number) {
   let seed = 7
   const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647)
   for (let y = 0; y < n; y++) {
@@ -100,24 +103,19 @@ export function buildGroundMap(grass: CanvasImageSource): CanvasTexture {
     ctx.fillStyle = g
     ctx.fillRect(0, 0, size, size)
   }
-  tex.colorSpace = SRGBColorSpace
-  tex.wrapS = RepeatWrapping
-  tex.wrapT = RepeatWrapping
-  tex.repeat.set(1400 / (GRASS_TILE * n), 1400 / (GRASS_TILE * n))
-  tex.anisotropy = 4
-  tex.needsUpdate = true
-  return tex
 }
 
 // One strip of road: asphalt tiled to world scale, two centre dashes, both edge lines, tyre wear,
 // then the paint aged with a thin asphalt wash. Repeats along the road every STRIP_LENGTH metres.
 export function paintRoadStrip(asphalt: CanvasImageSource): CanvasTexture {
-  const c = document.createElement('canvas')
-  c.width = STRIP_W
-  c.height = STRIP_H
-  const ctx = c.getContext('2d')
-  const tex = new CanvasTexture(c)
-  if (!ctx) return tex
+  const tex = makeTexture(STRIP_W, STRIP_H, (ctx) => paintStrip(ctx, asphalt))
+  tex.wrapS = RepeatWrapping
+  tex.wrapT = RepeatWrapping
+  tex.repeat.set(1, 1 / STRIP_LENGTH)
+  return tex
+}
+
+function paintStrip(ctx: CanvasRenderingContext2D, asphalt: CanvasImageSource) {
   const px = STRIP_W / ROAD_WIDTH // pixels per metre
   const tilePx = ASPHALT_TILE * px
   const drawAsphalt = () => {
@@ -149,12 +147,4 @@ export function paintRoadStrip(asphalt: CanvasImageSource): CanvasTexture {
   ctx.globalAlpha = 0.22
   drawAsphalt()
   ctx.globalAlpha = 1
-
-  tex.colorSpace = SRGBColorSpace
-  tex.wrapS = RepeatWrapping
-  tex.wrapT = RepeatWrapping
-  tex.repeat.set(1, 1 / STRIP_LENGTH)
-  tex.anisotropy = 4
-  tex.needsUpdate = true
-  return tex
 }

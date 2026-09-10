@@ -16,7 +16,7 @@ const SHADOW_MIN_HEIGHT = 3
 
 // The nature kit's palette is mint and peach. Multiplied by this it reads as green leaves and brown
 // trunks against the photographic ground.
-const NATURE_TINT = '#b4c46e'
+const NATURE_TINT = '#c99a5e'
 
 // Clone a loaded model and size it to the fit spec, footprint centred, base on the ground.
 // Swaps PBR materials for Lambert and limits shadow casting, both for integrated GPUs.

@@ -3,14 +3,17 @@
 import { useGLTF, useProgress } from '@react-three/drei'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Suspense, useEffect, useRef, useState } from 'react'
-import { Color, DirectionalLight, EquirectangularReflectionMapping, Fog, HemisphereLight, NeutralToneMapping, PMREMGenerator, Vector3 } from 'three'
+import { Color, DataTexture, DirectionalLight, EquirectangularReflectionMapping, Fog, HalfFloatType, HemisphereLight, type Mesh, type MeshStandardMaterial, NeutralToneMapping, PMREMGenerator, RGBAFormat, type Texture, Vector3 } from 'three'
 import { HDRLoader } from 'three/examples/jsm/loaders/HDRLoader.js'
 import { DUSK_SPAN, DUSK_START, usedModels } from '@/content/route'
 import { Car } from './Car'
 import { ChaseCamera } from './ChaseCamera'
 import { DebugStats } from './DebugStats'
 import { Effects } from './Effects'
+import { flushPaints, PaintPump, pendingPaints } from './paint'
 import { Billboards, Hills, Pier, PierPosts } from './Extras'
+import { Garage } from './pieces/Garage'
+import { MedChron } from './pieces/MedChron'
 import { Birds, Clouds, Water } from './Living'
 import { Road } from './Road'
 import { roadCurve } from './roadCurve'
@@ -19,7 +22,7 @@ import { flags } from '@/lib/flags'
 import { gpuInfo } from '@/lib/gpu'
 import { MOBILE_QUERY } from '@/lib/layout'
 import { useDrive } from '@/store/drive'
-import { DriveClock, IdleLoop, readRoadT, startIntro, useIsMobile } from './useDriveFrame'
+import { DriveClock, IdleLoop, openRenderGate, readRoadT, startIntro, useIsMobile } from './useDriveFrame'
 
 // Start every model download the moment the scene bundle arrives, not when each item first renders.
 for (const m of usedModels()) useGLTF.preload(`/models/${m}.glb`)
@@ -95,12 +98,42 @@ function Atmosphere({ mobile }: { mobile: boolean }) {
 
 const nextFrame = () => new Promise<void>((r) => requestAnimationFrame(() => r()))
 
+// Meshes that share a shader program. The first draw with a program is what stalls on ANGLE, so the
+// warm-up reveals one such group at a time, not one material object (there are two hundred).
+function programKey(m: Mesh): string {
+  const mat = (Array.isArray(m.material) ? m.material[0] : m.material) as MeshStandardMaterial
+  const has = (t: Texture | null | undefined) => (t ? 1 : 0)
+  return [
+    mat.type,
+    has(mat.map),
+    has(mat.normalMap),
+    has(mat.roughnessMap),
+    has(mat.metalnessMap),
+    has(mat.emissiveMap),
+    mat.transparent ? 1 : 0,
+    mat.side,
+    mat.flatShading ? 1 : 0,
+    mat.vertexColors ? 1 : 0,
+    mat.fog === false ? 0 : 1,
+    (m as unknown as { isInstancedMesh?: boolean }).isInstancedMesh ? 1 : 0,
+    m.receiveShadow ? 1 : 0,
+  ].join('|')
+}
+
+// Every texture a material samples, plus the sky.
+function texturesOf(mat: MeshStandardMaterial): Texture[] {
+  return [mat.map, mat.normalMap, mat.roughnessMap, mat.metalnessMap, mat.emissiveMap, mat.alphaMap].filter((t): t is Texture => !!t)
+}
+
 // Warm-up, run once every model has arrived and while the canvas is still faded out:
 // 1. decode the sky HDR and prefilter it into the environment map, each in its own frame,
 // 2. compile every shader with the environment present (KHR_parallel_shader_compile where available),
-// 3. render one frame so the post-processing passes compile too,
-// then report ready. Doing all of this in one frame lost the WebGL context on Intel graphics, and
-// letting the environment arrive after compilation recompiled every PBR material mid-drive.
+// 3. draw the scene one material at a time: on ANGLE the first draw with each program still compiles
+//    driver-side variants, and drawing everything at once measured a 1.5 s frame, long enough for
+//    Windows to reset the GPU and lose the context,
+// 4. render one full frame so the post-processing passes compile too,
+// then report ready. Letting the environment arrive after compilation recompiled every PBR material
+// mid-drive, so it is created here, before step 2.
 function CompileWhenLoaded({ onReady }: { onReady: () => void }) {
   const get = useThree((s) => s.get)
   const started = useRef(false)
@@ -114,6 +147,7 @@ function CompileWhenLoaded({ onReady }: { onReady: () => void }) {
       if (done) return
       done = true
       const store = useDrive.getState()
+      openRenderGate()
       // Play the intro once, only if the visitor has not scrolled yet and does not prefer reduced motion.
       if (flags.intro && !store.reducedMotion && store.scroll <= 0.002) {
         startIntro(performance.now())
@@ -124,20 +158,70 @@ function CompileWhenLoaded({ onReady }: { onReady: () => void }) {
       get().invalidate()
       onReady()
     }
+    // Step timings, readable as window.__warmup with ?stats=1, to find any step long enough to
+    // trip the GPU watchdog.
+    const marks: { step: string; ms: number; at: number }[] = []
+    let markAt = performance.now()
+    const mark = (step: string) => {
+      const now = performance.now()
+      marks.push({ step, ms: Math.round(now - markAt), at: Math.round(now) })
+      markAt = now
+      if (flags.stats) (window as unknown as { __warmup?: typeof marks }).__warmup = marks
+    }
     const run = async () => {
       const { gl, scene, camera, advance } = get()
-      // Let React commit the last resolved models before touching the graph.
-      await nextFrame()
+      // React commits the loaded models a while after the loaders report done, the scenery last.
+      // Wait until every placement is in the scene and the mesh count has held still for four frames
+      // (up to four seconds), so the warm-up sees the whole scene.
+      let stable = 0
+      let lastCount = -1
+      const waitStart = performance.now()
+      while (performance.now() - waitStart < 4000) {
+        await nextFrame()
+        const scenery = scene.getObjectByName('scenery')
+        const sceneryReady = !!scenery && scenery.children.length >= (scenery.userData.expected as number)
+        let count = 0
+        scene.traverse((o) => {
+          if ((o as Mesh).isMesh) count++
+        })
+        stable = count === lastCount ? stable + 1 : 0
+        lastCount = count
+        if (sceneryReady && stable >= 4) break
+      }
+      mark(`commit (${lastCount} meshes)`)
+      // Paint the queued canvases, one per frame.
+      let painted = 0
+      let longestPaint = 0
+      while (pendingPaints()) {
+        const t0 = performance.now()
+        flushPaints(1)
+        longestPaint = Math.max(longestPaint, performance.now() - t0)
+        painted++
+        await nextFrame()
+      }
+      mark(`paint (${painted} canvases, longest ${Math.round(longestPaint)} ms)`)
       if (flags.env) {
         try {
           const hdr = await new HDRLoader().loadAsync(HDRI)
           hdr.mapping = EquirectangularReflectionMapping
+          mark('hdr decode')
           await nextFrame()
           const pmrem = new PMREMGenerator(gl)
           pmrem.compileEquirectangularShader()
+          mark('pmrem equirect shader')
+          await nextFrame()
+          // A 4 by 2 texture through the prefilter compiles the blur shaders in their own frame, so the
+          // real prefilter below is passes only.
+          const tiny = new DataTexture(new Uint16Array(4 * 2 * 4).fill(0x3c00), 4, 2, RGBAFormat, HalfFloatType)
+          tiny.mapping = EquirectangularReflectionMapping
+          tiny.needsUpdate = true
+          pmrem.fromEquirectangular(tiny).dispose()
+          tiny.dispose()
+          mark('pmrem blur shaders')
           await nextFrame()
           const env = pmrem.fromEquirectangular(hdr).texture
           pmrem.dispose()
+          mark('pmrem')
           scene.environment = env
           // The same photo, unblurred, is the visible sky. Fog hides the seam with the ground plane.
           scene.background = hdr
@@ -148,8 +232,48 @@ function CompileWhenLoaded({ onReady }: { onReady: () => void }) {
         }
       }
       await gl.compileAsync(scene, camera)
+      mark('compile')
       await nextFrame()
+      // Upload textures ahead of the draws, two per frame. A large mipmapped upload inside a draw
+      // frame is another way to make that frame long.
+      const textures = new Set<Texture>()
+      const groups = new Map<string, Mesh[]>()
+      scene.traverse((o) => {
+        const m = o as Mesh
+        if (!m.isMesh || !m.visible) return
+        const mats = Array.isArray(m.material) ? m.material : [m.material]
+        mats.forEach((mat) => texturesOf(mat as MeshStandardMaterial).forEach((t) => textures.add(t)))
+        const key = programKey(m)
+        const list = groups.get(key) ?? []
+        list.push(m)
+        groups.set(key, list)
+      })
+      if (scene.background && (scene.background as Texture).isTexture) textures.add(scene.background as Texture)
+      let i = 0
+      let longest = 0
+      for (const t of textures) {
+        const t0 = performance.now()
+        gl.initTexture(t)
+        longest = Math.max(longest, performance.now() - t0)
+        if (++i % 2 === 0) await nextFrame()
+      }
+      mark(`textures (${textures.size}, longest ${Math.round(longest)} ms)`)
+      await nextFrame()
+      // Reveal the scene one program group per frame. Only meshes visible now take part; the rest
+      // (exhaust puffs) are managed by their own frame loops and stay untouched.
+      const all = [...groups.values()].flat()
+      all.forEach((m) => (m.visible = false))
+      longest = 0
+      for (const group of groups.values()) {
+        group.forEach((m) => (m.visible = true))
+        const t0 = performance.now()
+        advance(performance.now())
+        longest = Math.max(longest, performance.now() - t0)
+        await nextFrame()
+      }
+      mark(`first draws (${groups.size} programs, longest ${Math.round(longest)} ms)`)
       advance(performance.now())
+      mark('full frame')
     }
     const check = () => {
       const { active, progress } = useProgress.getState()
@@ -174,6 +298,7 @@ function World({ stats, fx, onReady }: { stats: boolean; fx: boolean; onReady: (
   return (
     <>
       {stats && <DebugStats />}
+      <PaintPump />
       <DriveClock />
       <IdleLoop />
       <Atmosphere mobile={mobile} />
@@ -185,6 +310,8 @@ function World({ stats, fx, onReady }: { stats: boolean; fx: boolean; onReady: (
       <Billboards />
       <Suspense fallback={null}>
         <Road />
+        {flags.garage && <Garage />}
+        {flags.medchron && <MedChron />}
         <Water />
         {flags.clouds && <Clouds />}
         <Car />
@@ -219,7 +346,10 @@ export function Scene() {
     <div className={`scene-root${ready ? ' ready' : ''}`} aria-hidden="true" data-testid="scene" data-ready={ready} data-intro={intro}>
       <Canvas
         key={mobile ? 'phone' : 'desktop'}
-        frameloop="demand"
+        // No frames at all until the warm-up has drawn every material: fiber requests a frame each
+        // time the scene graph changes, and one such frame drew the freshly loaded scene with every
+        // shader uncompiled, a 1.3 s stall that lost the WebGL context on Intel graphics.
+        frameloop={ready ? 'demand' : 'never'}
         dpr={dpr}
         shadows={mobile ? false : 'percentage'}
         gl={{ antialias: !fx, powerPreference: 'high-performance' }}

@@ -120,6 +120,9 @@ export function Car() {
     curve.getTangentAt(t, tmp.tan).setY(0).normalize()
     tmp.right.crossVectors(UP, tmp.tan).normalize()
     g.position.copy(tmp.pos)
+    // During the intro the car starts inside the garage, behind the road origin.
+    const introBack = readIntro().back
+    if (introBack > 0) g.position.addScaledVector(tmp.tan, -introBack)
     g.position.y = 0.03
     tmp.look.copy(tmp.pos).add(tmp.tan)
     g.lookAt(tmp.look)
@@ -141,7 +144,7 @@ export function Car() {
     const dusk = Math.min(1, Math.max(0, (t - DUSK_START) / DUSK_SPAN))
     // Lamps come on at dusk, and during the intro as the door opens.
     const intro = readIntro()
-    const lit = Math.max(dusk, intro.active ? Math.min(1, intro.door * 1.5) : 0)
+    const lit = Math.max(dusk, intro.active ? Math.min(0.7, intro.door * 1.2) : 0)
     const beam = Math.max(0, lit - 0.2) * BEAM_MAX_OPACITY
     if (beamL.current) beamL.current.opacity = beam
     if (beamR.current) beamR.current.opacity = beam
@@ -186,7 +189,7 @@ export function Car() {
 
   return (
     <>
-      <group ref={car}>
+      <group ref={car} name="car">
         {/* Ground contact: a blurred top-down depth of the car, re-rendered only when a frame is requested. */}
         {flags.contact && <ContactShadows position={[0, 0.005, 0]} scale={7} blur={2.4} far={1.5} opacity={0.5} resolution={256} frames={Infinity} color="#0a1020" />}
         <group ref={chassis}>

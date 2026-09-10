@@ -4,7 +4,7 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { useEffect } from 'react'
 import { introPhase } from '@/lib/pieceMath'
 import { roadT } from '@/lib/scroll'
-import { T_END, T_STOPS } from '@/content/route'
+import { INTRO_BACK, T_END, T_STOPS } from '@/content/route'
 import { isMobileSize } from '@/lib/layout'
 import { useDrive } from '@/store/drive'
 
@@ -12,9 +12,20 @@ import { useDrive } from '@/store/drive'
 // time-based so it feels the same at 60 and 144 Hz. One DriveClock advances it before anything reads it.
 const drive = { s: 0, t: 0, targetS: 0, targetT: 0, reduced: false, primed: false }
 
+// Nothing renders on its own until the warm-up in Scene.tsx has compiled and drawn every material.
+// Before that, a frame requested by a scroll or the idle loop would draw whatever had loaded and
+// compile its shaders on the spot, in one frame, which measured 1.3 s and lost the WebGL context.
+const gate = { open: false }
+export function openRenderGate() {
+  gate.open = true
+}
+export function renderGateOpen(): boolean {
+  return gate.open
+}
+
 // The first-load intro: door, car roll-out, camera swing. Module state read by the camera, the car
 // and the garage door inside their frame loops. Ends by time, or at once when the visitor scrolls.
-const intro = { active: false, start: 0, door: 0, car: 0, camera: 0 }
+const intro = { active: false, start: 0, door: 0, car: 0, camera: 0, back: 0 }
 
 export function startIntro(now: number) {
   intro.active = true
@@ -25,10 +36,11 @@ export function cancelIntro() {
   if (!intro.active) return
   intro.active = false
   intro.door = intro.car = intro.camera = 1
+  intro.back = 0
   useDrive.getState().setIntro('skipped')
 }
 
-export function readIntro(): { active: boolean; door: number; car: number; camera: number } {
+export function readIntro(): { active: boolean; door: number; car: number; camera: number; back: number } {
   return intro
 }
 const RESPONSE = 7 // higher is snappier, lower is floatier
@@ -46,11 +58,14 @@ export function stepDrive(delta: number, now = performance.now()): boolean {
     intro.door = ph.door
     intro.car = ph.car
     intro.camera = ph.camera
+    // The car rolls from inside the garage (behind the origin) up to the first stop.
+    intro.back = INTRO_BACK * (1 - ph.car)
     drive.s = drive.targetS
     drive.t = T_STOPS[0] * ph.car
     drive.primed = true
     if (ph.done) {
       intro.active = false
+      intro.back = 0
       useDrive.getState().setIntro('done')
     }
     return false
@@ -85,13 +100,13 @@ export function DriveClock() {
     () =>
       useDrive.subscribe((s, prev) => {
         if (s.scroll !== prev.scroll && s.scroll > 0.002) cancelIntro()
-        invalidate()
+        if (gate.open) invalidate()
       }),
     [invalidate],
   )
   useFrame((_, delta) => {
     const settled = stepDrive(delta, performance.now())
-    if (!settled) invalidate()
+    if (!settled && gate.open) invalidate()
   }, -10)
   return null
 }
@@ -110,7 +125,7 @@ export function IdleLoop({ fps = 24, sleepAfterMs = 25_000 }: { fps?: number; sl
     const events = ['scroll', 'pointermove', 'pointerdown', 'keydown', 'touchstart', 'wheel'] as const
     events.forEach((e) => addEventListener(e, bump, { passive: true }))
     const id = setInterval(() => {
-      if (document.visibilityState === 'visible' && performance.now() - last < sleepAfterMs) invalidate()
+      if (gate.open && document.visibilityState === 'visible' && performance.now() - last < sleepAfterMs) invalidate()
     }, 1000 / fps)
     return () => {
       clearInterval(id)

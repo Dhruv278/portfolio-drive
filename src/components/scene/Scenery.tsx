@@ -86,8 +86,9 @@ export function Scenery() {
   const mobile = useIsMobile()
   const lat = mobile ? 0.72 : 1
   const placements = useMemo(() => buildPlacements(), [])
+  // Named and counted by the warm-up in Scene.tsx, which waits until every placement has committed.
   return (
-    <group>
+    <group name="scenery" userData={{ expected: placements.length }}>
       {placements.map((p, i) => (
         <Suspense key={`${p.model}-${i}`} fallback={null}>
           <Placed p={p} lat={lat} />

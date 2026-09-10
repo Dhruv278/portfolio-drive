@@ -2,6 +2,8 @@
 
 // Canvas 2D painter for signs, cards, boards and the garage door, in the site's own design language.
 // Everything drawn here is text from profile.ts. Textures are small (512 wide) and repainted rarely.
+import { useFrame, useThree } from '@react-three/fiber'
+import { useEffect } from 'react'
 import { CanvasTexture, SRGBColorSpace } from 'three'
 import type { ChronologyCard } from '@/content/profile'
 import { wrapText } from '@/lib/pieceMath'
@@ -17,6 +19,12 @@ export function fonts(): { display: string; body: string } {
   return { display, body }
 }
 
+// Painting is deferred: canvases are rasterised on the GPU, and painting every board, the ground
+// map and the road strip in the single task where React commits the loaded scene lost the WebGL
+// context on Intel graphics. The warm-up in Scene.tsx paints one canvas per frame; PaintPump covers
+// anything created later. A texture is blank until its turn comes.
+const queue: (() => void)[] = []
+
 export function makeTexture(width: number, height: number, draw: Draw): CanvasTexture {
   const c = document.createElement('canvas')
   c.width = width
@@ -24,8 +32,51 @@ export function makeTexture(width: number, height: number, draw: Draw): CanvasTe
   const tex = new CanvasTexture(c)
   tex.colorSpace = SRGBColorSpace
   tex.anisotropy = 4
-  repaint(tex, draw)
+  queue.push(() => repaint(tex, draw))
   return tex
+}
+
+export function pendingPaints(): number {
+  return queue.length
+}
+
+// Paint up to `max` queued canvases now. Returns how many remain.
+export function flushPaints(max = 1): number {
+  for (let i = 0; i < max && queue.length; i++) queue.shift()!()
+  return queue.length
+}
+
+// Inside the Canvas: paints one queued canvas per frame and keeps frames coming until none remain.
+export function PaintPump() {
+  const invalidate = useThree((s) => s.invalidate)
+  useFrame(() => {
+    if (queue.length) {
+      flushPaints(1)
+      invalidate()
+    }
+  })
+  return null
+}
+
+// Textures painted at mount use the fallback font until the web fonts arrive. Call the given
+// repaint function once they have, and request a frame.
+export function useRepaintOnFonts(repaintAll: () => void): void {
+  const invalidate = useThree((s) => s.invalidate)
+  useEffect(() => {
+    let live = true
+    const f = fonts()
+    // Ask for the faces the painter uses, so this resolves after they are usable on a canvas.
+    Promise.all([document.fonts.load(`800 24px ${f.display}`), document.fonts.load(`400 16px ${f.body}`), document.fonts.ready])
+      .catch(() => undefined)
+      .then(() => {
+        if (!live) return
+        repaintAll()
+        invalidate()
+      })
+    return () => {
+      live = false
+    }
+  }, [repaintAll, invalidate])
 }
 
 export function repaint(tex: CanvasTexture, draw: Draw): void {

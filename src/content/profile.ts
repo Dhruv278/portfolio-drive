@@ -29,7 +29,7 @@ export const identity = {
   headline: 'Senior Full-Stack Engineer and Product Lead, AI products for medical records and legal workflows',
   shortHeadline: 'Senior Full-Stack Engineer and Product Lead',
   location: 'Surat, India',
-  availability: 'Remote or relocation',
+  availability: 'Remote, full overlap with Europe, three to four hours with US East. Open to contract, employer of record or relocation',
   current: 'Currently leading MedChron at Omnis AI',
   email: 'dhruvgopani8@gmail.com',
   phone: '+91 88499 27290',

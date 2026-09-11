@@ -19,7 +19,7 @@ const body = IBM_Plex_Sans({
 
 export const metadata: Metadata = {
   title: `${identity.name}, ${identity.shortHeadline}`,
-  description: `${identity.headline}. ${identity.location}, ${identity.availability.toLowerCase()}.`,
+  description: `${identity.headline}. ${identity.location}. ${identity.availability}.`,
   openGraph: {
     title: identity.name,
     description: identity.headline,

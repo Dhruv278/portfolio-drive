@@ -4,6 +4,7 @@ import { Contact } from '@/components/home/Contact'
 import { HeroScene } from '@/components/home/HeroScene'
 import { PlatformsList } from '@/components/home/PlatformsList'
 import { ProofStrip } from '@/components/home/ProofStrip'
+import { Writing } from '@/components/home/Writing'
 import { home, identity } from '@/content/profile'
 
 // The proof-first home page. The drive is the hero and lives in full at /drive.
@@ -50,6 +51,7 @@ export default function Page() {
         <ProofStrip />
         <CaseStudies />
         <PlatformsList />
+        <Writing />
         <Contact />
       </main>
     </>

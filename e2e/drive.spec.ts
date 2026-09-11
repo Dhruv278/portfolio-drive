@@ -160,6 +160,17 @@ test.describe('The Drive', () => {
     await expect(scene).toHaveAttribute('data-running', 'false', { timeout: 5_000 })
   })
 
+  test('writing: both articles render and are linked from the home page', async ({ page }) => {
+    await page.goto('/?scene=off')
+    await expect(page.locator('.writing-list a')).toHaveCount(2)
+    const res = await page.goto('/writing/cited-chronologies')
+    expect(res?.status()).toBe(200)
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('Every fact cites its page')
+    await expect(page.locator('.article h2')).toHaveCount(5)
+    const missing = await page.goto('/writing/does-not-exist')
+    expect(missing?.status()).toBe(404)
+  })
+
   test('resume PDF and resume page are reachable', async ({ page, request }) => {
     await page.goto('/drive')
     const href = await page.locator('.hud.top a.btn.primary').getAttribute('href')

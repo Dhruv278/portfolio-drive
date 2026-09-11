@@ -137,7 +137,7 @@ test.describe('The Drive', () => {
   test('home: hero, proof strip, four case studies, six platforms, links', async ({ page }) => {
     await page.goto('/?scene=off')
     await expect(page.getByRole('heading', { level: 1 })).toContainText('Dhruv')
-    await expect(page.getByRole('link', { name: 'Take the drive' })).toHaveAttribute('href', '/drive')
+    await expect(page.locator('.hero-copy').getByRole('link', { name: 'Take the drive' })).toHaveAttribute('href', '/drive')
     await expect(page.locator('article.case')).toHaveCount(4)
     await expect(page.locator('.platform-rows li')).toHaveCount(6)
     await expect(page.locator('#contact a[href^="mailto:"]')).toHaveCount(1)

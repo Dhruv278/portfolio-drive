@@ -2,6 +2,7 @@
 
 import { useProgress } from '@react-three/drei'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { identity, stops } from '@/content/profile'
 import { useScrollProgress } from '@/hooks/useScrollProgress'
@@ -10,7 +11,16 @@ import { useDrive } from '@/store/drive'
 export function Hud() {
   useScrollProgress()
   const setMode = useDrive((s) => s.setMode)
+  const router = useRouter()
   useEffect(() => setMode('drive'), [setMode])
+  // Escape leaves the drive, like closing a full-screen view.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') router.push('/#proof')
+    }
+    addEventListener('keydown', onKey)
+    return () => removeEventListener('keydown', onKey)
+  }, [router])
   const scroll = useDrive((s) => s.scroll)
   const stopIndex = useDrive((s) => s.stopIndex)
   const zones = useDrive((s) => s.zones)
@@ -29,6 +39,9 @@ export function Hud() {
           {identity.name}
         </Link>
         <div className="actions">
+          <Link className="btn exit" href="/#proof" data-testid="exit-drive">
+            <span aria-hidden="true">←</span> Back to the proof
+          </Link>
           <Link className="btn" href="/resume">
             Resume
           </Link>

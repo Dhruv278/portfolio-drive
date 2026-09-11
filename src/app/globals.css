@@ -183,6 +183,28 @@ a {
     display: none;
   }
 }
+.btn.exit {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper);
+}
+.btn.exit span {
+  margin-right: 4px;
+}
+.wheel a {
+  color: var(--cobalt);
+  font-weight: 600;
+}
+@media (max-width: 720px) {
+  .btn.exit {
+    font-size: 0;
+    padding: 8px 12px;
+  }
+  .btn.exit span {
+    font-size: 16px;
+    margin: 0;
+  }
+}
 .btn.primary {
   background: var(--cobalt);
   border-color: var(--cobalt);

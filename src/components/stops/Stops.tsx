@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import type { CSSProperties } from 'react'
 import { identity, stops, type StopContent } from '@/content/profile'
 
@@ -134,7 +135,9 @@ function Contact({ stop }: { stop: Extract<StopContent, { kind: 'contact' }> }) 
           </a>
         ))}
       </div>
-      <div className="wheel">{stop.wheel}</div>
+      <div className="wheel">
+        {stop.wheel} <Link href="/#proof">Back to the proof.</Link>
+      </div>
     </div>
   )
 }

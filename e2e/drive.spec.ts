@@ -171,6 +171,16 @@ test.describe('The Drive', () => {
     expect(missing?.status()).toBe(404)
   })
 
+  test('the drive has a visible way back to the proof', async ({ page }) => {
+    await page.goto('/drive?scene=off')
+    const exit = page.getByTestId('exit-drive')
+    await expect(exit).toBeVisible()
+    await expect(exit).toHaveAttribute('href', '/#proof')
+    await exit.click()
+    await expect(page).toHaveURL(/\/#proof$/)
+    await expect(page.locator('article.case').first()).toBeVisible()
+  })
+
   test('resume PDF and resume page are reachable', async ({ page, request }) => {
     await page.goto('/drive')
     const href = await page.locator('.hud.top a.btn.primary').getAttribute('href')

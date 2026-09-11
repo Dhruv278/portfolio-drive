@@ -1,0 +1,122 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4780 328" width="4780" height="328" font-family="'IBM Plex Sans', system-ui, sans-serif">
+<rect width="100%" height="100%" fill="#F4EFE6"/>
+<text x="40" y="30" font-size="15" font-weight="600" fill="#0F1722">59 nodes, 60 connections. Drawn from the workflow definition.</text>
+<rect x="4188" y="16" width="14" height="14" fill="#0F1722" stroke="#0F1722" stroke-width="1"/><text x="4208" y="27" font-size="11" fill="#55627A">Trigger</text><rect x="4280" y="16" width="14" height="14" fill="#0F1722" stroke="#0F1722" stroke-width="1"/><text x="4300" y="27" font-size="11" fill="#55627A">Branch</text><rect x="4372" y="16" width="14" height="14" fill="#2F5BEA" stroke="#0F1722" stroke-width="1"/><text x="4392" y="27" font-size="11" fill="#55627A">API call</text><rect x="4464" y="16" width="14" height="14" fill="#fff" stroke="#0F1722" stroke-width="1"/><text x="4484" y="27" font-size="11" fill="#55627A">Code</text><rect x="4556" y="16" width="14" height="14" fill="#E9E2D6" stroke="#0F1722" stroke-width="1"/><text x="4576" y="27" font-size="11" fill="#55627A">Wait</text><rect x="4648" y="16" width="14" height="14" fill="#DDE6FF" stroke="#0F1722" stroke-width="1"/><text x="4668" y="27" font-size="11" fill="#55627A">Drive or file</text><path d="M400,212 C424,212 388,196 412,196" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M400,212 C424,212 388,236 412,236" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M524,196 C548,196 512,196 536,196" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M648,196 C672,196 636,148 660,148" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M648,196 C672,196 636,244 660,244" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M772,148 C796,148 760,148 784,148" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M896,148 C920,148 884,148 908,148" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M1020,148 C1044,148 1008,148 1032,148" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M1144,148 C1168,148 1132,148 1156,148" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M1268,148 C1292,148 1256,148 1280,148" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M1392,148 C1416,148 1380,148 1404,148" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M1516,148 C1540,148 1504,148 1528,148" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M1640,148 C1664,148 1628,148 1652,148" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M1764,148 C1788,148 1752,148 1776,148" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M1888,148 C1912,148 1876,148 1900,148" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M2012,148 C2036,148 1380,116 1404,116" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M1516,116 C1540,116 1504,116 1528,116" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M1640,116 C1664,116 1628,116 1652,116" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M1764,116 C1788,116 1752,116 1776,116" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M1888,116 C1912,116 1876,116 1900,116" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M2012,116 C2036,116 2000,116 2024,116" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M2136,116 C2160,116 2124,116 2148,116" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M2260,116 C2284,116 2248,132 2272,132" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M772,244 C796,244 760,244 784,244" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M896,244 C920,244 884,244 908,244" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M1020,244 C1044,244 1008,244 1032,244" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M1144,244 C1168,244 1132,244 1156,244" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M1268,244 C1292,244 1256,244 1280,244" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M1392,244 C1416,244 1380,244 1404,244" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M1516,244 C1540,244 1504,244 1528,244" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M1640,244 C1664,244 1628,244 1652,244" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M1764,244 C1788,244 1752,244 1776,244" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M1888,244 C1912,244 1876,244 1900,244" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M2012,244 C2036,244 2000,244 2024,244" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M2136,244 C2160,244 2124,244 2148,244" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M2260,244 C2284,244 2248,228 2272,228" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M2384,132 C2408,132 2372,196 2396,196" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M2384,228 C2408,228 2372,196 2396,196" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M2508,196 C2532,196 2496,172 2520,172" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M2508,196 C2532,196 2496,220 2520,220" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M2632,172 C2656,172 2620,172 2644,172" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M2756,172 C2780,172 2744,172 2768,172" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M2880,172 C2904,172 2868,172 2892,172" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M3004,172 C3028,172 2992,196 3016,196" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M2632,220 C2824,220 2824,196 3016,196" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M3252,196 C3276,196 3240,196 3264,196" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M3376,196 C3400,196 3364,196 3388,196" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M3500,196 C3524,196 3488,196 3512,196" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M3624,196 C3648,196 3612,196 3636,196" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M3748,196 C3772,196 3736,196 3760,196" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M3872,196 C3896,196 3860,196 3884,196" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M3996,196 C4020,196 3984,196 4008,196" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M4120,196 C4144,196 4108,196 4132,196" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M4244,196 C4268,196 4232,196 4256,196" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M4368,196 C4392,196 4356,196 4380,196" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M4492,196 C4516,196 4480,196 4504,196" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M4616,196 C4640,196 4604,196 4628,196" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M3128,196 C3152,196 3116,196 3140,196" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M152,212 C176,212 140,212 164,212" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><path d="M276,212 C300,212 264,212 288,212" fill="none" stroke="#55627A" stroke-width="1.4" opacity="0.7"/><text x="660" y="86" font-size="12" font-weight="600" fill="#55627A">Product film lane (FLUX reference, Veo clips)</text><text x="660" y="282" font-size="12" font-weight="600" fill="#55627A">Brand film lane (Kling clips)</text><rect x="40" y="192" width="112" height="40" fill="#0F1722" stroke="#0F1722" stroke-width="1.2"/>
+<text x="50" y="211" font-size="11.5" font-weight="600" fill="#fff">Start</text>
+<text x="50" y="226" font-size="9.5" fill="#fff" opacity="0.75">Trigger</text><rect x="288" y="192" width="112" height="40" fill="#0F1722" stroke="#0F1722" stroke-width="1.2"/>
+<text x="298" y="211" font-size="11.5" font-weight="600" fill="#fff">Custom Mode?</text>
+<text x="298" y="226" font-size="9.5" fill="#fff" opacity="0.75">Branch</text><rect x="412" y="176" width="112" height="40" fill="#fff" stroke="#0F1722" stroke-width="1.2"/>
+<text x="422" y="195" font-size="11.5" font-weight="600" fill="#0F1722">⏭ Prepare Run</text>
+<text x="422" y="210" font-size="9.5" fill="#0F1722" opacity="0.75">Code</text><rect x="536" y="176" width="112" height="40" fill="#0F1722" stroke="#0F1722" stroke-width="1.2"/>
+<text x="546" y="195" font-size="11.5" font-weight="600" fill="#fff">Video Type</text>
+<text x="546" y="210" font-size="9.5" fill="#fff" opacity="0.75">Branch</text><rect x="660" y="128" width="112" height="40" fill="#fff" stroke="#0F1722" stroke-width="1.2"/>
+<text x="670" y="147" font-size="11.5" font-weight="600" fill="#0F1722">Build Script</text>
+<text x="670" y="162" font-size="9.5" fill="#0F1722" opacity="0.75">Code</text><rect x="784" y="128" width="112" height="40" fill="#2F5BEA" stroke="#0F1722" stroke-width="1.2"/>
+<text x="794" y="147" font-size="11.5" font-weight="600" fill="#fff">Claude Script</text>
+<text x="794" y="162" font-size="9.5" fill="#fff" opacity="0.75">API call</text><rect x="908" y="128" width="112" height="40" fill="#fff" stroke="#0F1722" stroke-width="1.2"/>
+<text x="918" y="147" font-size="11.5" font-weight="600" fill="#0F1722">Parse Script</text>
+<text x="918" y="162" font-size="9.5" fill="#0F1722" opacity="0.75">Code</text><rect x="1032" y="128" width="112" height="40" fill="#fff" stroke="#0F1722" stroke-width="1.2"/>
+<text x="1042" y="147" font-size="11.5" font-weight="600" fill="#0F1722">Build Meta</text>
+<text x="1042" y="162" font-size="9.5" fill="#0F1722" opacity="0.75">Code</text><rect x="1156" y="128" width="112" height="40" fill="#2F5BEA" stroke="#0F1722" stroke-width="1.2"/>
+<text x="1166" y="147" font-size="11.5" font-weight="600" fill="#fff">Claude Meta</text>
+<text x="1166" y="162" font-size="9.5" fill="#fff" opacity="0.75">API call</text><rect x="1280" y="128" width="112" height="40" fill="#fff" stroke="#0F1722" stroke-width="1.2"/>
+<text x="1290" y="147" font-size="11.5" font-weight="600" fill="#0F1722">Parse Meta</text>
+<text x="1290" y="162" font-size="9.5" fill="#0F1722" opacity="0.75">Code</text><rect x="1404" y="128" width="112" height="40" fill="#2F5BEA" stroke="#0F1722" stroke-width="1.2"/>
+<text x="1414" y="147" font-size="11.5" font-weight="600" fill="#fff">FLUX Ref</text>
+<text x="1414" y="162" font-size="9.5" fill="#fff" opacity="0.75">API call</text><rect x="1528" y="128" width="112" height="40" fill="#fff" stroke="#0F1722" stroke-width="1.2"/>
+<text x="1538" y="147" font-size="11.5" font-weight="600" fill="#0F1722">FLUX ID</text>
+<text x="1538" y="162" font-size="9.5" fill="#0F1722" opacity="0.75">Code</text><rect x="1652" y="128" width="112" height="40" fill="#E9E2D6" stroke="#0F1722" stroke-width="1.2"/>
+<text x="1662" y="147" font-size="11.5" font-weight="600" fill="#55627A">Wait FLUX</text>
+<text x="1662" y="162" font-size="9.5" fill="#55627A" opacity="0.75">Wait</text><rect x="1776" y="128" width="112" height="40" fill="#2F5BEA" stroke="#0F1722" stroke-width="1.2"/>
+<text x="1786" y="147" font-size="11.5" font-weight="600" fill="#fff">Get Ref</text>
+<text x="1786" y="162" font-size="9.5" fill="#fff" opacity="0.75">API call</text><rect x="1900" y="128" width="112" height="40" fill="#fff" stroke="#0F1722" stroke-width="1.2"/>
+<text x="1910" y="147" font-size="11.5" font-weight="600" fill="#0F1722">Ref URL</text>
+<text x="1910" y="162" font-size="9.5" fill="#0F1722" opacity="0.75">Code</text><rect x="1404" y="96" width="112" height="40" fill="#fff" stroke="#0F1722" stroke-width="1.2"/>
+<text x="1414" y="115" font-size="11.5" font-weight="600" fill="#0F1722">Prep Veo</text>
+<text x="1414" y="130" font-size="9.5" fill="#0F1722" opacity="0.75">Code</text><rect x="1528" y="96" width="112" height="40" fill="#2F5BEA" stroke="#0F1722" stroke-width="1.2"/>
+<text x="1538" y="115" font-size="11.5" font-weight="600" fill="#fff">Veo Submit</text>
+<text x="1538" y="130" font-size="9.5" fill="#fff" opacity="0.75">API call</text><rect x="1652" y="96" width="112" height="40" fill="#fff" stroke="#0F1722" stroke-width="1.2"/>
+<text x="1662" y="115" font-size="11.5" font-weight="600" fill="#0F1722">Veo IDs</text>
+<text x="1662" y="130" font-size="9.5" fill="#0F1722" opacity="0.75">Code</text><rect x="1776" y="96" width="112" height="40" fill="#E9E2D6" stroke="#0F1722" stroke-width="1.2"/>
+<text x="1786" y="115" font-size="11.5" font-weight="600" fill="#55627A">Wait 90s Veo</text>
+<text x="1786" y="130" font-size="9.5" fill="#55627A" opacity="0.75">Wait</text><rect x="1900" y="96" width="112" height="40" fill="#2F5BEA" stroke="#0F1722" stroke-width="1.2"/>
+<text x="1910" y="115" font-size="11.5" font-weight="600" fill="#fff">Get Veo</text>
+<text x="1910" y="130" font-size="9.5" fill="#fff" opacity="0.75">API call</text><rect x="2024" y="96" width="112" height="40" fill="#fff" stroke="#0F1722" stroke-width="1.2"/>
+<text x="2034" y="115" font-size="11.5" font-weight="600" fill="#0F1722">Clip URLs</text>
+<text x="2034" y="130" font-size="9.5" fill="#0F1722" opacity="0.75">Code</text><rect x="2148" y="96" width="112" height="40" fill="#fff" stroke="#0F1722" stroke-width="1.2"/>
+<text x="2158" y="115" font-size="11.5" font-weight="600" fill="#0F1722">Aggregate</text>
+<text x="2158" y="130" font-size="9.5" fill="#0F1722" opacity="0.75">Code</text><rect x="2272" y="112" width="112" height="40" fill="#fff" stroke="#0F1722" stroke-width="1.2"/>
+<text x="2282" y="131" font-size="11.5" font-weight="600" fill="#0F1722">Assembly</text>
+<text x="2282" y="146" font-size="9.5" fill="#0F1722" opacity="0.75">Code</text><rect x="660" y="224" width="112" height="40" fill="#fff" stroke="#0F1722" stroke-width="1.2"/>
+<text x="670" y="243" font-size="11.5" font-weight="600" fill="#0F1722">Build Script</text>
+<text x="670" y="258" font-size="9.5" fill="#0F1722" opacity="0.75">Code</text><rect x="784" y="224" width="112" height="40" fill="#2F5BEA" stroke="#0F1722" stroke-width="1.2"/>
+<text x="794" y="243" font-size="11.5" font-weight="600" fill="#fff">Claude Script</text>
+<text x="794" y="258" font-size="9.5" fill="#fff" opacity="0.75">API call</text><rect x="908" y="224" width="112" height="40" fill="#fff" stroke="#0F1722" stroke-width="1.2"/>
+<text x="918" y="243" font-size="11.5" font-weight="600" fill="#0F1722">Parse Script</text>
+<text x="918" y="258" font-size="9.5" fill="#0F1722" opacity="0.75">Code</text><rect x="1032" y="224" width="112" height="40" fill="#fff" stroke="#0F1722" stroke-width="1.2"/>
+<text x="1042" y="243" font-size="11.5" font-weight="600" fill="#0F1722">Build Meta</text>
+<text x="1042" y="258" font-size="9.5" fill="#0F1722" opacity="0.75">Code</text><rect x="1156" y="224" width="112" height="40" fill="#2F5BEA" stroke="#0F1722" stroke-width="1.2"/>
+<text x="1166" y="243" font-size="11.5" font-weight="600" fill="#fff">Claude Meta</text>
+<text x="1166" y="258" font-size="9.5" fill="#fff" opacity="0.75">API call</text><rect x="1280" y="224" width="112" height="40" fill="#fff" stroke="#0F1722" stroke-width="1.2"/>
+<text x="1290" y="243" font-size="11.5" font-weight="600" fill="#0F1722">Parse Meta</text>
+<text x="1290" y="258" font-size="9.5" fill="#0F1722" opacity="0.75">Code</text><rect x="1404" y="224" width="112" height="40" fill="#fff" stroke="#0F1722" stroke-width="1.2"/>
+<text x="1414" y="243" font-size="11.5" font-weight="600" fill="#0F1722">Prep Kling</text>
+<text x="1414" y="258" font-size="9.5" fill="#0F1722" opacity="0.75">Code</text><rect x="1528" y="224" width="112" height="40" fill="#2F5BEA" stroke="#0F1722" stroke-width="1.2"/>
+<text x="1538" y="243" font-size="11.5" font-weight="600" fill="#fff">Kling Submit</text>
+<text x="1538" y="258" font-size="9.5" fill="#fff" opacity="0.75">API call</text><rect x="1652" y="224" width="112" height="40" fill="#fff" stroke="#0F1722" stroke-width="1.2"/>
+<text x="1662" y="243" font-size="11.5" font-weight="600" fill="#0F1722">Kling IDs</text>
+<text x="1662" y="258" font-size="9.5" fill="#0F1722" opacity="0.75">Code</text><rect x="1776" y="224" width="112" height="40" fill="#E9E2D6" stroke="#0F1722" stroke-width="1.2"/>
+<text x="1786" y="243" font-size="11.5" font-weight="600" fill="#55627A">Wait 120s Kling</text>
+<text x="1786" y="258" font-size="9.5" fill="#55627A" opacity="0.75">Wait</text><rect x="1900" y="224" width="112" height="40" fill="#2F5BEA" stroke="#0F1722" stroke-width="1.2"/>
+<text x="1910" y="243" font-size="11.5" font-weight="600" fill="#fff">Get Kling</text>
+<text x="1910" y="258" font-size="9.5" fill="#fff" opacity="0.75">API call</text><rect x="2024" y="224" width="112" height="40" fill="#fff" stroke="#0F1722" stroke-width="1.2"/>
+<text x="2034" y="243" font-size="11.5" font-weight="600" fill="#0F1722">Clip URLs</text>
+<text x="2034" y="258" font-size="9.5" fill="#0F1722" opacity="0.75">Code</text><rect x="2148" y="224" width="112" height="40" fill="#fff" stroke="#0F1722" stroke-width="1.2"/>
+<text x="2158" y="243" font-size="11.5" font-weight="600" fill="#0F1722">Aggregate</text>
+<text x="2158" y="258" font-size="9.5" fill="#0F1722" opacity="0.75">Code</text><rect x="2272" y="208" width="112" height="40" fill="#fff" stroke="#0F1722" stroke-width="1.2"/>
+<text x="2282" y="227" font-size="11.5" font-weight="600" fill="#0F1722">Assembly</text>
+<text x="2282" y="242" font-size="9.5" fill="#0F1722" opacity="0.75">Code</text><rect x="2396" y="176" width="112" height="40" fill="#0F1722" stroke="#0F1722" stroke-width="1.2"/>
+<text x="2406" y="195" font-size="11.5" font-weight="600" fill="#fff">Voiceover?</text>
+<text x="2406" y="210" font-size="9.5" fill="#fff" opacity="0.75">Branch</text><rect x="2520" y="152" width="112" height="40" fill="#2F5BEA" stroke="#0F1722" stroke-width="1.2"/>
+<text x="2530" y="171" font-size="11.5" font-weight="600" fill="#fff">ElevenLabs</text>
+<text x="2530" y="186" font-size="9.5" fill="#fff" opacity="0.75">API call</text><rect x="2644" y="152" width="112" height="40" fill="#fff" stroke="#0F1722" stroke-width="1.2"/>
+<text x="2654" y="171" font-size="11.5" font-weight="600" fill="#0F1722">Prep Audio</text>
+<text x="2654" y="186" font-size="9.5" fill="#0F1722" opacity="0.75">Code</text><rect x="2768" y="152" width="112" height="40" fill="#DDE6FF" stroke="#0F1722" stroke-width="1.2"/>
+<text x="2778" y="171" font-size="11.5" font-weight="600" fill="#0F1722">Drive: Audio</text>
+<text x="2778" y="186" font-size="9.5" fill="#0F1722" opacity="0.75">Drive</text><rect x="2892" y="152" width="112" height="40" fill="#DDE6FF" stroke="#0F1722" stroke-width="1.2"/>
+<text x="2902" y="171" font-size="11.5" font-weight="600" fill="#0F1722">Share Audio</text>
+<text x="2902" y="186" font-size="9.5" fill="#0F1722" opacity="0.75">Drive</text><rect x="2520" y="200" width="112" height="40" fill="#fff" stroke="#0F1722" stroke-width="1.2"/>
+<text x="2530" y="219" font-size="11.5" font-weight="600" fill="#0F1722">⏭ Skip Voice</text>
+<text x="2530" y="234" font-size="9.5" fill="#0F1722" opacity="0.75">Code</text><rect x="3016" y="176" width="112" height="40" fill="#fff" stroke="#0F1722" stroke-width="1.2"/>
+<text x="3026" y="195" font-size="11.5" font-weight="600" fill="#0F1722">Build Timeline</text>
+<text x="3026" y="210" font-size="9.5" fill="#0F1722" opacity="0.75">Code</text><rect x="3140" y="176" width="112" height="40" fill="#2F5BEA" stroke="#0F1722" stroke-width="1.2"/>
+<text x="3150" y="195" font-size="11.5" font-weight="600" fill="#fff">Shotstack Rend…</text>
+<text x="3150" y="210" font-size="9.5" fill="#fff" opacity="0.75">API call</text><rect x="3264" y="176" width="112" height="40" fill="#fff" stroke="#0F1722" stroke-width="1.2"/>
+<text x="3274" y="195" font-size="11.5" font-weight="600" fill="#0F1722">Render ID</text>
+<text x="3274" y="210" font-size="9.5" fill="#0F1722" opacity="0.75">Code</text><rect x="3388" y="176" width="112" height="40" fill="#E9E2D6" stroke="#0F1722" stroke-width="1.2"/>
+<text x="3398" y="195" font-size="11.5" font-weight="600" fill="#55627A">Wait 180s Rend…</text>
+<text x="3398" y="210" font-size="9.5" fill="#55627A" opacity="0.75">Wait</text><rect x="3512" y="176" width="112" height="40" fill="#2F5BEA" stroke="#0F1722" stroke-width="1.2"/>
+<text x="3522" y="195" font-size="11.5" font-weight="600" fill="#fff">Get Video</text>
+<text x="3522" y="210" font-size="9.5" fill="#fff" opacity="0.75">API call</text><rect x="3636" y="176" width="112" height="40" fill="#fff" stroke="#0F1722" stroke-width="1.2"/>
+<text x="3646" y="195" font-size="11.5" font-weight="600" fill="#0F1722">Extract Video</text>
+<text x="3646" y="210" font-size="9.5" fill="#0F1722" opacity="0.75">Code</text><rect x="3760" y="176" width="112" height="40" fill="#2F5BEA" stroke="#0F1722" stroke-width="1.2"/>
+<text x="3770" y="195" font-size="11.5" font-weight="600" fill="#fff">Download</text>
+<text x="3770" y="210" font-size="9.5" fill="#fff" opacity="0.75">API call</text><rect x="3884" y="176" width="112" height="40" fill="#DDE6FF" stroke="#0F1722" stroke-width="1.2"/>
+<text x="3894" y="195" font-size="11.5" font-weight="600" fill="#0F1722">Save Local</text>
+<text x="3894" y="210" font-size="9.5" fill="#0F1722" opacity="0.75">File</text><rect x="4008" y="176" width="112" height="40" fill="#DDE6FF" stroke="#0F1722" stroke-width="1.2"/>
+<text x="4018" y="195" font-size="11.5" font-weight="600" fill="#0F1722">Drive: Video</text>
+<text x="4018" y="210" font-size="9.5" fill="#0F1722" opacity="0.75">Drive</text><rect x="4132" y="176" width="112" height="40" fill="#fff" stroke="#0F1722" stroke-width="1.2"/>
+<text x="4142" y="195" font-size="11.5" font-weight="600" fill="#0F1722">Cost</text>
+<text x="4142" y="210" font-size="9.5" fill="#0F1722" opacity="0.75">Code</text><rect x="4256" y="176" width="112" height="40" fill="#fff" stroke="#0F1722" stroke-width="1.2"/>
+<text x="4266" y="195" font-size="11.5" font-weight="600" fill="#0F1722">Metadata File</text>
+<text x="4266" y="210" font-size="9.5" fill="#0F1722" opacity="0.75">Code</text><rect x="4380" y="176" width="112" height="40" fill="#DDE6FF" stroke="#0F1722" stroke-width="1.2"/>
+<text x="4390" y="195" font-size="11.5" font-weight="600" fill="#0F1722">Save Meta</text>
+<text x="4390" y="210" font-size="9.5" fill="#0F1722" opacity="0.75">File</text><rect x="4504" y="176" width="112" height="40" fill="#DDE6FF" stroke="#0F1722" stroke-width="1.2"/>
+<text x="4514" y="195" font-size="11.5" font-weight="600" fill="#0F1722">Drive: Meta</text>
+<text x="4514" y="210" font-size="9.5" fill="#0F1722" opacity="0.75">Drive</text><rect x="4628" y="176" width="112" height="40" fill="#fff" stroke="#0F1722" stroke-width="1.2"/>
+<text x="4638" y="195" font-size="11.5" font-weight="600" fill="#0F1722">Done</text>
+<text x="4638" y="210" font-size="9.5" fill="#0F1722" opacity="0.75">Code</text><rect x="412" y="216" width="112" height="40" fill="#fff" stroke="#0F1722" stroke-width="1.2"/>
+<text x="422" y="235" font-size="11.5" font-weight="600" fill="#0F1722">L1 Puzzle (You…</text>
+<text x="422" y="250" font-size="9.5" fill="#0F1722" opacity="0.75">Code</text><rect x="164" y="192" width="112" height="40" fill="#E9E2D6" stroke="#0F1722" stroke-width="1.2"/>
+<text x="174" y="211" font-size="11.5" font-weight="600" fill="#55627A">Config</text>
+<text x="174" y="226" font-size="9.5" fill="#55627A" opacity="0.75">Config</text></svg>

@@ -1,5 +1,39 @@
 import Image from 'next/image'
-import { home } from '@/content/profile'
+import { home, type Artefact as ArtefactSpec } from '@/content/profile'
+
+// An artefact frame: a real screenshot, a pair of screenshots, muted looping clips, or a drawing.
+function Artefact({ a }: { a: ArtefactSpec }) {
+  return (
+    <figure className={`case-art ${a.kind}`}>
+      {a.kind === 'image' && <Image src={a.src} alt={a.alt} width={a.width ?? 1280} height={a.height ?? 800} sizes="(max-width: 900px) 90vw, 40vw" />}
+      {a.kind === 'images' && (
+        <div className="art-pair">
+          {a.items.map((it) => (
+            <Image key={it.src} src={it.src} alt={it.alt} width={1280} height={800} sizes="(max-width: 900px) 90vw, 20vw" />
+          ))}
+        </div>
+      )}
+      {a.kind === 'clips' && (
+        <div className="art-clips">
+          {a.items.map((it) => (
+            <video key={it.src} src={it.src} poster={it.poster} muted loop autoPlay playsInline preload="none" aria-label={it.alt} />
+          ))}
+        </div>
+      )}
+      {a.kind === 'svg' && (
+        <>
+          <div className="scroller" tabIndex={0}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={a.src} alt={a.alt} loading="lazy" />
+          </div>
+          <div className="hint">Scroll sideways to follow the whole run.</div>
+        </>
+      )}
+      {a.kind === 'pending' && <div className="pending-box" aria-hidden="true" />}
+      <figcaption>{a.caption}</figcaption>
+    </figure>
+  )
+}
 
 // Four case studies: the problem, the call, what shipped, what it measured, and an artefact.
 export function CaseStudies() {
@@ -68,14 +102,12 @@ export function CaseStudies() {
                 </p>
               )}
             </div>
-            <figure className={`case-art ${c.artefact.kind}`}>
-              {c.artefact.kind === 'image' ? (
-                <Image src={c.artefact.src} alt={c.artefact.alt} width={1280} height={800} sizes="(max-width: 900px) 90vw, 40vw" />
-              ) : (
-                <div className="pending-box" aria-hidden="true" />
-              )}
-              <figcaption>{c.artefact.caption}</figcaption>
-            </figure>
+            <Artefact a={c.artefact} />
+            {c.workflow && (
+              <div className="case-wide">
+                <Artefact a={c.workflow} />
+              </div>
+            )}
           </article>
         ))}
       </div>

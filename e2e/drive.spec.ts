@@ -139,6 +139,9 @@ test.describe('The Drive', () => {
     await expect(page.getByRole('heading', { level: 1 })).toContainText('Dhruv')
     await expect(page.locator('.hero-copy').getByRole('link', { name: 'Take the drive' })).toHaveAttribute('href', '/drive')
     await expect(page.locator('article.case')).toHaveCount(4)
+    // every case study shows a real artefact, none is a placeholder
+    await expect(page.locator('.case-art.pending')).toHaveCount(0)
+    await expect(page.locator('.case-art img, .case-art video')).toHaveCount(8)
     await expect(page.locator('.platform-rows li')).toHaveCount(6)
     await expect(page.locator('#contact a[href^="mailto:"]')).toHaveCount(1)
     // the proof strip counts up once it is in view

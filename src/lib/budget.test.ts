@@ -3,7 +3,7 @@ import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 // Everything the scene downloads before it fades in. The design spec caps this at 10 MB.
-const DIRS = ['public/models', 'public/textures', 'public/hdri']
+const DIRS = ['public/models', 'public/textures', 'public/hdri', 'public/images', 'public/media']
 const BUDGET = 10 * 1024 * 1024
 
 function sizeOf(dir: string): number {

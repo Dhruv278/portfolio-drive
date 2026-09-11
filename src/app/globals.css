@@ -1109,3 +1109,66 @@ section.stop .contact a {
   }
 }
 
+/* artefact kinds */
+.art-pair {
+  display: grid;
+  gap: 0;
+}
+.art-pair img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-bottom: 1px solid var(--paper-2);
+}
+.art-clips {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  padding: 6px;
+  background: var(--ink);
+}
+.art-clips video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  object-fit: cover;
+  background: #000;
+}
+/* The workflow drawing keeps its natural width and scrolls sideways, so every node stays legible. */
+.case-art.svg .scroller {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  background: var(--paper);
+}
+.case-art.svg img {
+  display: block;
+  height: 328px;
+  width: auto;
+  max-width: none;
+}
+.case-art.svg .hint {
+  font-size: 12.5px;
+  color: var(--ink-2);
+  padding: 6px 14px 0;
+}
+.case-wide {
+  grid-column: 1 / -1;
+  order: 3;
+}
+@media (prefers-reduced-motion: reduce) {
+  .art-clips video {
+    display: none;
+  }
+  .art-clips {
+    display: none;
+  }
+  .case-art.clips::before {
+    content: 'Clips hidden under reduced motion.';
+    display: block;
+    padding: 24px 14px;
+    color: var(--ink-2);
+    font-size: 14px;
+  }
+}
+

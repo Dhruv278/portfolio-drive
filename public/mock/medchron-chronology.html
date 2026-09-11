@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>MedChron chronology, illustrative screen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root { --paper:#F4EFE6; --paper2:#E9E2D6; --ink:#0F1722; --ink2:#55627A; --cobalt:#2F5BEA; --line:#D9D2C5; }
+  * { box-sizing: border-box; }
+  body { margin:0; width:1280px; height:800px; background:var(--paper); color:var(--ink); font-family:'IBM Plex Sans',sans-serif; font-size:14px; overflow:hidden; }
+  .app { display:grid; grid-template-columns: 220px 1fr 340px; height:800px; }
+  .nav { background:var(--ink); color:var(--paper); padding:22px 18px; }
+  .brand { font-family:'Bricolage Grotesque'; font-weight:800; font-size:20px; letter-spacing:-0.02em; margin-bottom:28px; }
+  .nav a { display:block; color:#b7c0d3; padding:9px 10px; border-radius:4px; text-decoration:none; }
+  .nav a.on { background:var(--cobalt); color:#fff; }
+  .main { padding:22px 28px; overflow:hidden; }
+  .crumbs { color:var(--ink2); font-size:13px; margin-bottom:8px; }
+  h1 { font-family:'Bricolage Grotesque'; font-weight:800; font-size:26px; letter-spacing:-0.02em; margin:0 0 4px; }
+  .sub { color:var(--ink2); margin-bottom:18px; }
+  .filters { display:flex; gap:8px; margin-bottom:16px; }
+  .chip { border:1.5px solid var(--ink); padding:3px 10px; font-size:12.5px; background:#fff; }
+  .chip.on { background:var(--cobalt); color:#fff; border-color:var(--cobalt); }
+  table { width:100%; border-collapse:collapse; background:#fff; border:1.5px solid var(--ink); box-shadow:0 3px 0 var(--line); }
+  th { text-align:left; font-size:11.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink2); padding:10px 12px; border-bottom:1.5px solid var(--ink); font-weight:600; }
+  td { padding:11px 12px; border-bottom:1px solid var(--line); vertical-align:top; }
+  tr.sel td { background:#EEF2FF; }
+  td.date { font-weight:600; white-space:nowrap; color:var(--cobalt); }
+  td.prov { white-space:nowrap; }
+  .cite { display:inline-block; border:1px solid var(--cobalt); color:var(--cobalt); font-size:11.5px; padding:1px 7px; margin-left:6px; white-space:nowrap; }
+  .tag { display:inline-block; font-size:11px; padding:1px 7px; background:var(--paper2); margin-right:6px; }
+  .side { border-left:1.5px solid var(--ink); background:#fff; padding:18px 20px; }
+  .side h2 { font-family:'Bricolage Grotesque'; font-weight:800; font-size:16px; margin:0 0 10px; letter-spacing:-0.01em; }
+  .page { background:var(--paper2); border:1px solid var(--line); padding:14px; font-family:Georgia,serif; font-size:12px; line-height:1.55; color:#333; height:330px; overflow:hidden; position:relative; }
+  .page mark { background:#FFE58A; color:inherit; }
+  .pnum { position:absolute; right:10px; bottom:8px; font-size:11px; color:var(--ink2); font-family:'IBM Plex Sans'; }
+  .facts { margin-top:16px; }
+  .facts div { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--line); font-size:13px; }
+  .facts b { font-weight:600; }
+  .ok { color:#1B7F4B; font-weight:600; }
+  .drop { color:#B2361D; font-weight:600; }
+  .label { position:absolute; left:0; right:0; bottom:0; background:var(--ink); color:var(--paper); font-size:12px; padding:6px 14px; letter-spacing:.02em; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="nav">
+    <div class="brand">MedChron</div>
+    <a>Matters</a><a class="on">Chronology</a><a>Medications</a><a>Bills</a><a>Chi</a><a>Exports</a>
+  </aside>
+  <main class="main">
+    <div class="crumbs">Matters / Sample matter 2024-0417 / Chronology</div>
+    <h1>Chronology, 6 entries from 214 pages</h1>
+    <div class="sub">Sample record, not a real patient. Every entry cites the page it came from. Unverifiable facts are dropped, not shown.</div>
+    <div class="filters"><span class="chip on">All providers</span><span class="chip">Riverside ER</span><span class="chip">Dr. Patel, Orthopedics</span><span class="chip">Northside PT</span><span class="chip">Open MRI Center</span></div>
+    <table>
+      <thead><tr><th>Date</th><th>Provider</th><th>Finding</th><th>Source</th></tr></thead>
+      <tbody>
+        <tr><td class="date">2024-03-02</td><td class="prov">Riverside ER</td><td>Rear-end collision, neck and low back pain. <span class="tag">ICD-10 S13.4</span></td><td><span class="cite">p. 14</span></td></tr>
+        <tr><td class="date">2024-03-09</td><td class="prov">Dr. Patel, Orthopedics</td><td>Cervical strain, referred to physical therapy.</td><td><span class="cite">p. 41</span></td></tr>
+        <tr><td class="date">2024-03-20</td><td class="prov">Northside Physical Therapy</td><td>Visit 1 of 12, range of motion limited.</td><td><span class="cite">p. 77</span></td></tr>
+        <tr class="sel"><td class="date">2024-05-14</td><td class="prov">Open MRI Center</td><td>C5 to C6 disc protrusion. <span class="tag">Imaging</span></td><td><span class="cite">p. 132</span></td></tr>
+        <tr><td class="date">2024-06-03</td><td class="prov">Dr. Patel, Orthopedics</td><td>Epidural steroid injection. <span class="tag">Procedure</span></td><td><span class="cite">p. 168</span></td></tr>
+        <tr><td class="date">2024-08-19</td><td class="prov">Northside Physical Therapy</td><td>Discharged, goals met.</td><td><span class="cite">p. 214</span></td></tr>
+      </tbody>
+    </table>
+  </main>
+  <aside class="side">
+    <h2>Source, page 132</h2>
+    <div class="page">
+      OPEN MRI CENTER<br>MRI CERVICAL SPINE WITHOUT CONTRAST<br><br>
+      CLINICAL HISTORY: Neck pain following motor vehicle collision, radiating to the left upper extremity.<br><br>
+      FINDINGS: Vertebral body heights are maintained. At <mark>C5 to C6 there is a posterior disc protrusion</mark> with mild effacement of the ventral thecal sac. No cord signal abnormality. Remaining levels unremarkable.<br><br>
+      IMPRESSION: 1. <mark>C5 to C6 disc protrusion.</mark> 2. No acute osseous injury.
+      <span class="pnum">132 / 214</span>
+    </div>
+    <div class="facts">
+      <h2>Citation check</h2>
+      <div><span>Page exists in record</span><b class="ok">Verified</b></div>
+      <div><span>Quoted span found on page</span><b class="ok">Verified</b></div>
+      <div><span>Date matches page header</span><b class="ok">Verified</b></div>
+      <div><span>Medication row without start date</span><b class="drop">Dropped</b></div>
+    </div>
+  </aside>
+</div>
+<div class="label">Illustrative screen drawn for this portfolio. Not a product screenshot. Sample data, no real patient.</div>
+</body>
+</html>

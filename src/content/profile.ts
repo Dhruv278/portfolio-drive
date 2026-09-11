@@ -85,7 +85,10 @@ export const setPieces = {
 
 export type Proof = { label: string; source: string; from?: number; to?: number; suffix?: string; text?: string }
 export type Artefact =
-  | { kind: 'image'; src: string; alt: string; caption: string }
+  | { kind: 'image'; src: string; alt: string; caption: string; width?: number; height?: number }
+  | { kind: 'images'; items: { src: string; alt: string }[]; caption: string }
+  | { kind: 'clips'; items: { src: string; poster: string; alt: string }[]; caption: string }
+  | { kind: 'svg'; src: string; alt: string; caption: string }
   | { kind: 'pending'; caption: string }
 export type CaseStudy = {
   id: string
@@ -97,6 +100,7 @@ export type CaseStudy = {
   stack: string[]
   links: Link[]
   artefact: Artefact
+  workflow?: Artefact
   figures?: [string, string, string][]
 }
 
@@ -128,7 +132,12 @@ export const home = {
         'Medication rows without a start date fell from 53% to 26% in a replay evaluation, with no fabricated drugs or citations. 28 defects worked through, including two critical data-isolation findings.',
       stack: ['NestJS', 'MongoDB', 'Gemini 2.5', 'Claude', 'BullMQ', 'Redis', 'React', 'Kubernetes on EKS'],
       links: [],
-      artefact: { kind: 'pending', caption: 'An illustrative chronology screen, labelled as such, arrives with the artefact session.' },
+      artefact: {
+        kind: 'image',
+        src: '/images/medchron-chronology.webp',
+        alt: 'Illustrative MedChron chronology screen: six dated entries, each with a page citation, and a source page with the quoted span highlighted and a citation check',
+        caption: 'Illustrative screen drawn for this portfolio in the product\'s shape. Not a product screenshot. Sample data, no real patient.',
+      },
     },
     {
       id: 'agentflow',
@@ -141,7 +150,14 @@ export const home = {
       result: 'A failed step halts the run and keeps the finished steps. Three plans live on Stripe. Per-plan limits hold at the service layer, so the UI cannot be talked around.',
       stack: ['NestJS', 'Next.js 14', 'Prisma', 'PostgreSQL', 'Redis', 'BullMQ', 'Stripe', 'OpenRouter', 'SSE'],
       links: [{ label: 'Frontend repository', value: 'github.com/Dhruv278/Agentflow-frontend', href: 'https://github.com/Dhruv278/Agentflow-frontend' }],
-      artefact: { kind: 'pending', caption: 'Screens of the agent library, a streaming run and the billing page, captured from the app, arrive with the artefact session.' },
+      artefact: {
+        kind: 'images',
+        items: [
+          { src: '/images/agentflow-pricing.webp', alt: 'AgentFlow pricing page with Free, Pro and bring-your-own-key plans' },
+          { src: '/images/agentflow-login.webp', alt: 'AgentFlow sign-in page' },
+        ],
+        caption: 'AgentFlow, captured from the app running locally: the pricing and sign-in pages. The dashboard sits behind sign-in.',
+      },
     },
     {
       id: 'video',
@@ -153,7 +169,21 @@ export const home = {
       result: '$0.57 to $3.41 a video depending on the tier. Seven shorts rendered unattended in one run in April 2026.',
       stack: ['n8n', 'Claude', 'Replicate', 'ElevenLabs', 'Shotstack', 'YouTube API'],
       links: [],
-      artefact: { kind: 'pending', caption: 'Three of the rendered shorts, unedited, and the workflow drawn from its own definition arrive with the artefact session.' },
+      artefact: {
+        kind: 'clips',
+        items: [
+          { src: '/media/short-1.mp4', poster: '/media/short-1.webp', alt: 'Seven seconds of a rendered product film short: a gold chronograph on marble' },
+          { src: '/media/short-2.mp4', poster: '/media/short-2.webp', alt: 'Seven seconds of a rendered short: an artisan coffee morning ritual' },
+          { src: '/media/short-3.mp4', poster: '/media/short-3.webp', alt: 'Seven seconds of a rendered puzzle short: spot the mistake in this lunch tray' },
+        ],
+        caption: 'Seven seconds from three of the shorts the pipeline rendered in April 2026, unedited, sound off.',
+      },
+      workflow: {
+        kind: 'svg',
+        src: '/images/workflow-59.svg',
+        alt: 'The 59-node workflow drawn as boxes and connections: trigger, branch by video type, two production lines, voiceover, render, save, cost and metadata',
+        caption: 'The workflow, drawn from its own definition: 59 nodes, 60 connections, two production lines that meet at the render step.',
+      },
     },
     {
       id: 'site',

@@ -125,3 +125,13 @@ The WebGL context was lost on roughly a third of loads while this landed. Instru
 
 Two more lessons: the fiber clock restarts from zero when the frameloop switches on, so anything timing across ready uses `performance.now()`. And a test harness that opens and closes WebGL contexts every few seconds makes the debug browser's GPU process lose contexts on its own; measurements need a fresh browser and ten seconds between runs. In the dev server this week `next/font` failed to fetch the Google fonts and fell back, so dev screenshots show the fallback face; the production build has the font files.
 
+## Addendum: proof first, session P1 (10 to 11 September 2026)
+
+The owner asked whether the resume or the portfolio would get him hired and asked for a blunt critique. A research pass on how US and EU startups hire (referrals and recruiter sourcing produce most hires, portfolios are a tiebreaker backend and AI reviewers rarely open, 3D portfolios belong to creative developers) led to a new direction, spec `../specs/2026-09-10-proof-first-design.md`: the site leads with proof and keeps the drive as its signature moment. Sessions B to D of the set-piece plan are cancelled.
+
+- `/` is new: a one-viewport hero with the scene in a hero mode (car parked at the first stop, fixed camera, mounted after first paint, rendering paused once scrolled away), a proof strip on ink with three measured results that count up once, four case studies (the problem, the call, what shipped, what it measured) with artefact frames, the six platforms as rows, and contact. The six-stop drive moved verbatim to `/drive`, linked from the hero and the top bar.
+- The nature kit's mint-and-peach palette is tinted toward green leaves and brown trunks so the toy trees no longer fight the photographic ground.
+- Home copy lives in `profile.ts` under the banned-word test. Numbers mirror the resume. Artefact frames for MedChron, AgentFlow and the video pipeline are honest placeholders until session P2 supplies the mock screen, the app screenshots and the rendered clips; the site case study carries a real production screenshot and a before-and-after table.
+- End-to-end on the production build: 47 passed across five engines, 23 skipped by design. New tests: the home structure and counters, the hero scene mounting and pausing.
+- Left for P2 and P3: artefacts, the two write-ups, the AgentFlow screenshots (the frontend repository is public at github.com/Dhruv278/Agentflow-frontend), resume and LinkedIn lines for remote and overlap, Vercel deployment.
+

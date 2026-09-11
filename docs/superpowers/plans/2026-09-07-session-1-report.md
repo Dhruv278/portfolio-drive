@@ -163,3 +163,7 @@ The owner asked for MedChron told as a product, not as percentages, more project
 - `design/track-final.html` is the page exported as one self-contained file (markup from the dev server, the track's CSS, Google Fonts, assets from the live site, a plain-JavaScript port of the car, road, telemetry, starfield and tickers). Regenerate with `node <scratchpad>/export_track.mjs`.
 - GitHub pushes fail: Git now authenticates as a different GitHub account without access to the repository. Commits are local; the live site is deployed straight from the CLI.
 
+## Addendum: the track is the home page (11 September 2026)
+
+The owner said: execute, deploy, remove the old code. The track moved to the root route, /track redirects to it, and the paper proof page went with its components, content, test, CSS and images. The hero mode added for the proof page (store fields, frame-loop branch, camera pose, scene pause, quiet mount) went too, so the scene code is back to one mode. The old paper design previews under design/ are deleted; design/assets stays because the route test checks models there. The drive exit and the pier card lead home. Production build: 55 end-to-end tests passed across five engines, 20 skipped by design, 38 unit tests. Deployed from the CLI. GitHub push still refused for the signed-in account.
+

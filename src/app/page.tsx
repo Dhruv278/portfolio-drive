@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import type { ReactNode } from 'react'
+import { HeroRoad } from '@/components/track/HeroRoad'
 import { Starfield } from '@/components/track/Starfield'
 import { TrackScene } from '@/components/track/TrackScene'
 import { identity, stops } from '@/content/profile'
@@ -76,6 +77,7 @@ export default function Page() {
               <br />
               {identity.last}
             </h1>
+            <HeroRoad />
             <p className="tp-lede">{t.hero.line}</p>
             <p className="tp-meta">{t.hero.meta}</p>
             <div className="tp-actions">
@@ -210,6 +212,7 @@ export default function Page() {
                 </article>
               ))}
             </div>
+            <p className="tp-swipe">Swipe for more</p>
           </div>
         </section>
 
@@ -246,6 +249,7 @@ export default function Page() {
                 </div>
               ))}
             </div>
+            <p className="tp-swipe">Swipe for more</p>
             <h3 className="tp-sub">{t.skills.howHeading}</h3>
             <ul className="tp-bullets">
               {t.skills.how.map((h) => (

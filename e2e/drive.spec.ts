@@ -175,6 +175,72 @@ test.describe('The Drive', () => {
     await expect(page).toHaveURL(/\/$/)
   })
 
+  test('home on a phone: the route bar takes over after the hero and the car drives across it', async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== 'phone', 'phone layout only')
+    await page.goto('/')
+    const road = page.getByTestId('track-road')
+    const carX = () => page.evaluate(() => parseFloat(document.querySelector('[data-testid=track-car]')!.getAttribute('transform')!.match(/translate\(([-\d.]+)/)![1]))
+    await expect(road).toHaveClass(/bar/)
+    await expect(road).not.toHaveClass(/shown/)
+    await expect(page.locator('.tp-heroroad')).toBeVisible()
+    const x0 = await carX()
+    const centre = (id: string) =>
+      page.evaluate((id) => {
+        const r = document.querySelector(`#${id} .tp-card`)!.getBoundingClientRect()
+        window.scrollTo(0, r.top + scrollY + r.height / 2 - innerHeight / 2)
+      }, id)
+    await centre('why')
+    await expect(road).toHaveClass(/shown/, { timeout: 5_000 })
+    const box = (await road.boundingBox())!
+    expect(box.height).toBeLessThanOrEqual(60)
+    expect(box.y).toBeGreaterThan(40)
+    expect(box.y).toBeLessThan(130)
+    await expect(page.getByTestId('track-caption')).toContainText('02 / 10')
+    await centre('skills')
+    await expect(page.getByTestId('track-caption')).toContainText('07 / 10', { timeout: 5_000 })
+    await expect.poll(carX, { timeout: 5_000 }).toBeGreaterThan(x0 + 100)
+    const m = await page.evaluate(() => ({
+      overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      projectsSwipe: document.querySelector('.tp-projects')!.scrollWidth > document.querySelector('.tp-projects')!.clientWidth + 20,
+      skillsSwipe: document.querySelector('.tp-skills')!.scrollWidth > document.querySelector('.tp-skills')!.clientWidth + 20,
+      cardW: document.querySelector('#skills .tp-card')!.getBoundingClientRect().width,
+    }))
+    expect(m.overflow).toBe(0)
+    expect(m.projectsSwipe).toBe(true)
+    expect(m.skillsSwipe).toBe(true)
+    expect(m.cardW).toBeGreaterThan(300)
+  })
+
+  test('home on tablets: the bar below 1024 px, and above it the road never crosses a card', async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== 'desktop', 'one engine is enough')
+    const road = page.getByTestId('track-road')
+    const centre = (id: string) =>
+      page.evaluate((id) => {
+        const r = document.querySelector(`#${id} .tp-card`)!.getBoundingClientRect()
+        window.scrollTo(0, r.top + scrollY + r.height / 2 - innerHeight / 2)
+      }, id)
+    await page.setViewportSize({ width: 820, height: 1180 })
+    await page.goto('/')
+    await expect(road).toHaveClass(/bar/)
+    await centre('experience')
+    await expect(road).toHaveClass(/shown/, { timeout: 5_000 })
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0)
+    for (const width of [1024, 1400]) {
+      await page.setViewportSize({ width, height: 800 })
+      await page.waitForTimeout(400)
+      await expect(road).not.toHaveClass(/bar/)
+      await centre('experience')
+      await page.waitForTimeout(400)
+      const g = await page.evaluate(() => {
+        const card = document.querySelector('#experience .tp-card')!.getBoundingClientRect()
+        const cp = document.querySelectorAll('.tp-cp')[2]
+        return { cardRight: card.right, roadX: parseFloat(cp.getAttribute('cx')!) }
+      })
+      // road centre minus half the road and kerb, with a gap
+      expect(g.cardRight).toBeLessThan(g.roadX - 29 - 20)
+    }
+  })
+
   test('resume PDF and resume page are reachable', async ({ page, request }) => {
     await page.goto('/drive')
     const href = await page.locator('.hud.top a.btn.primary').getAttribute('href')

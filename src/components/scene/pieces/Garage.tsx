@@ -7,7 +7,7 @@ import { useCallback, useMemo, useRef } from 'react'
 import { Mesh, PlaneGeometry } from 'three'
 import { setPieces } from '@/content/profile'
 import { GARAGE } from '@/content/route'
-import { drawDoor, makeTexture, PALETTE, repaint, useRepaintOnFonts } from '../paint'
+import { drawDoor, makeTexture, repaint, useRepaintOnFonts } from '../paint'
 import { frameAt } from '../roadCurve'
 import { readIntro, readRoadT } from '../useDriveFrame'
 import { usePieceTextures } from './textures'
@@ -58,7 +58,7 @@ export function Garage() {
       <Glow w={W - 1} h={0.4} d={D - 2} y={H - 0.5} z={centerZ} color="#ffd9a8" opacity={0.18} />
       <mesh position={[0, H - 0.3, centerZ]}>
         <boxGeometry args={[1.2, 0.08, 0.3]} />
-        <meshStandardMaterial color={PALETTE.paper} emissive="#ffe2b8" emissiveIntensity={1.4} />
+        <meshStandardMaterial color="#fff1d6" emissive="#ffe2b8" emissiveIntensity={1.4} />
       </mesh>
     </group>
   )

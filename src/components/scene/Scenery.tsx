@@ -16,7 +16,9 @@ const SHADOW_MIN_HEIGHT = 3
 
 // The nature kit's palette is mint and peach. Multiplied by this it reads as green leaves and brown
 // trunks against the photographic ground.
-const NATURE_TINT = '#9e9e6b'
+const NATURE_TINT = '#4f6068'
+// Buildings and props from the kits: cooled and dimmed into the night.
+const KIT_TINT = '#8b95ad'
 
 // Clone a loaded model and size it to the fit spec, footprint centred, base on the ground.
 // Swaps PBR materials for Lambert and limits shadow casting, both for integrated GPUs.
@@ -53,7 +55,7 @@ function Placed({ p, lat }: { p: Placement; lat: number }) {
   const group = useRef<Group>(null)
   const k = useRef(0)
   const model = useMemo(() => {
-    const m = fitModel(scene, p.fit, p.model.startsWith('nature/') ? NATURE_TINT : undefined)
+    const m = fitModel(scene, p.fit, p.model.startsWith('nature/') ? NATURE_TINT : KIT_TINT)
     if (p.rot) m.rotation.y = p.rot
     if (p.dx) m.position.x += p.dx
     if (p.dz) m.position.z += p.dz

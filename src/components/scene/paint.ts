@@ -8,7 +8,7 @@ import { CanvasTexture, SRGBColorSpace } from 'three'
 import type { ChronologyCard } from '@/content/profile'
 import { wrapText } from '@/lib/pieceMath'
 
-export const PALETTE = { paper: '#F6F1E9', paper2: '#EDE6DA', ink: '#1E2A38', ink2: '#55627A', cobalt: '#2F5BEA', white: '#FFFFFF' } as const
+export const PALETTE = { panel: '#101e3d', panel2: '#0b1630', text: '#e8edf7', muted: '#94a3c4', amber: '#ffb547', cobalt: '#6f93ff', line: '#1e2f58' } as const
 
 type Draw = (ctx: CanvasRenderingContext2D, w: number, h: number) => void
 
@@ -89,11 +89,15 @@ export function repaint(tex: CanvasTexture, draw: Draw): void {
   tex.needsUpdate = true
 }
 
+// A navy glass card with a thin line border and the lit amber top edge, like the cards on the page.
 function paperPanel(ctx: CanvasRenderingContext2D, w: number, h: number, inset = 0) {
-  ctx.fillStyle = PALETTE.paper
+  ctx.fillStyle = PALETTE.panel
   ctx.fillRect(inset, inset, w - inset * 2, h - inset * 2)
-  ctx.fillStyle = PALETTE.ink
-  ctx.fillRect(inset, h - inset - 6, w - inset * 2, 6) // the site's hard drop shadow
+  ctx.strokeStyle = PALETTE.line
+  ctx.lineWidth = 4
+  ctx.strokeRect(inset + 2, inset + 2, w - inset * 2 - 4, h - inset * 2 - 4)
+  ctx.fillStyle = PALETTE.amber
+  ctx.fillRect(inset, inset, w - inset * 2, 6)
 }
 
 // Shrink a font until the text fits the width.
@@ -105,29 +109,29 @@ function fitFont(ctx: CanvasRenderingContext2D, text: string, weight: number, si
   }
 }
 
-// A one-line sign: paper board, ink text, cobalt rule.
+// A one-line sign: navy board, light text, cobalt rule.
 export function drawSign(ctx: CanvasRenderingContext2D, w: number, h: number, text: string) {
   paperPanel(ctx, w, h)
   const f = fonts()
   ctx.fillStyle = PALETTE.cobalt
   ctx.fillRect(w * 0.08, h * 0.22, w * 0.84, 6)
-  ctx.fillStyle = PALETTE.ink
+  ctx.fillStyle = PALETTE.text
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
   fitFont(ctx, text, 800, h * 0.42, f.display, w * 0.84)
   ctx.fillText(text, w / 2, h * 0.62)
 }
 
-// The garage roller door: ribbed cobalt metal with the name across the middle.
+// The garage roller door: ribbed navy metal with the name across the middle in amber.
 export function drawDoor(ctx: CanvasRenderingContext2D, w: number, h: number, name: string) {
-  ctx.fillStyle = PALETTE.cobalt
+  ctx.fillStyle = PALETTE.panel2
   ctx.fillRect(0, 0, w, h)
   ctx.fillStyle = 'rgba(0,0,0,0.18)'
   for (let y = 0; y < h; y += h / 12) ctx.fillRect(0, y, w, 4)
   ctx.fillStyle = 'rgba(255,255,255,0.08)'
   for (let y = 8; y < h; y += h / 12) ctx.fillRect(0, y, w, 3)
   const f = fonts()
-  ctx.fillStyle = PALETTE.paper
+  ctx.fillStyle = PALETTE.amber
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
   fitFont(ctx, name, 800, h * 0.2, f.display, w * 0.86)
@@ -141,16 +145,16 @@ export function drawCard(ctx: CanvasRenderingContext2D, w: number, h: number, ca
   const pad = w * 0.08
   ctx.textAlign = 'left'
   ctx.textBaseline = 'alphabetic'
-  ctx.fillStyle = PALETTE.cobalt
+  ctx.fillStyle = PALETTE.amber
   ctx.font = `600 ${h * 0.09}px ${f.body}`
   ctx.fillText(card.date, pad, h * 0.19)
-  ctx.fillStyle = PALETTE.ink
+  ctx.fillStyle = PALETTE.text
   fitFont(ctx, card.provider, 800, h * 0.11, f.display, w - pad * 2)
   ctx.fillText(card.provider, pad, h * 0.34)
   ctx.font = `400 ${h * 0.085}px ${f.body}`
   wrapText(card.finding, 26).slice(0, 3).forEach((line, i) => ctx.fillText(line, pad, h * (0.48 + i * 0.11)))
   ctx.textAlign = 'right'
-  ctx.fillStyle = PALETTE.ink2
+  ctx.fillStyle = PALETTE.muted
   ctx.font = `600 ${h * 0.09}px ${f.body}`
   ctx.fillText(card.page, w - pad, h * 0.88)
   ctx.fillStyle = PALETTE.cobalt
@@ -161,11 +165,11 @@ export function drawCard(ctx: CanvasRenderingContext2D, w: number, h: number, ca
 export function drawLastCard(ctx: CanvasRenderingContext2D, w: number, h: number, text: string) {
   paperPanel(ctx, w, h)
   const f = fonts()
-  ctx.fillStyle = PALETTE.cobalt
+  ctx.fillStyle = PALETTE.amber
   ctx.beginPath()
   ctx.arc(w / 2, h * 0.36, h * 0.13, 0, Math.PI * 2)
   ctx.fill()
-  ctx.strokeStyle = PALETTE.paper
+  ctx.strokeStyle = PALETTE.panel2
   ctx.lineWidth = h * 0.03
   ctx.lineCap = 'round'
   ctx.lineJoin = 'round'
@@ -174,7 +178,7 @@ export function drawLastCard(ctx: CanvasRenderingContext2D, w: number, h: number
   ctx.lineTo(w / 2 - h * 0.01, h * 0.42)
   ctx.lineTo(w / 2 + h * 0.07, h * 0.29)
   ctx.stroke()
-  ctx.fillStyle = PALETTE.ink
+  ctx.fillStyle = PALETTE.text
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
   ctx.font = `800 ${h * 0.12}px ${f.display}`
@@ -188,33 +192,33 @@ export function drawBoard(ctx: CanvasRenderingContext2D, w: number, h: number, t
   const pad = w * 0.06
   ctx.textAlign = 'left'
   ctx.textBaseline = 'alphabetic'
-  ctx.fillStyle = PALETTE.ink
+  ctx.fillStyle = PALETTE.text
   ctx.font = `800 ${h * 0.13}px ${f.display}`
   ctx.fillText(title, pad, h * 0.18)
-  ctx.fillStyle = PALETTE.ink2
+  ctx.fillStyle = PALETTE.muted
   ctx.font = `400 ${h * 0.06}px ${f.body}`
   ctx.fillText(note, pad, h * 0.27)
   rows.forEach((r, i) => {
     const y = h * (0.45 + i * 0.18)
-    ctx.fillStyle = PALETTE.paper2
+    ctx.fillStyle = PALETTE.panel2
     ctx.fillRect(pad, y - h * 0.11, w - pad * 2, h * 0.15)
-    ctx.fillStyle = PALETTE.ink
+    ctx.fillStyle = PALETTE.text
     ctx.textAlign = 'left'
     ctx.font = `500 ${h * 0.065}px ${f.body}`
     ctx.fillText(wrapText(r.label, 34)[0] ?? '', pad * 1.5, y)
     ctx.textAlign = 'right'
-    ctx.fillStyle = PALETTE.cobalt
+    ctx.fillStyle = PALETTE.amber
     ctx.font = `800 ${h * 0.11}px ${f.display}`
     ctx.fillText(r.value, w - pad * 1.5, y + h * 0.01)
   })
 }
 
-// A short label for the scanner arch: paper on cobalt.
+// A short label for the scanner arch: navy on amber.
 export function drawArchLabel(ctx: CanvasRenderingContext2D, w: number, h: number, text: string) {
-  ctx.fillStyle = PALETTE.cobalt
+  ctx.fillStyle = PALETTE.amber
   ctx.fillRect(0, 0, w, h)
   const f = fonts()
-  ctx.fillStyle = PALETTE.paper
+  ctx.fillStyle = PALETTE.panel2
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
   fitFont(ctx, text, 800, h * 0.5, f.display, w * 0.9)

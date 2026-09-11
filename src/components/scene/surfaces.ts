@@ -103,6 +103,9 @@ function paintGround(ctx: CanvasRenderingContext2D, grass: CanvasImageSource, n:
     ctx.fillStyle = g
     ctx.fillRect(0, 0, size, size)
   }
+  // Night: grass reads as a dark blue-green under the moon.
+  ctx.fillStyle = 'rgba(7,15,34,0.5)'
+  ctx.fillRect(0, 0, size, size)
 }
 
 // One strip of road: asphalt tiled to world scale, two centre dashes, both edge lines, tyre wear,
@@ -122,6 +125,9 @@ function paintStrip(ctx: CanvasRenderingContext2D, asphalt: CanvasImageSource) {
     for (let y = 0; y < STRIP_H; y += tilePx) for (let x = 0; x < STRIP_W; x += tilePx) ctx.drawImage(asphalt, x, y, tilePx, tilePx)
   }
   drawAsphalt()
+  // Night: the asphalt sits under a navy wash.
+  ctx.fillStyle = 'rgba(7,15,34,0.42)'
+  ctx.fillRect(0, 0, STRIP_W, STRIP_H)
 
   // Tyre wear: each lane centre sits 1.6 m from the crown, wheels 0.75 m either side of it.
   for (const lane of [-1.6, 1.6]) {
@@ -137,14 +143,16 @@ function paintStrip(ctx: CanvasRenderingContext2D, asphalt: CanvasImageSource) {
   }
 
   // Markings.
-  ctx.fillStyle = 'rgba(255,255,255,0.9)'
+  ctx.fillStyle = 'rgba(255,238,205,0.92)'
   const lw = LINE_WIDTH * px
   ctx.fillRect(EDGE_INSET * px - lw / 2, 0, lw, STRIP_H)
   ctx.fillRect(STRIP_W - EDGE_INSET * px - lw / 2, 0, lw, STRIP_H)
   for (let y = 0; y < STRIP_H; y += DASH_PERIOD * px) ctx.fillRect(STRIP_W / 2 - lw / 2, y, lw, DASH_LENGTH * px)
 
-  // Age the paint.
+  // Age the paint, then bring the wash back over it.
   ctx.globalAlpha = 0.22
   drawAsphalt()
   ctx.globalAlpha = 1
+  ctx.fillStyle = 'rgba(7,15,34,0.2)'
+  ctx.fillRect(0, 0, STRIP_W, STRIP_H)
 }

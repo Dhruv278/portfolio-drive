@@ -11,6 +11,18 @@
   --cobalt-2: #1f44c0;
   --road: #c9cdd2;
   --shadow: #d9d3c6;
+  --tp-navy: #0b1630;
+  --tp-deep: #070f22;
+  --tp-panel: #101e3d;
+  --tp-line: #1e2f58;
+  --tp-text: #e8edf7;
+  --tp-muted: #94a3c4;
+  --tp-amber: #ffb547;
+  --tp-amber-soft: rgba(255, 181, 71, 0.18);
+  --tp-cobalt: #6f93ff;
+  --tp-r-card: 14px;
+  --tp-r-ui: 8px;
+  --tp-r-chip: 6px;
 }
 
 @theme inline {
@@ -720,6 +732,176 @@ section.stop .contact a {
   }
 }
 
+/* ---------- The drive at night: the 3D page in the track's palette ---------- */
+.drive {
+  --paper: var(--tp-panel);
+  --paper-2: var(--tp-navy);
+  --ink: var(--tp-text);
+  --ink-2: var(--tp-muted);
+  --cobalt: var(--tp-amber);
+  --cobalt-2: #d9922a;
+  --cobalt-on-ink: var(--tp-cobalt);
+  --road: var(--tp-line);
+  --shadow: transparent;
+  color: var(--tp-text);
+}
+body:has(.drive) {
+  background: var(--tp-deep);
+}
+.drive .wordmark,
+.drive .btn,
+.drive .odometer,
+.drive .hint {
+  background: rgba(16, 30, 61, 0.94);
+  border: 1px solid var(--tp-line);
+  border-radius: var(--tp-r-ui);
+  box-shadow: none;
+}
+.drive .wordmark {
+  color: var(--tp-text);
+}
+.drive .btn {
+  color: var(--tp-text);
+}
+.drive .btn.primary {
+  background: var(--tp-amber);
+  border-color: var(--tp-amber);
+  color: var(--tp-deep);
+}
+.drive .btn.exit {
+  background: rgba(16, 30, 61, 0.94);
+  border-color: var(--tp-line);
+  color: var(--tp-text);
+}
+.drive .odometer {
+  font: 500 12.5px var(--font-mono);
+  color: var(--tp-muted);
+}
+.drive .odometer b {
+  color: var(--tp-text);
+  font: 600 14px var(--font-mono);
+}
+.drive .track {
+  background: var(--tp-line);
+  border-radius: 3px;
+}
+.drive .track::after {
+  display: none;
+}
+.drive .track i {
+  background: var(--tp-amber);
+}
+.drive .loadstatus,
+.drive .hint {
+  color: var(--tp-muted);
+}
+.drive section.stop .panel {
+  background: linear-gradient(180deg, rgba(20, 37, 74, 0.96), rgba(12, 22, 46, 0.96));
+  border: 1px solid var(--tp-line);
+  border-top-color: var(--tp-amber);
+  border-radius: var(--tp-r-card);
+  box-shadow:
+    0 30px 60px rgba(3, 8, 20, 0.5),
+    0 0 0 1px rgba(255, 181, 71, 0.18);
+}
+.drive section.stop.hero .panel {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+.drive .eyebrow {
+  font: 600 12px var(--font-mono);
+  letter-spacing: 0.03em;
+  color: var(--tp-amber);
+}
+.drive h1 span,
+.drive .hero .lede,
+.drive .hero .meta span {
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+}
+.drive h1,
+.drive h2,
+.drive .hero .lede,
+.drive .panel p,
+.drive .panel li {
+  color: var(--tp-text);
+}
+.drive .hero .meta {
+  color: var(--tp-muted);
+}
+.drive .panel li b {
+  color: #fff;
+}
+.drive .chip {
+  border: 1px solid var(--tp-line);
+  background: rgba(7, 15, 34, 0.35);
+  color: var(--tp-muted);
+  border-radius: var(--tp-r-chip);
+}
+.drive .chip.blue {
+  border-color: var(--tp-cobalt);
+  color: var(--tp-cobalt);
+}
+.drive .card,
+.drive .contact a {
+  border: 1px solid var(--tp-line);
+  background: rgba(7, 15, 34, 0.45);
+  border-radius: var(--tp-r-ui);
+  color: var(--tp-text);
+}
+.drive .contact a span {
+  color: var(--tp-muted);
+}
+.drive .contact a:hover {
+  border-color: var(--tp-amber);
+}
+.drive .skillgroup h3 {
+  color: var(--tp-amber);
+  font: 600 12px var(--font-mono);
+  letter-spacing: 0.08em;
+}
+.drive .habits {
+  border-top-color: var(--tp-line);
+  color: var(--tp-muted);
+}
+.drive .habits b {
+  color: var(--tp-text);
+}
+.drive .platforms li {
+  border-top-color: var(--tp-line);
+}
+.drive .dot {
+  background: var(--tp-amber);
+  box-shadow: none;
+  border-radius: 50%;
+}
+.drive .wheel {
+  background: var(--tp-amber-soft);
+  border: 1px dashed rgba(255, 181, 71, 0.5);
+  color: var(--tp-text);
+  border-radius: var(--tp-r-ui);
+}
+.drive .wheel a {
+  color: var(--tp-amber);
+}
+.drive .nogl {
+  background: linear-gradient(var(--tp-navy), var(--tp-deep));
+  color: var(--tp-muted);
+}
+.drive :focus-visible {
+  outline-color: var(--tp-amber);
+}
+@media (max-width: 900px) and (orientation: portrait) {
+  .drive section.stop:not(.hero) .panel::before {
+    background: var(--tp-line);
+  }
+  .drive section.stop .panel {
+    scrollbar-color: var(--tp-line) transparent;
+  }
+}
+
 /* ---------- Resume page ---------- */
 .resume {
   position: relative;
@@ -942,18 +1124,6 @@ section.stop .contact a {
 
 /* ---------- The track: dark instrument-panel page ---------- */
 .tp {
-  --tp-navy: #0b1630;
-  --tp-deep: #070f22;
-  --tp-panel: #101e3d;
-  --tp-line: #1e2f58;
-  --tp-text: #e8edf7;
-  --tp-muted: #94a3c4;
-  --tp-amber: #ffb547;
-  --tp-amber-soft: rgba(255, 181, 71, 0.18);
-  --tp-cobalt: #6f93ff;
-  --tp-r-card: 14px;
-  --tp-r-ui: 8px;
-  --tp-r-chip: 6px;
   position: relative;
   min-height: 100vh;
   color: var(--tp-text);

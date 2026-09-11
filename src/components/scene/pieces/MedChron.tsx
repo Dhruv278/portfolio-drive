@@ -29,8 +29,8 @@ const q = new Quaternion()
 const scale = new Vector3()
 const pos = new Vector3()
 const yAxis = new Vector3(0, 1, 0)
-const white = new Color(PALETTE.white)
-const paper = new Color(PALETTE.paper)
+const white = new Color('#e8edf7')
+const paper = new Color('#ffd9a0')
 
 export function MedChron() {
   const tex = usePieceTextures()

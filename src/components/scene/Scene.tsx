@@ -3,9 +3,9 @@
 import { useGLTF, useProgress } from '@react-three/drei'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Suspense, useEffect, useRef, useState } from 'react'
-import { Color, DataTexture, DirectionalLight, EquirectangularReflectionMapping, Fog, HalfFloatType, HemisphereLight, type Mesh, type MeshStandardMaterial, NeutralToneMapping, PMREMGenerator, RGBAFormat, type Texture, Vector3 } from 'three'
+import { DataTexture, DirectionalLight, EquirectangularReflectionMapping, HalfFloatType, type Mesh, type MeshStandardMaterial, NeutralToneMapping, PMREMGenerator, RGBAFormat, type Texture, Vector3 } from 'three'
 import { HDRLoader } from 'three/examples/jsm/loaders/HDRLoader.js'
-import { DUSK_SPAN, DUSK_START, usedModels } from '@/content/route'
+import { usedModels } from '@/content/route'
 import { Car } from './Car'
 import { ChaseCamera } from './ChaseCamera'
 import { DebugStats } from './DebugStats'
@@ -15,6 +15,7 @@ import { Billboards, Hills, Pier, PierPosts } from './Extras'
 import { Garage } from './pieces/Garage'
 import { MedChron } from './pieces/MedChron'
 import { Birds, Clouds, Water } from './Living'
+import { Night, NIGHT } from './Night'
 import { Road } from './Road'
 import { roadCurve } from './roadCurve'
 import { Scenery } from './Scenery'
@@ -27,18 +28,10 @@ import { DriveClock, IdleLoop, openRenderGate, readRoadT, startIntro, useIsMobil
 // Start every model download the moment the scene bundle arrives, not when each item first renders.
 for (const m of usedModels()) useGLTF.preload(`/models/${m}.glb`)
 
-const SKY_DAY = new Color('#DCEAF4')
-const SKY_DUSK = new Color('#F3D9C4')
-// Fog meets the photographic sky at the horizon, so it carries the sky's haze.
-const FOG_DAY = new Color('#D9E4EC')
-const FOG_DUSK = new Color('#EBD3BE')
-// The sky photo is the visible background; dusk dims and warms it through uniforms only.
-const SKY_INTENSITY_DAY = 1
-const SKY_INTENSITY_DUSK = 0.72
 const carPos = new Vector3() // module-level scratch, never handed to React
-// Sky light from the HDRI on PBR surfaces, eased down at dusk. Only uniforms change.
-const ENV_DAY = 0.7
-const ENV_DUSK = 0.35
+// Night. The sky photo is no longer visible; it only feeds reflections, at low strength. The sky
+// itself is the gradient dome in Night.tsx, in the page's navy.
+const ENV_NIGHT = 0.22
 const HDRI = '/hdri/autumn_field_1k.hdr'
 
 // Render resolution, capped below the device ratio. Integrated GPUs pay per pixel.
@@ -48,39 +41,29 @@ const DPR_PHONE = 1.25
 const COMPILE_TIMEOUT_MS = 8000
 
 function Atmosphere({ mobile }: { mobile: boolean }) {
-  const bg = useRef<Color>(null)
-  const fog = useRef<Fog>(null)
-  const sun = useRef<DirectionalLight>(null)
-  const hemi = useRef<HemisphereLight>(null)
+  const moon = useRef<DirectionalLight>(null)
 
-  useFrame((state) => {
+  // The moon follows the car so its shadow map always covers the scene around it.
+  useFrame(() => {
+    const m = moon.current
+    if (!m) return
     const { t } = readRoadT()
-    const dusk = Math.min(1, Math.max(0, (t - DUSK_START) / DUSK_SPAN))
-    state.scene.environmentIntensity = ENV_DAY + (ENV_DUSK - ENV_DAY) * dusk
-    state.scene.backgroundIntensity = SKY_INTENSITY_DAY + (SKY_INTENSITY_DUSK - SKY_INTENSITY_DAY) * dusk
-    if (bg.current) bg.current.copy(SKY_DAY).lerp(SKY_DUSK, dusk)
-    if (fog.current) fog.current.color.copy(FOG_DAY).lerp(FOG_DUSK, dusk)
-    if (sun.current) {
-      sun.current.intensity = 2.2 - dusk * 0.9
-      roadCurve().getPointAt(t, carPos)
-      sun.current.position.set(carPos.x + 30, 50, carPos.z + 20)
-      sun.current.target.position.copy(carPos)
-      sun.current.target.updateMatrixWorld()
-    }
-    if (hemi.current) hemi.current.intensity = 0.75 - dusk * 0.2
+    roadCurve().getPointAt(t, carPos)
+    m.position.set(carPos.x - 26, 46, carPos.z + 24)
+    m.target.position.copy(carPos)
+    m.target.updateMatrixWorld()
   })
 
   return (
     <>
-      {/* Drawn sky colour until the sky photo arrives, and for good if it never does. */}
-      <color ref={bg} attach="background" args={['#DCEAF4']} />
-      <fog ref={fog} attach="fog" args={['#D9E4EC', 50, 170]} />
-      <hemisphereLight ref={hemi} args={['#E8F1F8', '#FFFDF8', 0.75]} />
+      <color attach="background" args={[NIGHT.zenith]} />
+      <fog attach="fog" args={[NIGHT.fog, 45, 165]} />
+      <hemisphereLight args={[NIGHT.skyLight, NIGHT.groundLight, 0.6]} />
       <directionalLight
-        ref={sun}
-        position={[30, 50, 20]}
-        intensity={2.2}
-        color="#FFF6E8"
+        ref={moon}
+        position={[-26, 46, 24]}
+        intensity={1.05}
+        color={NIGHT.moon}
         castShadow={!mobile}
         shadow-mapSize={mobile ? [1024, 1024] : [1536, 1536]}
         shadow-camera-near={1}
@@ -223,9 +206,8 @@ function CompileWhenLoaded({ onReady }: { onReady: () => void }) {
           pmrem.dispose()
           mark('pmrem')
           scene.environment = env
-          // The same photo, unblurred, is the visible sky. Fog hides the seam with the ground plane.
-          scene.background = hdr
-          scene.backgroundIntensity = SKY_INTENSITY_DAY
+          scene.environmentIntensity = ENV_NIGHT
+          hdr.dispose()
           await nextFrame()
         } catch {
           // No sky light. The scene still renders under the sun and hemisphere lights.
@@ -302,6 +284,7 @@ function World({ stats, fx, onReady }: { stats: boolean; fx: boolean; onReady: (
       <DriveClock />
       <IdleLoop />
       <Atmosphere mobile={mobile} />
+      <Night />
       <ChaseCamera />
       <Birds />
       <Hills />

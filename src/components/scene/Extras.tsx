@@ -40,7 +40,7 @@ export function Hills() {
       {HILLS.map((h, i) => (
         <mesh key={i} position={poseAt(h.t, h.lateral).position} scale={[1, h.h / h.r, 1]} castShadow receiveShadow>
           <sphereGeometry args={[h.r, 18, 12, 0, Math.PI * 2, 0, Math.PI / 2]} />
-          <meshStandardMaterial map={map} normalMap={s.grassNor} roughness={1} metalness={0} color={h.dark ? '#b9c4a6' : '#d4dcc4'} />
+          <meshStandardMaterial map={map} normalMap={s.grassNor} roughness={1} metalness={0} color={h.dark ? '#3a4760' : '#485878'} />
         </mesh>
       ))}
     </>
@@ -96,10 +96,10 @@ export function Billboards() {
           <group key={i} position={pose.position} quaternion={pose.quaternion}>
             <Cyl r={0.14} h={3.6} c={COLORS.ink} x={-1.8} seg={6} />
             <Cyl r={0.14} h={3.6} c={COLORS.ink} x={1.8} seg={6} />
-            <Box w={5.2} h={2.8} d={0.2} c="#ffffff" y={3.4} />
-            <Box w={4.2} h={0.4} d={0.05} c={COLORS.cobalt} y={5.2} z={0.12} />
-            <Box w={3.4} h={0.25} d={0.05} c={COLORS.ink} x={-0.4} y={4.5} z={0.12} />
-            <Box w={2.6} h={0.25} d={0.05} c={COLORS.ink} x={-0.8} y={4.0} z={0.12} />
+            <Box w={5.2} h={2.8} d={0.2} c="#101e3d" y={3.4} />
+            <Box w={4.2} h={0.4} d={0.05} c="#ffb547" y={5.2} z={0.12} />
+            <Box w={3.4} h={0.25} d={0.05} c="#e8edf7" x={-0.4} y={4.5} z={0.12} />
+            <Box w={2.6} h={0.25} d={0.05} c="#94a3c4" x={-0.8} y={4.0} z={0.12} />
           </group>
         )
       })}

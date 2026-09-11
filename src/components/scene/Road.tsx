@@ -12,9 +12,9 @@ export const COLORS = {
   road: '#8E949C',
   kerb: '#D8DCE0',
   line: '#FFFFFF',
-  water: '#9FC4DA',
-  wood: '#C9B48F',
-  ink: '#1E2A38',
+  water: '#10203f',
+  wood: '#4a3d2e',
+  ink: '#1e2f58',
   cobalt: '#2F5BEA',
   leaf: '#7FB069',
   leafDark: '#6A9C57',
@@ -41,10 +41,10 @@ export function Road() {
         <meshStandardMaterial map={strip} normalMap={s.asphaltNor} normalScale={[0.8, 0.8]} roughnessMap={s.asphaltArm} metalnessMap={s.asphaltArm} roughness={1} metalness={0} side={DoubleSide} />
       </mesh>
       <mesh geometry={kerbL} receiveShadow>
-        <meshStandardMaterial map={s.concreteDiff} normalMap={s.concreteNor} roughness={0.9} metalness={0} side={DoubleSide} />
+        <meshStandardMaterial map={s.concreteDiff} normalMap={s.concreteNor} color="#8a97b3" roughness={0.9} metalness={0} side={DoubleSide} />
       </mesh>
       <mesh geometry={kerbR} receiveShadow>
-        <meshStandardMaterial map={s.concreteDiff} normalMap={s.concreteNor} roughness={0.9} metalness={0} side={DoubleSide} />
+        <meshStandardMaterial map={s.concreteDiff} normalMap={s.concreteNor} color="#8a97b3" roughness={0.9} metalness={0} side={DoubleSide} />
       </mesh>
     </group>
   )

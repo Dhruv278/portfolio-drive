@@ -107,9 +107,9 @@ export function Clouds() {
           volume={8 * c.s}
           growth={2}
           speed={0.12}
-          opacity={0.72}
+          opacity={0.38}
           fade={40}
-          color="#ffffff"
+          color="#22345f"
         />
       ))}
     </CloudField>

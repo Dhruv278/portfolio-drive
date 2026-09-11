@@ -4,17 +4,18 @@ import { ContactShadows, useGLTF } from '@react-three/drei'
 import { useFrame, useThree } from '@react-three/fiber'
 import { useMemo, useRef } from 'react'
 import { AdditiveBlending, Box3, CanvasTexture, DoubleSide, Group, Material, Mesh, MeshBasicMaterial, MeshStandardMaterial, NearestFilter, Object3D, SRGBColorSpace, Vector3 } from 'three'
-import { CAR_LENGTH, CAR_MODEL, DUSK_SPAN, DUSK_START } from '@/content/route'
+import { CAR_LENGTH, CAR_MODEL } from '@/content/route'
 import { flags } from '@/lib/flags'
 import { recolorRedCells } from '@/lib/recolor'
+import { NIGHT, usePoolTexture } from './Night'
 import { roadCurve, UP } from './roadCurve'
 import { readIntro, readRoadT } from './useDriveFrame'
 
 const MODEL_URL = `/models/${CAR_MODEL}.glb`
 const COBALT: [number, number, number] = [47, 91, 234]
-const BEAM_LENGTH = 11
-const BEAM_RADIUS = 1.7
-const BEAM_MAX_OPACITY = 0.26
+const BEAM_LENGTH = 9
+const BEAM_RADIUS = 1.25
+const BEAM_MAX_OPACITY = 0.16
 // Exhaust: a small pool of puffs recycled while the car moves.
 const PUFFS = 12
 const PUFF_EVERY = 0.09 // seconds between puffs at speed
@@ -52,6 +53,7 @@ function recolorMaterial(mat: MeshStandardMaterial): Material {
 export function Car() {
   const { scene } = useGLTF(MODEL_URL) as unknown as LoadedGltf
   const invalidate = useThree((s) => s.invalidate)
+  const pool = usePoolTexture()
   const car = useRef<Group>(null)
   const chassis = useRef<Group>(null)
   const state = useRef({ prevT: 0, prevSpeed: 0, spin: 0, steer: 0, roll: 0, pitch: 0, lastPuff: 0, next: 0 })
@@ -141,11 +143,9 @@ export function Car() {
     st.spin += speed * 900
     for (const w of wheels.current) w.rotation.x = st.spin
 
-    const dusk = Math.min(1, Math.max(0, (t - DUSK_START) / DUSK_SPAN))
-    // Lamps come on at dusk, and during the intro as the door opens.
-    const intro = readIntro()
-    const lit = Math.max(dusk, intro.active ? Math.min(0.7, intro.door * 1.2) : 0)
-    const beam = Math.max(0, lit - 0.2) * BEAM_MAX_OPACITY
+    // Night: lamps and beams are always on.
+    const lit = 1
+    const beam = 0.8 * BEAM_MAX_OPACITY
     if (beamL.current) beamL.current.opacity = beam
     if (beamR.current) beamR.current.opacity = beam
     if (lampMat.current) lampMat.current.emissiveIntensity = 0.5 + lit * 1.8
@@ -192,6 +192,11 @@ export function Car() {
       <group ref={car} name="car">
         {/* Ground contact: a blurred top-down depth of the car, re-rendered only when a frame is requested. */}
         {flags.contact && <ContactShadows position={[0, 0.005, 0]} scale={7} blur={2.4} far={1.5} opacity={0.5} resolution={256} frames={Infinity} color="#0a1020" />}
+        {/* the amber pool under the car, like the one on the 2D track */}
+        <mesh rotation-x={-Math.PI / 2} position={[0, 0.02, 0.4]}>
+          <planeGeometry args={[6.5, 9]} />
+          <meshBasicMaterial map={pool} color={NIGHT.amber} transparent opacity={0.3} depthWrite={false} blending={AdditiveBlending} toneMapped={false} fog={false} />
+        </mesh>
         <group ref={chassis}>
           <primitive object={model} />
           {[1, -1].map((sx) => (
@@ -207,7 +212,7 @@ export function Car() {
               {/* cone apex sits on the lamp, base lands on the road ahead */}
               <mesh position={[sx * (halfW - 0.45), lampY - 0.35, front + BEAM_LENGTH / 2]} rotation={[-Math.PI / 2 + 0.06, 0, 0]}>
                 <coneGeometry args={[BEAM_RADIUS, BEAM_LENGTH, 14, 1, true]} />
-                <meshBasicMaterial ref={sx === 1 ? beamL : beamR} color="#FFF1C8" transparent opacity={0} depthWrite={false} blending={AdditiveBlending} side={DoubleSide} fog={false} toneMapped={false} />
+                <meshBasicMaterial ref={sx === 1 ? beamL : beamR} color="#ffc46b" transparent opacity={0} depthWrite={false} blending={AdditiveBlending} side={DoubleSide} fog={false} toneMapped={false} />
               </mesh>
             </group>
           ))}

@@ -22,7 +22,7 @@ export function Mass({ w, h, d, x = 0, y = 0, z = 0, diff, nor, metres = 2, colo
   )
 }
 
-export function Post({ h, r = 0.08, x = 0, z = 0, color = PALETTE.ink }: { h: number; r?: number; x?: number; z?: number; color?: string }) {
+export function Post({ h, r = 0.08, x = 0, z = 0, color = PALETTE.line }: { h: number; r?: number; x?: number; z?: number; color?: string }) {
   return (
     <mesh position={[x, h / 2, z]} castShadow>
       <cylinderGeometry args={[r, r, h, 8]} />
@@ -63,7 +63,7 @@ export function Screen({ texture, w, h, x = 0, y, z = 0, rotationY = 0 }: Screen
     <group position={[x, y, z]} rotation={[0, rotationY, 0]}>
       <mesh position={[0, 0, -0.03]}>
         <boxGeometry args={[w + 0.12, h + 0.12, 0.06]} />
-        <meshStandardMaterial color={PALETTE.ink} roughness={0.5} metalness={0.4} />
+        <meshStandardMaterial color={PALETTE.line} roughness={0.5} metalness={0.4} />
       </mesh>
       <mesh position={[0, 0, 0.001]}>
         <planeGeometry args={[w, h]} />

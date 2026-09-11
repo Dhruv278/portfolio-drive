@@ -144,3 +144,12 @@ The owner asked whether the resume or the portfolio would get him hired and aske
 - Tests on the final production build: 52 passed across five engines, 23 skipped by design; 39 unit tests. Assets 6.8 MB of the 10 MB budget.
 - Left for the owner: approve or edit the two write-ups (remove `draft: true` in `src/content/writing.ts`), confirm the Vercel project's Git connection in the dashboard so pushes to main deploy on their own, and decide on a custom domain.
 
+## Addendum: the track, a 2D dark home (11 September 2026)
+
+The owner liked the drive but found the paper look plain, asked for a "dark navy, advanced technology" feel, and sketched a 2D idea: a path down the page with a car that moves to each checkpoint as you scroll. He also asked for far more content (experience, projects, skills from the resume) and for animated background effects, with research on libraries.
+
+- Sample first: `design/track-2d.html`, a self-contained page. He approved the UI.
+- Then the route `/track` in the app: the SVG road is built at runtime from the cards' positions so it fits any viewport, scroll maps piecewise between checkpoints so the car is at a checkpoint exactly when its card is centred, the travelled road lights in amber, cards wake and a monospace telemetry readout shows checkpoint, stop and distance. Nine checkpoints: start, experience (three roles), MedChron with the illustrative screen and tickers, own products with the rendered shorts, six platforms, ten skill groups, education and awards, writing, contact. The 3D drive is one click away.
+- Effects, from the research report (zero dependencies, about 4 KB of own code): a canvas starfield over the hero that streams with scroll velocity and pauses off-screen or on a hidden tab, two compositor-only aurora drifts, a one-shot light sweep around a card border when its checkpoint turns on, and number tickers. Reduced motion stills all of it. The research advised against every WebGL background (a second GL context, 34 KB or more, runs forever), against Aceternity's beams (51 infinite gradient tweens), and against letter-split or scramble text (breaks screen readers). Motion, GSAP and tsParticles were evaluated and left out for now; `motion` with `LazyMotion` (about 20 KB) is the pick if declarative reveals are wanted later.
+- Open decision for the owner: make `/track` the home page. The proof-first page would become `/proof` or fold its case-study artefacts into the track cards (the MedChron screen and the shorts are already there; the workflow drawing and the AgentFlow screens are not).
+

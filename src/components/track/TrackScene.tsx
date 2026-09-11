@@ -15,6 +15,7 @@ export function TrackScene({ mainId, stopSelector, cardSelector }: Props) {
   const dash = useRef<SVGPathElement>(null)
   const lit = useRef<SVGPathElement>(null)
   const cps = useRef<SVGGElement>(null)
+  const bigs = useRef<SVGGElement>(null)
   const car = useRef<SVGGElement>(null)
   const pool = useRef<SVGCircleElement>(null)
   const odoStop = useRef<HTMLElement>(null)
@@ -119,6 +120,19 @@ export function TrackScene({ mainId, stopSelector, cardSelector }: Props) {
       cps.current!.innerHTML = points
         .map((p, i) => `<circle class="tp-cp" cx="${p.x}" cy="${p.y}" r="14" /><text class="tp-cpn" x="${p.x}" y="${p.y + 0.5}">${i + 1}</text>`)
         .join('')
+      // Large faint numerals and names beside the road, filling the side the card leaves empty.
+      if (bigs.current) {
+        bigs.current.innerHTML = narrow
+          ? ''
+          : points
+              .map((p, i) => {
+                const name = stops[i].dataset.name ?? ''
+                const anchor = p.x > W / 2 ? 'start' : 'end'
+                const x = p.x > W / 2 ? p.x + 60 : p.x - 60
+                return `<text class="tp-big" x="${x}" y="${p.y + 40}" text-anchor="${anchor}">${String(i + 1).padStart(2, '0')}</text><text class="tp-bigname" x="${x}" y="${p.y + 76}" text-anchor="${anchor}">${name}</text>`
+              })
+              .join('')
+      }
       lastIdx = -1
       place(current)
     }
@@ -224,6 +238,7 @@ export function TrackScene({ mainId, stopSelector, cardSelector }: Props) {
             <stop offset="1" stopColor="#ffb547" stopOpacity="0" />
           </linearGradient>
         </defs>
+        <g ref={bigs} />
         <path ref={kerb} className="tp-kerb" d="" />
         <path ref={road} className="tp-road" d="" />
         <path ref={dash} className="tp-dash" d="" />

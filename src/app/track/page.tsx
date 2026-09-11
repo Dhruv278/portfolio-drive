@@ -62,6 +62,14 @@ export default function TrackPage() {
                 Take the 3D drive
               </Link>
             </div>
+            <ul className="tp-tiles" aria-label="Measured results">
+              {home.proof.map((p) => (
+                <li key={p.label}>
+                  <b>{p.text ?? (p.from ? `${p.from}${p.suffix} to ${p.to}${p.suffix}` : `${p.to}${p.suffix}`)}</b>
+                  <span>{p.label}</span>
+                </li>
+              ))}
+            </ul>
           </div>
         </section>
 
@@ -86,17 +94,25 @@ export default function TrackPage() {
 
         {medchron && medchron.kind === 'bullets' && (
           <section className="tp-stop left" id="medchron" data-name="MedChron">
-            <div className="tp-card">
+            <div className="tp-card wide">
               <p className="tp-eyebrow">{cp(3, 'Omnis AI, January 2026 to now')}</p>
               <h2>{medchron.heading}</h2>
-              <p>{medchron.intro}</p>
-              <ul className="tp-bullets">
-                {medchron.bullets.map((b) => (
-                  <li key={b.lead}>
-                    <b>{b.lead}</b> {b.text}
-                  </li>
-                ))}
-              </ul>
+              <div className="tp-split">
+                <div>
+                  <p>{medchron.intro}</p>
+                  <ul className="tp-bullets">
+                    {medchron.bullets.map((b) => (
+                      <li key={b.lead}>
+                        <b>{b.lead}</b> {b.text}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <figure className="tp-figure">
+                  <Image src="/images/medchron-chronology.webp" alt="Illustrative MedChron chronology screen with page citations and a citation check" width={1280} height={800} sizes="(max-width: 760px) 90vw, 360px" />
+                  <figcaption>Illustrative screen drawn for this portfolio. Not a product screenshot. Sample data.</figcaption>
+                </figure>
+              </div>
               <div className="tp-nums">
                 {home.proof.slice(0, 2).map((p) => (
                   <div key={p.label}>
@@ -107,10 +123,6 @@ export default function TrackPage() {
                   </div>
                 ))}
               </div>
-              <figure className="tp-figure">
-                <Image src="/images/medchron-chronology.webp" alt="Illustrative MedChron chronology screen with page citations and a citation check" width={1280} height={800} sizes="(max-width: 760px) 90vw, 520px" />
-                <figcaption>Illustrative screen drawn for this portfolio. Not a product screenshot. Sample data.</figcaption>
-              </figure>
               <div className="tp-chips">
                 {medchron.stack.map((c) => (
                   <span key={c} className="tp-chip">
@@ -209,16 +221,24 @@ export default function TrackPage() {
         </section>
 
         <section className="tp-stop left" id="education" data-name="Education">
-          <div className="tp-card">
+          <div className="tp-card wide">
             <p className="tp-eyebrow">{cp(7, 'Education and awards')}</p>
-            <h2>{resume.education.degree}</h2>
-            <p>{resume.education.school}</p>
-            <p className="tp-muted">{resume.education.awards}</p>
+            <div className="tp-split">
+              <div>
+                <h2>{resume.education.degree}</h2>
+                <p>{resume.education.school}</p>
+              </div>
+              <ul className="tp-list compact">
+                {resume.education.awards.split('. ').filter(Boolean).map((a) => (
+                  <li key={a}>{a.replace(/\.$/, '')}.</li>
+                ))}
+              </ul>
+            </div>
           </div>
         </section>
 
         <section className="tp-stop right" id="writing" data-name="Writing">
-          <div className="tp-card">
+          <div className="tp-card wide">
             <p className="tp-eyebrow">{cp(8, 'Writing')}</p>
             <h2>Two write-ups.</h2>
             <ul className="tp-list">
@@ -239,16 +259,21 @@ export default function TrackPage() {
 
         {contact && contact.kind === 'contact' && (
           <section className="tp-stop left" id="contact" data-name="Contact">
-            <div className="tp-card">
+            <div className="tp-card wide">
               <p className="tp-eyebrow">{cp(9, 'Contact')}</p>
-              <h2>{contact.heading}</h2>
-              <p className="tp-muted">{home.contactLine}</p>
-              <div className="tp-contact">
-                {contact.links.map((l) => (
-                  <a key={l.label} href={l.href} {...(l.href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>
-                    {l.label} <span>{l.value}</span>
-                  </a>
-                ))}
+              <div className="tp-split">
+                <div>
+                  <h2>{contact.heading}</h2>
+                  <p className="tp-muted">{home.contactLine}</p>
+                  <p className="tp-muted">{home.hero.meta}</p>
+                </div>
+                <div className="tp-contact">
+                  {contact.links.map((l) => (
+                    <a key={l.label} href={l.href} {...(l.href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>
+                      {l.label} <span>{l.value}</span>
+                    </a>
+                  ))}
+                </div>
               </div>
             </div>
           </section>

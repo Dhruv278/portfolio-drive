@@ -4,6 +4,8 @@ import { useProgress } from '@react-three/drei'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
+import { ViewMemory } from '@/components/ViewMemory'
+import { ViewSwitch } from '@/components/ViewSwitch'
 import { identity, stops } from '@/content/profile'
 import { useScrollProgress } from '@/hooks/useScrollProgress'
 import { useDrive } from '@/store/drive'
@@ -32,15 +34,14 @@ export function Hud() {
 
   return (
     <>
+      <ViewMemory view="3d" />
       <div className="hud top">
         <Link className="wordmark" href="/">
           {identity.name}
         </Link>
         <div className="actions">
-          <Link className="btn exit" href="/" data-testid="exit-drive">
-            <span aria-hidden="true">←</span> Back home
-          </Link>
-          <Link className="btn" href="/resume">
+          <ViewSwitch current="3d" exitTestId="exit-drive" />
+          <Link className="btn long" href="/resume">
             Resume
           </Link>
           <a className="btn primary" href={identity.resumePdf} download>

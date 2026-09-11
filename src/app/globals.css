@@ -195,27 +195,9 @@ a {
     display: none;
   }
 }
-.btn.exit {
-  background: var(--ink);
-  border-color: var(--ink);
-  color: var(--paper);
-}
-.btn.exit span {
-  margin-right: 4px;
-}
 .wheel a {
   color: var(--cobalt);
   font-weight: 600;
-}
-@media (max-width: 720px) {
-  .btn.exit {
-    font-size: 0;
-    padding: 8px 12px;
-  }
-  .btn.exit span {
-    font-size: 16px;
-    margin: 0;
-  }
 }
 .btn.primary {
   background: var(--cobalt);
@@ -768,11 +750,6 @@ body:has(.drive) {
   border-color: var(--tp-amber);
   color: var(--tp-deep);
 }
-.drive .btn.exit {
-  background: rgba(16, 30, 61, 0.94);
-  border-color: var(--tp-line);
-  color: var(--tp-text);
-}
 .drive .odometer {
   font: 500 12.5px var(--font-mono);
   color: var(--tp-muted);
@@ -900,6 +877,119 @@ body:has(.drive) {
   .drive section.stop .panel {
     scrollbar-color: var(--tp-line) transparent;
   }
+}
+
+/* ---------- 2D / 3D switch, in both top bars ---------- */
+.view-switch {
+  display: inline-flex;
+  align-items: stretch;
+  border: 1px solid var(--tp-line);
+  border-radius: var(--tp-r-ui);
+  background: rgba(16, 30, 61, 0.94);
+}
+.view-switch a {
+  font: 600 13.5px var(--font-body);
+  color: var(--tp-muted);
+  text-decoration: none;
+  padding: 0 14px;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+.view-switch a:first-child {
+  border-radius: 7px 0 0 7px;
+}
+.view-switch a:last-child {
+  border-radius: 0 7px 7px 0;
+}
+.view-switch a + a {
+  border-left: 1px solid var(--tp-line);
+}
+.view-switch a[aria-current='page'] {
+  background: var(--tp-amber);
+  color: var(--tp-deep);
+}
+@media (hover: hover) {
+  .view-switch a:not([aria-current='page']):hover {
+    color: var(--tp-text);
+  }
+}
+.drive .view-switch a {
+  min-height: 37px;
+  padding: 0 12px;
+}
+@media (pointer: coarse) {
+  .view-switch a,
+  .drive .view-switch a {
+    min-height: 44px;
+  }
+}
+
+/* A heartbeat on the way into the 3D drive: two beats, a rest, an amber ring that fades. */
+@keyframes tp-beat {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 181, 71, 0.55);
+  }
+  12% {
+    transform: scale(1.05);
+  }
+  24% {
+    transform: scale(1);
+  }
+  36% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 10px rgba(255, 181, 71, 0);
+  }
+  60% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 181, 71, 0);
+  }
+}
+.pulse {
+  position: relative;
+  z-index: 1;
+  animation: tp-beat 2.6s ease-in-out infinite;
+}
+.view-switch a.pulse {
+  color: var(--tp-text);
+  background: rgba(255, 181, 71, 0.16);
+}
+@media (prefers-reduced-motion: reduce) {
+  .pulse {
+    animation: none;
+    box-shadow: 0 0 0 3px rgba(255, 181, 71, 0.45);
+  }
+}
+
+/* The finish block after the last checkpoint on the 2D page. */
+.tp-finish {
+  position: relative;
+  z-index: 1;
+  width: min(720px, calc(100% - 40px));
+  margin: 4vh auto 0;
+  padding: 34px 28px 32px;
+  text-align: center;
+  border: 1px solid var(--tp-line);
+  border-top-color: var(--tp-amber);
+  border-radius: var(--tp-r-card);
+  background: linear-gradient(180deg, rgba(20, 37, 74, 0.96), rgba(12, 22, 46, 0.96));
+}
+.tp-finish h2 {
+  margin: 6px 0 10px;
+}
+.tp-finish p {
+  color: var(--tp-muted);
+  max-width: 52ch;
+  margin: 0 auto 20px;
+}
+.tp-btn.big {
+  font-size: 16px;
+  padding: 14px 24px;
+  min-height: 50px;
+  border-radius: 10px;
 }
 
 /* ---------- Resume page ---------- */
@@ -1317,8 +1407,9 @@ body:has(.tp) {
 .tp-contact span { color: var(--tp-muted); }
 .tp-end { height: 30vh; }
 
-/* Desktop only: the hero's own road and the swipe hints do not exist. */
+/* Desktop only: the hero's own road, the route-bar caption and the swipe hints do not exist. */
 .tp-heroroad { display: none; }
+.tp-barcap { display: none; }
 .tp-swipe { display: none; }
 
 /* Narrow screens, phones and tablets below 1024 px. The drive becomes a fixed route bar under the

@@ -170,6 +170,9 @@ test.describe('The Drive', () => {
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
     expect(overflow).toBe(0)
     await expect(page.locator('#top').getByRole('link', { name: 'Take the 3D drive' })).toHaveAttribute('href', '/drive')
+    // a first visit: the 3D side of the switch beats, and the page ends with the invitation
+    await expect(page.locator('.view-switch a.pulse')).toHaveText('3D')
+    await expect(page.locator('.tp-finish .tp-btn')).toHaveAttribute('href', '/drive')
     // the old address still lands on the home page
     await page.goto('/track')
     await expect(page).toHaveURL(/\/$/)
@@ -239,6 +242,30 @@ test.describe('The Drive', () => {
       // road centre minus half the road and kerb, with a gap
       expect(g.cardRight).toBeLessThan(g.roadX - 29 - 20)
     }
+  })
+
+  test('remembers the last view: the home address opens the drive once, and the 2D switch sticks', async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== 'desktop', 'one engine is enough')
+    await page.goto('/drive?scene=off')
+    await expect(page.getByTestId('odometer')).toBeVisible()
+    await page.goto('/')
+    await expect(page).toHaveURL(/\/drive$/)
+    await page.getByTestId('exit-drive').click()
+    await expect(page.locator('section.tp-stop')).toHaveCount(10)
+    // the drive has been seen, so the switch no longer beats
+    await expect(page.locator('.view-switch a.pulse')).toHaveCount(0)
+    await page.goto('/')
+    await expect(page).toHaveURL(/\/$/)
+    await expect(page.locator('.view-switch a[aria-current="page"]')).toHaveText('2D')
+  })
+
+  test('phones never open the drive from the home address', async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== 'phone', 'phone layout only')
+    await page.goto('/drive?scene=off')
+    await expect(page.getByTestId('odometer')).toBeVisible()
+    await page.goto('/')
+    await expect(page).toHaveURL(/\/$/)
+    await expect(page.locator('section.tp-stop')).toHaveCount(10)
   })
 
   test('resume PDF and resume page are reachable', async ({ page, request }) => {

@@ -182,6 +182,13 @@ export const track = {
 
   writing: { heading: 'Writing.' },
 
+  finish: {
+    eyebrow: 'The map is done. The drive is waiting.',
+    heading: 'Same road, in 3D.',
+    body: 'Ten checkpoints on a map is the short version. The 3D drive takes you down the road itself at night: out of the garage, past the records building, to the pier.',
+    button: 'Switch to the 3D drive',
+  },
+
   contact: {
     heading: 'Say hello.',
     line: 'Email is fastest. I answer within a day, and I am happy to walk through any of this on a call.',

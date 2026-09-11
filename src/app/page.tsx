@@ -5,6 +5,8 @@ import type { ReactNode } from 'react'
 import { HeroRoad } from '@/components/track/HeroRoad'
 import { Starfield } from '@/components/track/Starfield'
 import { TrackScene } from '@/components/track/TrackScene'
+import { ViewMemory } from '@/components/ViewMemory'
+import { ViewSwitch } from '@/components/ViewSwitch'
 import { identity, stops } from '@/content/profile'
 import { track } from '@/content/track'
 import { articles } from '@/content/writing'
@@ -47,6 +49,7 @@ export default function Page() {
 
   return (
     <div className="tp">
+      <ViewMemory view="2d" />
       <div className="tp-aurora a" aria-hidden="true" />
       <div className="tp-aurora b" aria-hidden="true" />
       <header className="tp-hud top">
@@ -54,9 +57,7 @@ export default function Page() {
           {identity.name}
         </a>
         <nav className="tp-actions" aria-label="Site">
-          <Link className="tp-btn" href="/drive">
-            3D drive
-          </Link>
+          <ViewSwitch current="2d" />
           <Link className="tp-btn" href="/resume">
             Resume
           </Link>
@@ -330,6 +331,14 @@ export default function Page() {
             </div>
           </section>
         )}
+        <aside className="tp-finish" aria-label="Switch to the 3D drive">
+          <p className="tp-eyebrow">{t.finish.eyebrow}</p>
+          <h2>{t.finish.heading}</h2>
+          <p>{t.finish.body}</p>
+          <Link className="tp-btn primary big pulse" href="/drive">
+            {t.finish.button}
+          </Link>
+        </aside>
         <div className="tp-end" />
       </main>
     </div>

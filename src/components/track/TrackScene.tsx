@@ -35,6 +35,7 @@ export function TrackScene({ mainId, stopSelector, cardSelector }: Props) {
     let current = 0
     let raf = 0
     let lastIdx = -1
+    let lastTick = 0
     const ticked = new Set<Element>()
 
     // Count a stat up once when its checkpoint turns on. Reduced motion jumps to the final value.
@@ -118,23 +119,21 @@ export function TrackScene({ mainId, stopSelector, cardSelector }: Props) {
       cps.current!.innerHTML = points
         .map((p, i) => `<circle class="tp-cp" cx="${p.x}" cy="${p.y}" r="14" /><text class="tp-cpn" x="${p.x}" y="${p.y + 0.5}">${i + 1}</text>`)
         .join('')
+      lastIdx = -1
       place(current)
     }
 
-    const place = (len: number) => {
-      const r = road.current!
-      const p = r.getPointAtLength(len)
-      const q = r.getPointAtLength(Math.min(L, len + 2))
-      const ang = (Math.atan2(q.y - p.y, q.x - p.x) * 180) / Math.PI + 90
-      const scale = innerWidth < 760 ? 0.85 : 1.25
-      car.current!.setAttribute('transform', `translate(${p.x.toFixed(1)},${p.y.toFixed(1)}) rotate(${ang.toFixed(1)}) scale(${scale})`)
-      pool.current!.setAttribute('cx', p.x.toFixed(1))
-      pool.current!.setAttribute('cy', p.y.toFixed(1))
-      lit.current!.style.strokeDashoffset = `${L - len}`
+    // Which checkpoint a track length has reached.
+    const indexAt = (len: number) => {
       let idx = 0
       cpLen.forEach((cl, i) => {
         if (len >= cl - 60) idx = i
       })
+      return idx
+    }
+
+    // Light the checkpoints and cards up to idx, and update the readout. Runs on scroll, not on frames.
+    const setState = (idx: number, len: number) => {
       if (idx !== lastIdx) {
         lastIdx = idx
         stops.forEach((st, i) => {
@@ -147,16 +146,32 @@ export function TrackScene({ mainId, stopSelector, cardSelector }: Props) {
         if (odoCp.current) odoCp.current.textContent = `${String(idx + 1).padStart(2, '0')} / ${String(stops.length).padStart(2, '0')}`
       }
       if (odoDist.current) odoDist.current.textContent = `${Math.round(len / 4).toLocaleString('en-US')} m`
-      if (bar.current) bar.current.style.width = `${(len / L) * 100}%`
+      if (bar.current) bar.current.style.width = `${(len / Math.max(1, L)) * 100}%`
     }
 
-    const tick = () => {
+    const place = (len: number) => {
+      const r = road.current!
+      const p = r.getPointAtLength(len)
+      const q = r.getPointAtLength(Math.min(L, len + 2))
+      const ang = (Math.atan2(q.y - p.y, q.x - p.x) * 180) / Math.PI + 90
+      const scale = innerWidth < 760 ? 0.85 : 1.25
+      car.current!.setAttribute('transform', `translate(${p.x.toFixed(1)},${p.y.toFixed(1)}) rotate(${ang.toFixed(1)}) scale(${scale})`)
+      pool.current!.setAttribute('cx', p.x.toFixed(1))
+      pool.current!.setAttribute('cy', p.y.toFixed(1))
+      lit.current!.style.strokeDashoffset = `${L - len}`
+    }
+
+    const tick = (now: number) => {
       raf = 0
-      const k = reduced ? 1 : 0.12
+      const dt = lastTick ? Math.min(0.1, (now - lastTick) / 1000) : 1 / 60
+      lastTick = now
+      // Time-based easing: the same feel at any frame rate, and a big catch-up after a paused tab.
+      const k = reduced ? 1 : 1 - Math.exp(-dt * 8)
       current += (target - current) * k
       if (Math.abs(target - current) < 0.5) current = target
       place(current)
       if (current !== target) raf = requestAnimationFrame(tick)
+      else lastTick = 0
     }
 
     const onScroll = () => {
@@ -173,6 +188,7 @@ export function TrackScene({ mainId, stopSelector, cardSelector }: Props) {
         break
       }
       target = len
+      setState(indexAt(len), len)
       hint.current?.classList.toggle('gone', y > 40)
       if (!raf) raf = requestAnimationFrame(tick)
     }

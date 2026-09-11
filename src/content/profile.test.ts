@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { bannedPatterns, home, identity, milestones, resume, setPieces, stops } from './profile'
+import { bannedPatterns, identity, milestones, resume, setPieces, stops } from './profile'
 import { track } from './track'
 import { articles } from './writing'
 
@@ -11,7 +11,7 @@ function collectStrings(value: unknown, out: string[] = []): string[] {
 }
 
 describe('profile content', () => {
-  const all = collectStrings({ identity, milestones, stops, resume, setPieces, home, articles, track })
+  const all = collectStrings({ identity, milestones, stops, resume, setPieces, articles, track })
 
   it('has six stops with unique ids in the agreed order', () => {
     expect(stops.map((s) => s.id)).toEqual(['start', 'medchron', 'products', 'platforms', 'how', 'contact'])
@@ -50,16 +50,6 @@ describe('profile content', () => {
     for (const c of setPieces.medchron.chronology) expect(c.page).toMatch(/^p\. \d+$/)
     expect(setPieces.medchron.counters.map((c) => c.to)).toEqual([26, 28, 3])
     expect(setPieces.garage.door).toBe('DHRUV GOPANI')
-  })
-
-  it('gives the home page four case studies with results and three proof figures', () => {
-    expect(home.caseStudies).toHaveLength(4)
-    for (const c of home.caseStudies) {
-      expect(c.result.length).toBeGreaterThan(40)
-      expect(c.stack.length).toBeGreaterThan(2)
-    }
-    expect(home.proof).toHaveLength(3)
-    expect(home.proof.filter((p) => p.to !== undefined).map((p) => p.to)).toEqual([26, 28])
   })
 
   it('numbers the eyebrows two to six for the non-hero stops', () => {

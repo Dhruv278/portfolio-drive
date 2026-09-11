@@ -1,6 +1,6 @@
 # The Drive
 
-Live: https://portfolio-drive-mu.vercel.app (home, proof first). The six-stop drive is at /drive, the resume at /resume.
+Live: https://portfolio-drive-mu.vercel.app (the track: ten checkpoints, a car that follows the scroll). The 3D drive is at /drive, the resume at /resume, write-ups under /writing.
 
 
 Dhruv Gopani's portfolio. A scroll-driven road trip: a cobalt sedan drives through six stops, one per chapter of the work, while the content stays real HTML underneath.

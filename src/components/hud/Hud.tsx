@@ -10,13 +10,11 @@ import { useDrive } from '@/store/drive'
 
 export function Hud() {
   useScrollProgress()
-  const setMode = useDrive((s) => s.setMode)
   const router = useRouter()
-  useEffect(() => setMode('drive'), [setMode])
   // Escape leaves the drive, like closing a full-screen view.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') router.push('/#proof')
+      if (e.key === 'Escape') router.push('/')
     }
     addEventListener('keydown', onKey)
     return () => removeEventListener('keydown', onKey)
@@ -39,8 +37,8 @@ export function Hud() {
           {identity.name}
         </Link>
         <div className="actions">
-          <Link className="btn exit" href="/#proof" data-testid="exit-drive">
-            <span aria-hidden="true">←</span> Back to the proof
+          <Link className="btn exit" href="/" data-testid="exit-drive">
+            <span aria-hidden="true">←</span> Back home
           </Link>
           <Link className="btn" href="/resume">
             Resume

@@ -16,8 +16,7 @@ function sceneSwitchedOff(): boolean {
   return typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('scene') === 'off'
 }
 
-// quiet: no fallback note when WebGL is missing (the home hero simply stays paper).
-export function SceneMount({ quiet = false }: { quiet?: boolean }) {
+export function SceneMount() {
   const webglOk = useDrive((s) => s.webglOk)
   const setWebglOk = useDrive((s) => s.setWebglOk)
   const [off] = useState(sceneSwitchedOff)
@@ -27,6 +26,6 @@ export function SceneMount({ quiet = false }: { quiet?: boolean }) {
   }, [off, setWebglOk])
 
   if (off || webglOk === null) return null
-  if (!webglOk) return quiet ? null : <Fallback />
+  if (!webglOk) return <Fallback />
   return <Scene />
 }

@@ -3,7 +3,7 @@
 import { useFrame } from '@react-three/fiber'
 import { useMemo, useRef } from 'react'
 import { Vector3 } from 'three'
-import { ARRIVAL_POSE_PHONE, ARRIVAL_POSES, HERO_POSE, INTRO_CAMERA, type CameraPose } from '@/content/route'
+import { ARRIVAL_POSE_PHONE, ARRIVAL_POSES, INTRO_CAMERA, type CameraPose } from '@/content/route'
 import { parkedStop } from '@/lib/scroll'
 import { useDrive } from '@/store/drive'
 import { frameAt, roadCurve, UP, type Frame } from './roadCurve'
@@ -51,9 +51,9 @@ export function ChaseCamera() {
 
   useFrame(({ camera }) => {
     const { s, t, reduced } = readRoadT()
-    const { zones, stopIndex, mode } = useDrive.getState()
-    const heroCam = mode === 'hero' || (mobile && zones.length > 1 && s < zones[1].a * 0.6)
-    const chase = heroCam ? (mobile ? PHONE_HERO : HERO_POSE) : mobile ? PHONE : DESKTOP
+    const { zones, stopIndex } = useDrive.getState()
+    const heroCam = mobile && zones.length > 1 && s < zones[1].a * 0.6
+    const chase = heroCam ? PHONE_HERO : mobile ? PHONE : DESKTOP
 
     // Arrival blend: toward 1 while parked at a stop, back to 0 while driving.
     const parked = parkedStop(s, zones)

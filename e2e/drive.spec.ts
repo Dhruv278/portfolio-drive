@@ -134,35 +134,9 @@ test.describe('The Drive', () => {
     expect(names).toEqual([true, true, true])
   })
 
-  test('home: hero, proof strip, four case studies, six platforms, links', async ({ page }) => {
-    await page.goto('/?scene=off')
-    await expect(page.getByRole('heading', { level: 1 })).toContainText('Dhruv')
-    await expect(page.locator('.hero-copy').getByRole('link', { name: 'Take the drive' })).toHaveAttribute('href', '/drive')
-    await expect(page.locator('article.case')).toHaveCount(4)
-    // every case study shows a real artefact, none is a placeholder
-    await expect(page.locator('.case-art.pending')).toHaveCount(0)
-    await expect(page.locator('.case-art img, .case-art video')).toHaveCount(8)
-    await expect(page.locator('.platform-rows li')).toHaveCount(6)
-    await expect(page.locator('#contact a[href^="mailto:"]')).toHaveCount(1)
-    // the proof strip counts up once it is in view
-    await page.locator('.proof').scrollIntoViewIfNeeded()
-    await expect(page.getByTestId('proof-value').first()).toHaveText('53% to 26%', { timeout: 5_000 })
-    await expect(page.getByTestId('proof-value').nth(1)).toHaveText('28')
-  })
-
-  test('home: the hero scene mounts, then stops rendering once scrolled away', async ({ page }, testInfo) => {
-    test.skip(!['desktop', 'phone'].includes(testInfo.project.name), 'needs a real WebGL scene')
-    await page.goto('/?stats=1&intro=0')
-    const scene = page.getByTestId('scene')
-    await expect(scene).toHaveAttribute('data-ready', 'true', { timeout: 60_000 })
-    await expect(scene).toHaveAttribute('data-running', 'true')
-    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight))
-    await expect(scene).toHaveAttribute('data-running', 'false', { timeout: 5_000 })
-  })
-
   test('writing: both articles render and are linked from the home page', async ({ page }) => {
-    await page.goto('/?scene=off')
-    await expect(page.locator('.writing-list a')).toHaveCount(2)
+    await page.goto('/')
+    await expect(page.locator('#writing .tp-list a')).toHaveCount(2)
     const res = await page.goto('/writing/cited-chronologies')
     expect(res?.status()).toBe(200)
     await expect(page.getByRole('heading', { level: 1 })).toContainText('Every fact cites its page')
@@ -175,14 +149,13 @@ test.describe('The Drive', () => {
     await page.goto('/drive?scene=off')
     const exit = page.getByTestId('exit-drive')
     await expect(exit).toBeVisible()
-    await expect(exit).toHaveAttribute('href', '/#proof')
+    await expect(exit).toHaveAttribute('href', '/')
     await exit.click()
-    await expect(page).toHaveURL(/\/#proof$/)
-    await expect(page.locator('article.case').first()).toBeVisible()
+    await expect(page.locator('section.tp-stop')).toHaveCount(10)
   })
 
-  test('track: nine checkpoints, telemetry follows the scroll, no sideways overflow', async ({ page }) => {
-    await page.goto('/track')
+  test('home: ten checkpoints, telemetry follows the scroll, no sideways overflow', async ({ page }) => {
+    await page.goto('/')
     await expect(page.locator('section.tp-stop')).toHaveCount(10)
     await expect(page.getByRole('heading', { level: 1 })).toContainText('Dhruv')
     const odo = page.getByTestId('track-odometer')
@@ -197,6 +170,9 @@ test.describe('The Drive', () => {
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
     expect(overflow).toBe(0)
     await expect(page.locator('#top').getByRole('link', { name: 'Take the 3D drive' })).toHaveAttribute('href', '/drive')
+    // the old address still lands on the home page
+    await page.goto('/track')
+    await expect(page).toHaveURL(/\/$/)
   })
 
   test('resume PDF and resume page are reachable', async ({ page, request }) => {

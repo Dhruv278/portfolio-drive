@@ -49,10 +49,9 @@ const EPS_S = 1e-4
 
 // Returns true when the eased state has caught up with the scroll target.
 export function stepDrive(delta: number, now = performance.now()): boolean {
-  const { scroll, zones, reducedMotion, mode } = useDrive.getState()
-  drive.targetS = mode === 'hero' ? 0 : scroll
-  // On the home page the car waits at the first stop; the page's scroll does not drive it.
-  drive.targetT = mode === 'hero' ? T_STOPS[0] : zones.length ? roadT(scroll, zones, T_STOPS, T_END) : T_STOPS[0]
+  const { scroll, zones, reducedMotion } = useDrive.getState()
+  drive.targetS = scroll
+  drive.targetT = zones.length ? roadT(scroll, zones, T_STOPS, T_END) : T_STOPS[0]
   drive.reduced = reducedMotion
   if (intro.active) {
     const ph = introPhase((now - intro.start) / 1000)

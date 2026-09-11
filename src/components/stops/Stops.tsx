@@ -136,7 +136,7 @@ function Contact({ stop }: { stop: Extract<StopContent, { kind: 'contact' }> }) 
         ))}
       </div>
       <div className="wheel">
-        {stop.wheel} <Link href="/#proof">Back to the proof.</Link>
+        {stop.wheel} <Link href="/">Back home.</Link>
       </div>
     </div>
   )

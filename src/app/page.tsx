@@ -1,59 +1,333 @@
+import type { Metadata } from 'next'
+import Image from 'next/image'
 import Link from 'next/link'
-import { CaseStudies } from '@/components/home/CaseStudies'
-import { Contact } from '@/components/home/Contact'
-import { HeroScene } from '@/components/home/HeroScene'
-import { PlatformsList } from '@/components/home/PlatformsList'
-import { ProofStrip } from '@/components/home/ProofStrip'
-import { Writing } from '@/components/home/Writing'
-import { home, identity } from '@/content/profile'
+import type { ReactNode } from 'react'
+import { Starfield } from '@/components/track/Starfield'
+import { TrackScene } from '@/components/track/TrackScene'
+import { identity, stops } from '@/content/profile'
+import { track } from '@/content/track'
+import { articles } from '@/content/writing'
 
-// The proof-first home page. The drive is the hero and lives in full at /drive.
-export default function Page() {
+export const metadata: Metadata = {
+  title: `${identity.name}, ${identity.shortHeadline}`,
+  description: `${identity.headline}. ${identity.location}. ${identity.availability}.`,
+}
+
+const TOTAL = 10
+const cp = (n: number, rest: string) => `Checkpoint ${String(n).padStart(2, '0')} of ${String(TOTAL).padStart(2, '0')}. ${rest}`
+
+function Chips({ items }: { items: readonly string[] }) {
   return (
-    <>
-      <header className="topbar">
-        <a className="wordmark" href="#top">
+    <div className="tp-chips">
+      {items.map((c) => (
+        <span key={c} className="tp-chip">
+          {c}
+        </span>
+      ))}
+    </div>
+  )
+}
+
+function Ext({ href, children }: { href: string; children: ReactNode }) {
+  return href.startsWith('http') ? (
+    <a href={href} target="_blank" rel="noopener noreferrer">
+      {children}
+    </a>
+  ) : (
+    <Link href={href}>{children}</Link>
+  )
+}
+
+// Home: a dark instrument-panel page where a car follows a road through ten checkpoints of the resume.
+export default function Page() {
+  const platforms = stops.find((s) => s.kind === 'platforms')
+  const contact = stops.find((s) => s.kind === 'contact')
+  const t = track
+
+  return (
+    <div className="tp">
+      <div className="tp-aurora a" aria-hidden="true" />
+      <div className="tp-aurora b" aria-hidden="true" />
+      <header className="tp-hud top">
+        <a className="tp-wordmark" href="#top">
           {identity.name}
         </a>
-        <nav className="actions" aria-label="Site">
-          <Link className="btn" href="/drive">
-            Drive
+        <nav className="tp-actions" aria-label="Site">
+          <Link className="tp-btn" href="/drive">
+            3D drive
           </Link>
-          <Link className="btn" href="/resume">
+          <Link className="tp-btn" href="/resume">
             Resume
           </Link>
-          <a className="btn primary" href={identity.resumePdf} download>
+          <a className="tp-btn primary" href={identity.resumePdf} download>
             PDF
           </a>
         </nav>
       </header>
-      <main id="content" className="home">
-        <section className="hero-scene" id="top">
-          <HeroScene />
-          <div className="hero-copy">
+      <TrackScene mainId="track-main" stopSelector="section.tp-stop" cardSelector=".tp-card" />
+      <main id="track-main" className="tp-main">
+        {/* 1 */}
+        <section className="tp-stop hero left on" id="top" data-name="Start">
+          <Starfield />
+          <div className="tp-card">
+            <p className="tp-eyebrow">{cp(1, t.hero.eyebrow)}</p>
             <h1>
-              <span>{identity.first}</span> <span>{identity.last}</span>
+              {identity.first}
+              <br />
+              {identity.last}
             </h1>
-            <p className="line">{home.hero.line}</p>
-            <p className="meta">
-              <span>{home.hero.meta}</span>
-            </p>
-            <div className="actions">
-              <a className="btn primary" href="#proof">
-                {home.hero.seeProof}
+            <p className="tp-lede">{t.hero.line}</p>
+            <p className="tp-meta">{t.hero.meta}</p>
+            <div className="tp-actions">
+              <a className="tp-btn primary" href="#why">
+                Start the drive
               </a>
-              <Link className="btn" href="/drive">
-                {home.hero.takeDrive}
+              <Link className="tp-btn" href="/drive">
+                Take the 3D drive
               </Link>
+            </div>
+            <ul className="tp-tiles">
+              {t.hero.tiles.map((x) => (
+                <li key={x.title}>
+                  <b>{x.title}</b>
+                  <span>{x.body}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        {/* 2 */}
+        <section className="tp-stop right" id="why" data-name="Why me">
+          <div className="tp-card wide">
+            <p className="tp-eyebrow">{cp(2, 'Why hire me')}</p>
+            <h2>{t.why.heading}</h2>
+            <p className="tp-intro">{t.why.intro}</p>
+            <div className="tp-grid2">
+              {t.why.points.map((p) => (
+                <div key={p.title} className="tp-point">
+                  <h3>{p.title}</h3>
+                  <p>{p.body}</p>
+                </div>
+              ))}
+            </div>
+            <h3 className="tp-sub">{t.why.planHeading}</h3>
+            <ol className="tp-steps">
+              {t.why.plan.map((s) => (
+                <li key={s}>{s}</li>
+              ))}
+            </ol>
+          </div>
+        </section>
+
+        {/* 3 */}
+        <section className="tp-stop left" id="experience" data-name="Experience">
+          <div className="tp-card wide">
+            <p className="tp-eyebrow">{cp(3, 'Experience, 2023 to now')}</p>
+            <h2>{t.experience.heading}</h2>
+            <ol className="tp-roles">
+              {t.experience.roles.map((r) => (
+                <li key={r.company}>
+                  <div className="tp-role-head">
+                    <b>
+                      {r.company}
+                      <span className="tp-role-title">{r.title}</span>
+                    </b>
+                    <span>{r.dates}</span>
+                  </div>
+                  <small>{r.where}</small>
+                  <ul className="tp-bullets">
+                    {r.points.map((p) => (
+                      <li key={p.slice(0, 40)}>{p}</li>
+                    ))}
+                  </ul>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+
+        {/* 4 */}
+        <section className="tp-stop right" id="medchron" data-name="MedChron">
+          <div className="tp-card wide">
+            <p className="tp-eyebrow">{cp(4, t.medchron.eyebrow)}</p>
+            <h2>{t.medchron.heading}</h2>
+            <div className="tp-split">
+              <div>
+                {t.medchron.what.map((p) => (
+                  <p key={p.slice(0, 40)}>{p}</p>
+                ))}
+                <p className="tp-role">{t.medchron.role}</p>
+              </div>
+              <figure className="tp-figure">
+                <Image src="/images/medchron-chronology.webp" alt="Illustrative MedChron chronology screen with page citations and a citation check" width={1280} height={800} sizes="(max-width: 760px) 90vw, 360px" />
+                <figcaption>Illustrative screen drawn for this portfolio. Not a product screenshot. Sample data.</figcaption>
+              </figure>
+            </div>
+            <div className="tp-grid2 parts">
+              {t.medchron.parts.map((p) => (
+                <div key={p.title} className="tp-point">
+                  <h3>{p.title}</h3>
+                  <p>{p.body}</p>
+                </div>
+              ))}
+            </div>
+            <h3 className="tp-sub">Why attorneys can trust it</h3>
+            <ul className="tp-bullets">
+              {t.medchron.trust.map((p) => (
+                <li key={p.slice(0, 40)}>{p}</li>
+              ))}
+            </ul>
+            <Chips items={t.medchron.stack} />
+          </div>
+        </section>
+
+        {/* 5 */}
+        <section className="tp-stop left" id="projects" data-name="Projects">
+          <div className="tp-card wide">
+            <p className="tp-eyebrow">{cp(5, 'Projects')}</p>
+            <h2>{t.projects.heading}</h2>
+            <p className="tp-intro">{t.projects.intro}</p>
+            <div className="tp-projects">
+              {t.projects.items.map((p) => (
+                <article key={p.title} className="tp-project">
+                  <p className="tp-kind">{p.kind}</p>
+                  <h3>{p.title}</h3>
+                  <p>{p.body}</p>
+                  {'clips' in p && p.clips && (
+                    <div className="tp-clips" aria-label="Three shorts rendered by the pipeline, sound off">
+                      {[1, 2, 3].map((n) => (
+                        <video key={n} src={`/media/short-${n}.mp4`} poster={`/media/short-${n}.webp`} muted loop autoPlay playsInline preload="none" />
+                      ))}
+                    </div>
+                  )}
+                  <Chips items={p.stack} />
+                  {'link' in p && p.link && (
+                    <p className="tp-links">
+                      <Ext href={p.link.href}>{p.link.label}</Ext>
+                    </p>
+                  )}
+                </article>
+              ))}
             </div>
           </div>
         </section>
-        <ProofStrip />
-        <CaseStudies />
-        <PlatformsList />
-        <Writing />
-        <Contact />
+
+        {/* 6 */}
+        {platforms && platforms.kind === 'platforms' && (
+          <section className="tp-stop right" id="platforms" data-name="Platforms">
+            <div className="tp-card wide">
+              <p className="tp-eyebrow">{cp(6, 'Delivered platforms, 2024 to 2026')}</p>
+              <h2>{t.platforms.heading}</h2>
+              <p className="tp-intro">{t.platforms.intro}</p>
+              <ul className="tp-list">
+                {platforms.platforms.map((p) => (
+                  <li key={p.title}>
+                    <b>{p.title}</b>
+                    {p.body}
+                    <small>{p.chips.join(', ')}</small>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </section>
+        )}
+
+        {/* 7 */}
+        <section className="tp-stop left" id="skills" data-name="Skills">
+          <div className="tp-card wide">
+            <p className="tp-eyebrow">{cp(7, 'Skills and how I work')}</p>
+            <h2>{t.skills.heading}</h2>
+            <div className="tp-skills">
+              {t.skills.groups.map((g) => (
+                <div key={g.label} className="tp-skillgroup">
+                  <h3>{g.label}</h3>
+                  <Chips items={g.items} />
+                </div>
+              ))}
+            </div>
+            <h3 className="tp-sub">{t.skills.howHeading}</h3>
+            <ul className="tp-bullets">
+              {t.skills.how.map((h) => (
+                <li key={h.slice(0, 40)}>{h}</li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        {/* 8 */}
+        <section className="tp-stop right" id="achievements" data-name="Achievements">
+          <div className="tp-card wide">
+            <p className="tp-eyebrow">{cp(8, 'Achievements, awards and education')}</p>
+            <h2>{t.achievements.heading}</h2>
+            <div className="tp-split">
+              <div>
+                <h3 className="tp-sub first">At work</h3>
+                <ul className="tp-bullets">
+                  {t.achievements.work.map((a) => (
+                    <li key={a.slice(0, 40)}>{a}</li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <h3 className="tp-sub first">Awards</h3>
+                <ul className="tp-list compact">
+                  {t.achievements.awards.map((a) => (
+                    <li key={a}>{a}</li>
+                  ))}
+                </ul>
+                <h3 className="tp-sub">Education</h3>
+                <p className="tp-muted">{t.achievements.education}</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 9 */}
+        <section className="tp-stop left" id="writing" data-name="Writing">
+          <div className="tp-card wide">
+            <p className="tp-eyebrow">{cp(9, 'Writing')}</p>
+            <h2>{t.writing.heading}</h2>
+            <ul className="tp-list">
+              {articles.map((a) => (
+                <li key={a.slug}>
+                  <Link href={`/writing/${a.slug}`}>
+                    <b>{a.title}</b>
+                  </Link>
+                  {a.standfirst}
+                  <small>
+                    {a.readingMinutes} minute read.{a.draft ? ' Draft.' : ''}
+                  </small>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        {/* 10 */}
+        {contact && contact.kind === 'contact' && (
+          <section className="tp-stop right" id="contact" data-name="Contact">
+            <div className="tp-card wide">
+              <p className="tp-eyebrow">{cp(10, 'Contact')}</p>
+              <div className="tp-split">
+                <div>
+                  <h2>{t.contact.heading}</h2>
+                  <p className="tp-muted">{t.contact.line}</p>
+                  <p className="tp-muted">{t.hero.meta}</p>
+                </div>
+                <div className="tp-contact">
+                  {contact.links.map((l) => (
+                    <a key={l.label} href={l.href} {...(l.href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>
+                      {l.label} <span>{l.value}</span>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+        <div className="tp-end" />
       </main>
-    </>
+    </div>
   )
 }

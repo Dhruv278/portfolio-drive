@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dhruv Gopani, the track. 2D sample</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --navy: #0b1630;
+    --navy-deep: #070f22;
+    --panel: #101e3d;
+    --line: #1e2f58;
+    --text: #e8edf7;
+    --muted: #94a3c4;
+    --amber: #ffb547;
+    --amber-soft: rgba(255, 181, 71, 0.18);
+    --cobalt: #6f93ff;
+    --display: 'Bricolage Grotesque', system-ui, sans-serif;
+    --body: 'IBM Plex Sans', system-ui, sans-serif;
+    --mono: 'IBM Plex Mono', ui-monospace, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: auto; }
+  body {
+    margin: 0;
+    background:
+      radial-gradient(circle at 1px 1px, rgba(148, 163, 196, 0.13) 1px, transparent 1.6px) 0 0 / 28px 28px,
+      radial-gradient(1200px 600px at 20% -10%, #14254a 0%, var(--navy) 45%, var(--navy-deep) 100%) fixed;
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 17px;
+    line-height: 1.55;
+    overflow-x: hidden;
+  }
+  a { color: var(--cobalt); }
+
+  /* ---------- the track behind everything ---------- */
+  #track {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 100%;
+    pointer-events: none;
+    z-index: 0;
+  }
+  #track .road { fill: none; stroke: #0f1d3d; stroke-width: 54; stroke-linecap: round; stroke-linejoin: round; }
+  #track .kerb { fill: none; stroke: #3a5cc8; stroke-width: 58; stroke-linecap: round; stroke-linejoin: round; opacity: .55; filter: drop-shadow(0 0 14px rgba(79, 123, 255, 0.45)); }
+  #track .dash { fill: none; stroke: #5f7fd6; stroke-width: 3; stroke-dasharray: 18 22; stroke-linecap: round; animation: flow 1.6s linear infinite; }
+  @keyframes flow { to { stroke-dashoffset: -40; } }
+  #track .pool { fill: url(#pool); }
+  #track .lit  { fill: none; stroke: var(--amber); stroke-width: 6; stroke-linecap: round; filter: drop-shadow(0 0 10px rgba(255, 181, 71, 0.55)); }
+  #track .cp   { fill: var(--navy); stroke: #3d5390; stroke-width: 3; }
+  #track .cp.on { fill: var(--amber); stroke: var(--amber); filter: drop-shadow(0 0 12px rgba(255, 181, 71, 0.7)); }
+  #track .cpn  { font: 700 12px var(--body); fill: var(--muted); text-anchor: middle; dominant-baseline: middle; }
+  #track .cp.on + .cpn { fill: var(--navy-deep); }
+
+  /* ---------- the car ---------- */
+  #car { will-change: transform; }
+  #car .beam { fill: url(#beam); opacity: 0.9; }
+  #car .body { fill: #2f5bea; stroke: #9db4ff; stroke-width: 1.2; }
+  #car .roof { fill: #1e3fb0; }
+  #car .glass { fill: #bcd0ff; }
+  #car .lamp { fill: var(--amber); filter: drop-shadow(0 0 6px var(--amber)); }
+  #car .tail { fill: #ff5a4f; }
+  #car .tyre { fill: #0a1226; }
+
+  /* ---------- HUD ---------- */
+  .hud {
+    position: fixed;
+    z-index: 5;
+    left: 22px;
+    right: 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    pointer-events: none;
+  }
+  .hud > * { pointer-events: auto; }
+  .hud.top { top: 18px; }
+  .hud.bottom { bottom: 18px; align-items: flex-end; }
+  .wordmark {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 18px;
+    color: var(--text);
+    text-decoration: none;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 7px 12px;
+  }
+  .btn {
+    font: 600 13.5px var(--body);
+    color: var(--text);
+    text-decoration: none;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 8px 14px;
+    display: inline-block;
+  }
+  .btn.primary { background: var(--amber); border-color: var(--amber); color: var(--navy-deep); }
+  .btn.cobalt { background: var(--cobalt); border-color: var(--cobalt); color: var(--navy-deep); }
+  .actions { display: flex; gap: 8px; }
+  .odo {
+    background: rgba(16, 30, 61, 0.85);
+    border: 1px solid var(--line);
+    padding: 10px 14px;
+    font: 500 12.5px var(--mono);
+    color: var(--muted);
+    min-width: 300px;
+    display: grid;
+    grid-template-columns: auto auto auto;
+    gap: 4px 22px;
+    backdrop-filter: blur(6px);
+  }
+  .odo b { display: block; color: var(--text); font-weight: 600; font-size: 15px; letter-spacing: .01em; }
+  .odo small { display: block; font-size: 10.5px; letter-spacing: .06em; }
+  .odo .bar { grid-column: 1 / -1; }
+  .odo .bar { position: relative; height: 5px; margin-top: 8px; background: var(--line); overflow: hidden; }
+  .odo .bar i { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--amber); }
+  .hint { background: var(--panel); border: 1px solid var(--line); padding: 8px 12px; font-size: 13px; color: var(--muted); transition: opacity .4s; }
+  .hint.gone { opacity: 0; }
+
+  /* ---------- checkpoints (the content) ---------- */
+  main { position: relative; z-index: 1; }
+  .stop {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 12vh 6vw;
+  }
+  .stop.hero { min-height: 100vh; align-items: flex-start; padding-top: 22vh; }
+  .card {
+    width: min(560px, 100%);
+    background: linear-gradient(180deg, rgba(20, 37, 74, 0.92), rgba(12, 22, 46, 0.92));
+    border: 1px solid var(--line);
+    border-top-color: rgba(111, 147, 255, 0.55);
+    box-shadow: 0 30px 60px rgba(3, 8, 20, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    padding: 28px 30px 26px;
+    backdrop-filter: blur(8px);
+    opacity: 0.45;
+    transform: translateY(18px);
+    transition: opacity .5s ease, transform .6s cubic-bezier(.2,.8,.2,1), border-color .4s;
+  }
+  .stop.on .card { opacity: 1; transform: none; border-top-color: var(--amber); box-shadow: 0 30px 60px rgba(3, 8, 20, 0.5), 0 0 0 1px rgba(255, 181, 71, 0.25), 0 -18px 50px -30px rgba(255, 181, 71, 0.6); }
+  .stop.right { justify-content: flex-end; }
+  .stop.left { justify-content: flex-start; }
+  .eyebrow { font: 600 12px var(--mono); letter-spacing: 0.03em; color: var(--amber); margin: 0 0 10px; }
+  h1 { font-family: var(--display); font-weight: 800; font-size: clamp(56px, 9vw, 120px); line-height: .92; letter-spacing: -.03em; margin: 0 0 18px; }
+  h2 { font-family: var(--display); font-weight: 800; font-size: clamp(26px, 3vw, 38px); line-height: 1.06; letter-spacing: -.02em; margin: 0 0 14px; }
+  .hero .card { background: transparent; border: 0; padding: 0; backdrop-filter: none; width: min(760px, 100%); opacity: 1; transform: none; }
+  .lede { font-family: var(--display); font-weight: 600; font-size: clamp(20px, 2.4vw, 30px); line-height: 1.22; max-width: 30ch; margin: 0 0 16px; }
+  .meta { color: var(--muted); max-width: 56ch; margin: 0 0 22px; }
+  p { margin: 0 0 12px; }
+  p b { font-weight: 600; color: #fff; }
+  .result { border-left: 4px solid var(--amber); background: var(--amber-soft); padding: 12px 16px; margin: 16px 0; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .chip { font-size: 12px; font-weight: 500; border: 1px solid var(--line); color: var(--muted); padding: 2px 8px; }
+  .nums { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 14px 0 4px; }
+  .nums b { display: block; font-family: var(--display); font-weight: 800; font-size: 40px; line-height: 1; color: var(--amber); letter-spacing: -.02em; }
+  .nums span { display: block; font-size: 13px; color: var(--muted); margin-top: 6px; }
+  ul.list { list-style: none; margin: 0; padding: 0; }
+  ul.list li { padding: 10px 0; border-top: 1px solid var(--line); font-size: 15px; }
+  ul.list li b { display: block; font-family: var(--display); font-weight: 800; font-size: 17px; color: #fff; }
+  ul.list li small { color: var(--muted); display: block; margin-top: 4px; }
+  .contact { display: grid; gap: 8px; margin-top: 12px; }
+  .contact a { display: flex; justify-content: space-between; gap: 12px; padding: 10px 12px; border: 1px solid var(--line); color: var(--text); text-decoration: none; }
+  .contact a:hover { border-color: var(--amber); }
+  .contact span { color: var(--muted); }
+  .end { height: 30vh; }
+
+  @media (max-width: 760px) {
+    .stop { padding: 10vh 5vw; min-height: 92vh; }
+    .stop.right, .stop.left { justify-content: center; }
+    .card { padding: 22px 20px; }
+    #track .road { stroke-width: 34; }
+    #track .kerb { stroke-width: 38; }
+    .odo { min-width: 0; }
+    .hint { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .card { transition: none; }
+    #car { transition: none; }
+    #track .dash { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<svg id="track" aria-hidden="true">
+  <defs>
+    <radialGradient id="pool">
+      <stop offset="0" stop-color="#ffb547" stop-opacity="0.22" />
+      <stop offset="1" stop-color="#ffb547" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="beam" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffb547" stop-opacity="0.55" />
+      <stop offset="1" stop-color="#ffb547" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+  <path class="kerb" id="kerb" d="" />
+  <path class="road" id="road" d="" />
+  <path class="dash" id="dash" d="" />
+  <path class="lit"  id="lit"  d="" />
+  <g id="cps"></g>
+  <circle id="pool" class="pool" r="150" cx="0" cy="0" />
+  <g id="car">
+    <polygon class="beam" points="-26,-150 26,-150 9,-22 -9,-22" />
+    <rect class="tyre" x="-15" y="-18" width="6" height="12" rx="2" /><rect class="tyre" x="9" y="-18" width="6" height="12" rx="2" />
+    <rect class="tyre" x="-15" y="8" width="6" height="12" rx="2" /><rect class="tyre" x="9" y="8" width="6" height="12" rx="2" />
+    <rect class="body" x="-13" y="-24" width="26" height="48" rx="7" />
+    <rect class="roof" x="-9" y="-6" width="18" height="18" rx="3" />
+    <rect class="glass" x="-9" y="-13" width="18" height="6" rx="2" />
+    <circle class="lamp" cx="-8" cy="-22" r="2.4" /><circle class="lamp" cx="8" cy="-22" r="2.4" />
+    <rect class="tail" x="-11" y="21" width="6" height="2.5" /><rect class="tail" x="5" y="21" width="6" height="2.5" />
+  </g>
+</svg>
+
+<div class="hud top">
+  <a class="wordmark" href="#top">Dhruv Gopani</a>
+  <div class="actions">
+    <a class="btn" href="#contact">Contact</a>
+    <a class="btn primary" href="#">Resume PDF</a>
+  </div>
+</div>
+<div class="hud bottom">
+  <div class="odo" aria-live="polite">
+    <div><small>checkpoint</small><b id="odo-cp">01 / 06</b></div>
+    <div><small>stop</small><b id="odo">Start</b></div>
+    <div><small>distance</small><b id="odo-dist">0 m</b></div>
+    <div class="bar"><i id="bar"></i></div>
+  </div>
+  <div class="hint" id="hint">Scroll to drive</div>
+</div>
+
+<main id="main">
+  <section class="stop hero left on" id="top" data-name="Start">
+    <div class="card">
+      <p class="eyebrow">Checkpoint 1 of 6</p>
+      <h1>Dhruv<br>Gopani</h1>
+      <p class="lede">AI products that have to be right: medical records into cited chronologies, agents that stop when a step fails.</p>
+      <p class="meta">Surat, India. Remote, full overlap with Europe, three to four hours with US East. Open to contract, employer of record or relocation. Currently leading MedChron at Omnis AI.</p>
+      <div class="actions"><a class="btn primary" href="#medchron">Start the drive</a><a class="btn" href="#contact">Say hello</a></div>
+    </div>
+  </section>
+
+  <section class="stop right" id="medchron" data-name="MedChron">
+    <div class="card">
+      <p class="eyebrow">Checkpoint 2 of 6. Omnis AI, January 2026 to now</p>
+      <h2>Medical records in, cited chronology out.</h2>
+      <p><b>The problem.</b> Personal-injury firms spent days reading thousands of pages of records to build one case chronology, and the same visit often appeared three times.</p>
+      <p><b>The call.</b> Every extracted fact carries the page it came from, or it is dropped. I rebuilt the deduplication and extraction stages of the Gemini pipeline and introduced a citation resolver that checks each reference against the record.</p>
+      <div class="nums">
+        <div><b>53% to 26%</b><span>Medication rows without a start date, replay evaluation</span></div>
+        <div><b>28</b><span>Defects worked through to take Chi to release candidate</span></div>
+      </div>
+      <div class="chips"><span class="chip">NestJS</span><span class="chip">MongoDB</span><span class="chip">Gemini 2.5</span><span class="chip">Claude</span><span class="chip">BullMQ</span><span class="chip">Redis</span><span class="chip">Kubernetes on EKS</span></div>
+    </div>
+  </section>
+
+  <section class="stop left" id="agentflow" data-name="AgentFlow">
+    <div class="card">
+      <p class="eyebrow">Checkpoint 3 of 6. Own product</p>
+      <h2>Agents that stop when a step fails.</h2>
+      <p><b>The problem.</b> One failed step halfway through a long agent run used to waste every step before it, and users did not want to hand over their API keys.</p>
+      <p><b>The call.</b> Run the agents as a dependency graph, save every step before the next starts, halt on failure. Bring-your-own-key, encrypted with AES-256-GCM, with limits enforced in the service layer.</p>
+      <p class="result"><b>What shipped.</b> AgentFlow on NestJS and Next.js 14, runs streamed over SSE from Redis pub/sub, three plans on Stripe.</p>
+      <div class="chips"><span class="chip">NestJS</span><span class="chip">Next.js 14</span><span class="chip">Prisma</span><span class="chip">PostgreSQL</span><span class="chip">Redis</span><span class="chip">Stripe</span><span class="chip">SSE</span></div>
+    </div>
+  </section>
+
+  <section class="stop right" id="video" data-name="Video factory">
+    <div class="card">
+      <p class="eyebrow">Checkpoint 4 of 6. Own product</p>
+      <h2>A video factory that runs itself.</h2>
+      <p><b>The problem.</b> Making one short video by hand took hours: research a trend, write a script, make images, record a voice, cut it, upload it.</p>
+      <p><b>The call.</b> One 59-node n8n workflow does the whole job unattended, with three quality tiers priced at their real cost and a fallback provider at every step.</p>
+      <div class="nums">
+        <div><b>$0.57 to $3.41</b><span>Cost per video across three quality tiers</span></div>
+        <div><b>7</b><span>Shorts rendered unattended in one run, April 2026</span></div>
+      </div>
+      <div class="chips"><span class="chip">n8n</span><span class="chip">Claude</span><span class="chip">Replicate</span><span class="chip">ElevenLabs</span><span class="chip">Shotstack</span><span class="chip">YouTube API</span></div>
+    </div>
+  </section>
+
+  <section class="stop left" id="platforms" data-name="Platforms">
+    <div class="card">
+      <p class="eyebrow">Checkpoint 5 of 6. Delivered platforms, 2024 to 2026</p>
+      <h2>Six platforms, six problems.</h2>
+      <ul class="list">
+        <li><b>Wholesale quotation platform</b>Retailers request quotes, prices stay private per quote, drivers confirm delivery by QR scan.<small>NestJS, Prisma, PostgreSQL, Next.js</small></li>
+        <li><b>Deposit-return recycling</b>Government sets prices, collectors pay the public, finance settles verified claims, every step audited.<small>NestJS 11, Prisma 7, Next.js 16</small></li>
+        <li><b>License lifecycle</b>An aviation regulator off paper: apply, inspect, pay, issue, renew.<small>Express 5, Prisma 6, Next.js 15</small></li>
+        <li><b>Incentive engine</b>Disputed spreadsheet payouts replaced by a configurable slab engine with a full audit trail.<small>Express 5, Prisma 6, Next.js 16</small></li>
+        <li><b>Food-surplus marketplace</b>Two-sided marketplace with dual payment rails and map-based discovery.<small>Next.js 14, Payload CMS, tRPC, MongoDB</small></li>
+        <li><b>Exchange backend</b>Real-time order matching over WebSocket for BTC, ETH, TRON and XRP.<small>Express, MySQL, Socket.io</small></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="stop right" id="contact" data-name="Contact">
+    <div class="card">
+      <p class="eyebrow">Checkpoint 6 of 6. Contact</p>
+      <h2>The road ends here. The inbox does not.</h2>
+      <p class="meta">Email is fastest. I answer within a day.</p>
+      <div class="contact">
+        <a href="mailto:dhruvgopani8@gmail.com">Email <span>dhruvgopani8@gmail.com</span></a>
+        <a href="https://www.linkedin.com/in/dhruv-gopani-2636361ab/">LinkedIn <span>dhruv-gopani-2636361ab</span></a>
+        <a href="https://github.com/dhruv278">GitHub <span>dhruv278</span></a>
+        <a href="#">Resume <span>PDF, two pages</span></a>
+      </div>
+    </div>
+  </section>
+  <div class="end"></div>
+</main>
+
+<script>
+(() => {
+  const svg = document.getElementById('track')
+  const road = document.getElementById('road'), kerb = document.getElementById('kerb'), dash = document.getElementById('dash'), lit = document.getElementById('lit')
+  const cps = document.getElementById('cps'), car = document.getElementById('car')
+  const odo = document.getElementById('odo'), odoCp = document.getElementById('odo-cp'), odoDist = document.getElementById('odo-dist'), bar = document.getElementById('bar'), hint = document.getElementById('hint'), pool = document.getElementById('pool')
+  const stops = [...document.querySelectorAll('.stop')]
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches
+  let points = [], L = 0, cpLen = [], cpScroll = [], target = 0, current = 0, raf = 0
+
+  // The track passes each checkpoint beside its card: on the empty side of the page, at card height.
+  function layout() {
+    const W = innerWidth, H = document.documentElement.scrollHeight
+    svg.setAttribute('width', W); svg.setAttribute('height', H); svg.setAttribute('viewBox', `0 0 ${W} ${H}`)
+    const narrow = W < 760
+    points = stops.map((s, i) => {
+      const card = s.querySelector('.card')
+      const r = card.getBoundingClientRect()
+      const y = r.top + scrollY + Math.min(r.height * 0.45, 260)
+      let x
+      if (narrow) x = i % 2 ? W * 0.14 : W * 0.86
+      else if (s.classList.contains('hero')) x = W * 0.78
+      else x = s.classList.contains('left') ? W * 0.78 : W * 0.22
+      return { x, y }
+    })
+    // Start above the first checkpoint, end below the last.
+    const first = points[0], last = points[points.length - 1]
+    const pts = [{ x: first.x, y: -80 }, ...points, { x: last.x, y: last.y + 260 }]
+    let d = `M${pts[0].x},${pts[0].y}`
+    for (let i = 1; i < pts.length; i++) {
+      const a = pts[i - 1], b = pts[i], k = (b.y - a.y) * 0.5
+      d += ` C${a.x},${a.y + k} ${b.x},${b.y - k} ${b.x},${b.y}`
+    }
+    for (const p of [kerb, road, dash, lit]) p.setAttribute('d', d)
+    L = road.getTotalLength()
+    lit.style.strokeDasharray = `${L}`
+    // Length along the path of each checkpoint, by nearest sample.
+    const N = 600, samples = []
+    for (let i = 0; i <= N; i++) samples.push(road.getPointAtLength((i / N) * L))
+    cpLen = points.map((p) => {
+      let best = 0, bd = Infinity
+      samples.forEach((s, i) => { const dd = (s.x - p.x) ** 2 + (s.y - p.y) ** 2; if (dd < bd) { bd = dd; best = i } })
+      return (best / N) * L
+    })
+    // The scroll position at which each card sits in the middle of the window. Scroll maps to the
+    // track piecewise between these, so the car is at a checkpoint exactly when its card is in view.
+    cpScroll = stops.map((s, i) => {
+      const card = s.querySelector('.card')
+      const r = card.getBoundingClientRect()
+      const centre = r.top + scrollY + r.height / 2 - innerHeight / 2
+      return i === 0 ? 0 : Math.max(0, centre)
+    })
+    cps.innerHTML = points.map((p, i) => `<circle class="cp" data-i="${i}" cx="${p.x}" cy="${p.y}" r="14" /><text class="cpn" x="${p.x}" y="${p.y + 0.5}">${i + 1}</text>`).join('')
+    place(current, true)
+  }
+
+  function place(len, force) {
+    const p = road.getPointAtLength(len), q = road.getPointAtLength(Math.min(L, len + 2))
+    const ang = Math.atan2(q.y - p.y, q.x - p.x) * 180 / Math.PI + 90
+    car.setAttribute('transform', `translate(${p.x.toFixed(1)},${p.y.toFixed(1)}) rotate(${ang.toFixed(1)}) scale(${innerWidth < 760 ? 0.85 : 1.25})`)
+    pool.setAttribute('cx', p.x.toFixed(1)); pool.setAttribute('cy', p.y.toFixed(1))
+    lit.style.strokeDashoffset = `${L - len}`
+    // Checkpoint reached: light the marker and wake the card.
+    let idx = 0
+    cpLen.forEach((cl, i) => { if (len >= cl - 60) idx = i })
+    stops.forEach((s, i) => s.classList.toggle('on', i <= idx))
+    cps.querySelectorAll('.cp').forEach((c, i) => c.classList.toggle('on', i <= idx))
+    odo.textContent = stops[idx].dataset.name
+    odoCp.textContent = `${String(idx + 1).padStart(2, '0')} / ${String(stops.length).padStart(2, '0')}`
+    odoDist.textContent = `${Math.round(len / 4).toLocaleString('en-US')} m`
+    bar.style.width = `${(len / L) * 100}%`
+    if (force) current = len
+  }
+
+  function tick() {
+    raf = 0
+    const k = reduced ? 1 : 0.12
+    current += (target - current) * k
+    if (Math.abs(target - current) < 0.5) current = target
+    place(current)
+    if (current !== target) raf = requestAnimationFrame(tick)
+  }
+
+  function onScroll() {
+    const y = scrollY
+    // Piecewise: between the scroll positions of two checkpoints the car moves between their track lengths.
+    let len = cpLen[0] || 0
+    for (let i = 1; i < cpScroll.length; i++) {
+      const a = cpScroll[i - 1], b = cpScroll[i]
+      if (y >= b) { len = cpLen[i]; continue }
+      if (y > a) { const k = (y - a) / Math.max(1, b - a); len = cpLen[i - 1] + (cpLen[i] - cpLen[i - 1]) * k }
+      break
+    }
+    target = len
+    hint.classList.toggle('gone', y > 40)
+    if (!raf) raf = requestAnimationFrame(tick)
+  }
+
+  addEventListener('resize', () => { layout(); onScroll() })
+  addEventListener('scroll', onScroll, { passive: true })
+  document.fonts.ready.then(() => { layout(); onScroll() })
+  layout(); onScroll()
+})()
+</script>
+</body>
+</html>

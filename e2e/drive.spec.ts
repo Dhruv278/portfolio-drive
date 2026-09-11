@@ -183,20 +183,20 @@ test.describe('The Drive', () => {
 
   test('track: nine checkpoints, telemetry follows the scroll, no sideways overflow', async ({ page }) => {
     await page.goto('/track')
-    await expect(page.locator('section.tp-stop')).toHaveCount(9)
+    await expect(page.locator('section.tp-stop')).toHaveCount(10)
     await expect(page.getByRole('heading', { level: 1 })).toContainText('Dhruv')
     const odo = page.getByTestId('track-odometer')
-    await expect(odo).toContainText('01 / 09')
+    await expect(odo).toContainText('01 / 10')
     await page.evaluate(() => {
       const c = document.querySelector('#skills .tp-card')!
       const r = c.getBoundingClientRect()
       window.scrollTo(0, r.top + scrollY + r.height / 2 - innerHeight / 2)
     })
-    await expect(odo).toContainText('06 / 09', { timeout: 5_000 })
+    await expect(odo).toContainText('07 / 10', { timeout: 5_000 })
     await expect(page.locator('#skills')).toHaveClass(/on/)
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
     expect(overflow).toBe(0)
-    await expect(page.getByRole('link', { name: 'Take the 3D drive' })).toHaveAttribute('href', '/drive')
+    await expect(page.locator('#top').getByRole('link', { name: 'Take the 3D drive' })).toHaveAttribute('href', '/drive')
   })
 
   test('resume PDF and resume page are reachable', async ({ page, request }) => {

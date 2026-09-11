@@ -73,12 +73,12 @@ export function TrackScene({ mainId, stopSelector, cardSelector }: Props) {
       s.setAttribute('height', String(H))
       s.setAttribute('viewBox', `0 0 ${W} ${H}`)
       const narrow = W < 760
-      const points = stops.map((st, i) => {
+      const points = stops.map((st) => {
         const card = st.querySelector<HTMLElement>(cardSelector) ?? st
         const r = card.getBoundingClientRect()
         const y = r.top + scrollY + Math.min(r.height * 0.45, 260)
         let x: number
-        if (narrow) x = i % 2 ? W * 0.14 : W * 0.86
+        if (narrow) x = 26
         else if (st.classList.contains('hero')) x = W * 0.78
         else x = st.classList.contains('left') ? W * 0.78 : W * 0.22
         return { x, y }
@@ -168,7 +168,7 @@ export function TrackScene({ mainId, stopSelector, cardSelector }: Props) {
       const p = r.getPointAtLength(len)
       const q = r.getPointAtLength(Math.min(L, len + 2))
       const ang = (Math.atan2(q.y - p.y, q.x - p.x) * 180) / Math.PI + 90
-      const scale = innerWidth < 760 ? 0.85 : 1.25
+      const scale = innerWidth < 760 ? 0.62 : 1.25
       car.current!.setAttribute('transform', `translate(${p.x.toFixed(1)},${p.y.toFixed(1)}) rotate(${ang.toFixed(1)}) scale(${scale})`)
       pool.current!.setAttribute('cx', p.x.toFixed(1))
       pool.current!.setAttribute('cy', p.y.toFixed(1))

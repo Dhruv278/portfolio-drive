@@ -332,6 +332,10 @@ export function Scene() {
   const dpr = Math.min(window.devicePixelRatio, mobile ? DPR_PHONE : DPR_DESKTOP)
   const [ready, setReady] = useState(false)
   const intro = useDrive((s) => s.intro)
+  const mode = useDrive((s) => s.mode)
+  const heroInView = useDrive((s) => s.heroInView)
+  // On the home page the hero stops rendering once it has scrolled out of view.
+  const running = ready && (mode === 'drive' || heroInView)
 
   // Rotating a phone crosses the layout query. Shadows, resolution and field of view are fixed at
   // Canvas creation, so the Canvas remounts with a new key instead of running with stale settings.
@@ -343,13 +347,13 @@ export function Scene() {
   }, [])
 
   return (
-    <div className={`scene-root${ready ? ' ready' : ''}`} aria-hidden="true" data-testid="scene" data-ready={ready} data-intro={intro}>
+    <div className={`scene-root${ready ? ' ready' : ''}${mode === 'hero' ? ' hero' : ''}`} aria-hidden="true" data-testid="scene" data-ready={ready} data-intro={intro} data-running={running}>
       <Canvas
         key={mobile ? 'phone' : 'desktop'}
         // No frames at all until the warm-up has drawn every material: fiber requests a frame each
         // time the scene graph changes, and one such frame drew the freshly loaded scene with every
         // shader uncompiled, a 1.3 s stall that lost the WebGL context on Intel graphics.
-        frameloop={ready ? 'demand' : 'never'}
+        frameloop={running ? 'demand' : 'never'}
         dpr={dpr}
         shadows={mobile ? false : 'percentage'}
         gl={{ antialias: !fx, powerPreference: 'high-performance' }}

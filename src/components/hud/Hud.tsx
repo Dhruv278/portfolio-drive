@@ -2,12 +2,15 @@
 
 import { useProgress } from '@react-three/drei'
 import Link from 'next/link'
+import { useEffect } from 'react'
 import { identity, stops } from '@/content/profile'
 import { useScrollProgress } from '@/hooks/useScrollProgress'
 import { useDrive } from '@/store/drive'
 
 export function Hud() {
   useScrollProgress()
+  const setMode = useDrive((s) => s.setMode)
+  useEffect(() => setMode('drive'), [setMode])
   const scroll = useDrive((s) => s.scroll)
   const stopIndex = useDrive((s) => s.stopIndex)
   const zones = useDrive((s) => s.zones)
@@ -22,9 +25,9 @@ export function Hud() {
   return (
     <>
       <div className="hud top">
-        <a className="wordmark" href="#content">
+        <Link className="wordmark" href="/">
           {identity.name}
-        </a>
+        </Link>
         <div className="actions">
           <Link className="btn" href="/resume">
             Resume

@@ -83,6 +83,106 @@ export const setPieces = {
   },
 } as const
 
+export type Proof = { label: string; source: string; from?: number; to?: number; suffix?: string; text?: string }
+export type Artefact =
+  | { kind: 'image'; src: string; alt: string; caption: string }
+  | { kind: 'pending'; caption: string }
+export type CaseStudy = {
+  id: string
+  title: string
+  problem: string
+  decision: string
+  shipped: string
+  result: string
+  stack: string[]
+  links: Link[]
+  artefact: Artefact
+  figures?: [string, string, string][]
+}
+
+// The proof-first home page. Numbers mirror the resume; nothing here is unsupported.
+export const home = {
+  hero: {
+    line: 'AI products that have to be right: medical records into cited chronologies, agents that stop when a step fails.',
+    meta: 'Surat, India. Remote. Full overlap with Europe, three to four hours with US East. Open to contract or employer of record.',
+    seeProof: 'See the proof',
+    takeDrive: 'Take the drive',
+  },
+  proof: [
+    { from: 53, to: 26, suffix: '%', label: 'Medication rows without a start date', source: 'Replay evaluation against source records, MedChron' },
+    { from: 0, to: 28, suffix: '', label: 'Defects worked through to release candidate', source: 'Chi, the in-product assistant, three QA rounds' },
+    { text: '$0.57 to $3.41', label: 'Cost per video across three quality tiers', source: 'Short-video pipeline, seven shorts rendered unattended' },
+  ] as Proof[],
+  casesHeading: 'Four things I built, and what they measured.',
+  caseStudies: [
+    {
+      id: 'medchron',
+      title: 'Medical records in, cited chronology out.',
+      problem:
+        'Personal-injury firms spent days reading thousands of pages of records from many providers to build one case chronology, and the same visit often appeared three times.',
+      decision:
+        'Every extracted fact carries the page it came from, or it is dropped. I rebuilt the deduplication and extraction stages of the Gemini pipeline, added deterministic merge guards ahead of the LLM pass, and introduced a citation resolver that checks each reference against the record.',
+      shipped:
+        'The chronology pipeline on BullMQ workers, page-level citations, Chi, the in-product assistant, taken from prototype to release candidate through three QA rounds, and a prompt registry with versioning and PHI scrubbing.',
+      result:
+        'Medication rows without a start date fell from 53% to 26% in a replay evaluation, with no fabricated drugs or citations. 28 defects worked through, including two critical data-isolation findings.',
+      stack: ['NestJS', 'MongoDB', 'Gemini 2.5', 'Claude', 'BullMQ', 'Redis', 'React', 'Kubernetes on EKS'],
+      links: [],
+      artefact: { kind: 'pending', caption: 'An illustrative chronology screen, labelled as such, arrives with the artefact session.' },
+    },
+    {
+      id: 'agentflow',
+      title: 'Agents that stop when a step fails.',
+      problem:
+        'One failed step halfway through a long agent run used to waste every step before it, and users who wanted teams of specialized agents did not want to hand over their API keys.',
+      decision:
+        'Run the agents as a dependency graph, save every step before the next starts, and halt the run on failure. Let users bring their own keys, encrypted with AES-256-GCM, with model allowlists and run limits enforced in the service layer, not the UI.',
+      shipped: 'AgentFlow: NestJS and Next.js 14, runs streamed to the browser over SSE from Redis pub/sub, Free, Pro and bring-your-own-key plans on Stripe.',
+      result: 'A failed step halts the run and keeps the finished steps. Three plans live on Stripe. Per-plan limits hold at the service layer, so the UI cannot be talked around.',
+      stack: ['NestJS', 'Next.js 14', 'Prisma', 'PostgreSQL', 'Redis', 'BullMQ', 'Stripe', 'OpenRouter', 'SSE'],
+      links: [{ label: 'Frontend repository', value: 'github.com/Dhruv278/Agentflow-frontend', href: 'https://github.com/Dhruv278/Agentflow-frontend' }],
+      artefact: { kind: 'pending', caption: 'Screens of the agent library, a streaming run and the billing page, captured from the app, arrive with the artefact session.' },
+    },
+    {
+      id: 'video',
+      title: 'A video factory that runs itself.',
+      problem: 'Making one short video by hand took hours: research a trend, write a script, make images, record a voice, cut it, upload it.',
+      decision:
+        'One workflow does the whole job unattended, with three quality tiers priced at their real cost and a fallback provider at every step, so one outage does not stop a render.',
+      shipped: 'A 59-node n8n workflow across Claude, Replicate, ElevenLabs, Shotstack and the YouTube API, with FLUX, Wan and Kling as the three tiers.',
+      result: '$0.57 to $3.41 a video depending on the tier. Seven shorts rendered unattended in one run in April 2026.',
+      stack: ['n8n', 'Claude', 'Replicate', 'ElevenLabs', 'Shotstack', 'YouTube API'],
+      links: [],
+      artefact: { kind: 'pending', caption: 'Three of the rendered shorts, unedited, and the workflow drawn from its own definition arrive with the artefact session.' },
+    },
+    {
+      id: 'site',
+      title: "WebGL that runs on a hiring manager's laptop.",
+      problem: 'A 3D portfolio is worth nothing if it stutters on integrated graphics or crashes the tab. The first build ran at 32 fps and rendered all day while nobody scrolled.',
+      decision: 'Render only on demand, compile every shader before the fade-in, and measure on the slowest machine I own before adding anything.',
+      shipped:
+        'This site: a React Three Fiber scene with a demand frame loop, a staged warm-up, an idle loop that sleeps, post-processing gated by the GPU, and Playwright across Chromium, Firefox and WebKit.',
+      result: '35 to 50 fps while driving on an Intel Iris Xe laptop, zero frames while idle, a 1.3 s start-up stall found with per-frame timing and removed.',
+      stack: ['Next.js 16', 'React Three Fiber', 'three', 'zustand', 'Playwright', 'Vitest'],
+      links: [{ label: 'Take the drive', value: 'the full six-stop version', href: '/drive' }],
+      artefact: {
+        kind: 'image',
+        src: '/images/drive-medchron.webp',
+        alt: 'The MedChron stop of the drive: a records building, a conveyor through a scanner arch, and chronology signposts along the road',
+        caption: 'The MedChron stop, production build.',
+      },
+      figures: [
+        ['Frame rate while driving', '32 fps', '35 to 50 fps'],
+        ['Frames while idle', 'continuous', '0'],
+        ['Longest start-up frame', '1.3 s', '0.15 s'],
+      ],
+    },
+  ] as CaseStudy[],
+  platformsHeading: 'Six platforms delivered, 2024 to 2026.',
+  contactHeading: 'Say hello.',
+  contactLine: 'Email is fastest. I answer within a day.',
+} as const
+
 export const stops: StopContent[] = [
   {
     kind: 'hero',

@@ -1,5 +1,8 @@
 # The Drive
 
+Live: https://portfolio-drive-mu.vercel.app (home, proof first). The six-stop drive is at /drive, the resume at /resume.
+
+
 Dhruv Gopani's portfolio. A scroll-driven road trip: a cobalt sedan drives through six stops, one per chapter of the work, while the content stays real HTML underneath.
 
 Design spec: `docs/superpowers/specs/2026-09-07-the-drive-design.md`. Plans: `docs/superpowers/plans/`.

@@ -1,0 +1,9 @@
+design
+docs
+e2e
+test-results
+playwright-report
+assets
+scripts
+.next
+node_modules

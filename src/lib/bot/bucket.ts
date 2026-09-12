@@ -34,6 +34,6 @@ export function takeFromBucket(prev: Bucket | null, now: number): Take {
   if (now - b.start >= BUCKET.windowMs) b = { ...b, start: now, count: 0 }
   if (b.total >= BUCKET.lifetime) return { allowed: false, reason: 'lifetime', bucket: b }
   if (b.count >= BUCKET.perHour) return { allowed: false, reason: 'hour', bucket: b }
-  if (b.last && now - b.last < BUCKET.minGapMs) return { allowed: false, reason: 'gap', bucket: b }
+  if (b.count > 0 && now - b.last < BUCKET.minGapMs) return { allowed: false, reason: 'gap', bucket: b }
   return { allowed: true, bucket: { ...b, count: b.count + 1, total: b.total + 1, last: now } }
 }

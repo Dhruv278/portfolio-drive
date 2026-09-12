@@ -12,6 +12,15 @@ import { useDrive } from '@/store/drive'
 export function Hud() {
   useScrollProgress()
   const router = useRouter()
+  // The drive starts at the garage. Browsers restore the last scroll position on reload, which on a
+  // page this long meant opening at the pier with the intro skipped.
+  useEffect(() => {
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual'
+    if (!location.hash) window.scrollTo(0, 0)
+    return () => {
+      if ('scrollRestoration' in history) history.scrollRestoration = 'auto'
+    }
+  }, [])
   // Escape leaves the drive, like closing a full-screen view.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {

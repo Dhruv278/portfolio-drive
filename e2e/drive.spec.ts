@@ -105,6 +105,16 @@ test.describe('The Drive', () => {
     expect(m.minButton).toBeGreaterThanOrEqual(44)
   })
 
+  test('a reload starts the drive at the garage, not where the visitor left it', async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== 'phone', 'the report came from a phone; one engine is enough')
+    await page.goto('/drive?scene=off')
+    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight))
+    await page.waitForTimeout(600)
+    await page.reload()
+    await expect(page.getByTestId('odometer')).toContainText('Stop 1 of 6', { timeout: 10_000 })
+    expect(await page.evaluate(() => Math.round(scrollY))).toBeLessThan(10)
+  })
+
   test('plays the intro once and ends within six seconds', async ({ page }, testInfo) => {
     test.skip(!['desktop', 'phone'].includes(testInfo.project.name), 'needs a real WebGL scene')
     await page.goto('/drive?stats=1')

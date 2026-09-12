@@ -189,3 +189,23 @@ The owner reported the "old light 3D UI" after going to the resume and back. Rep
 
 The drive has a loading screen: a full-screen navy panel with a small road and the car advancing along it, "Loading assets, 63 of 101" while models, textures and the sky download (drei progress, to 80 percent of the bar), then "Warming up the road and the lights" while the shaders compile (the bar creeps to 95), then the scene reports ready through a new store flag, the bar fills and the screen fades. It shows only when a scene is really coming (never without WebGL or with ?scene=off), sits under the HUD so the top bar stays usable, and offers "Skip to the 2D page". The old eleven-pixel loading text in the odometer is removed. End-to-end asserts the screen is visible during loading and gone after ready: 59 passed.
 
+## Addendum: DhruvBot (12 September 2026)
+
+Spec `docs/superpowers/specs/2026-09-12-dhruvbot-design.md`, plan `docs/superpowers/plans/2026-09-12-dhruvbot.md`, built in ten tasks on the `dhruvbot` branch, test first. Unit tests: 40 new across knowledge, prompt, input guards, output guards, spend guards and the route (mocked upstream). End-to-end: four panel tests with the endpoint mocked, on five engines. Full suite on the build: 75 passed, 40 skipped by design.
+
+First real answers, local dev server, Claude Haiku 4.5 through OpenRouter, guards on, flags none on all three:
+
+Q: How does the MedChron pipeline work? (200 in 6.9 s, first call writes the prompt cache)
+A: MedChron runs in stages on background workers. Files arrive deduplicated so the same document sent by two providers is processed once. Pages are read by OCR. Gemini extracts facts in stages: visits, diagnoses, medications, procedures, bills. Deterministic merge guards run before the model's own deduplication, so one visit recorded by three providers comes back as one event. Every extracted fact carries the page it came from. A resolver checks each citation against the record and drops anything it cannot verify. Chi, the in-product assistant, answers questions about one patient using only that patient's file, cites the pages it used, and exports answers as PDF. Bills are reconciled against the record and injury codes are validated against ICD-10 body parts so diagnoses and numbers line up. MedChron syncs with the CasePro legal CRM and gives clients a hardened portal to share records. Prompts live in an append-only registry with versions and restore. Patient identifiers are scrubbed before text reaches a model. Tenant scoping and rate limits hold on every route.
+Sources: How MedChron works, MedChron
+
+Q: Is Dhruv open to relocation, and what time zones does he cover? (200 in 2.2 s)
+A: Yes, Dhruv is open to relocation. He is also open to contract or employer-of-record arrangements. He works remotely from Surat, India, with full overlap with European working hours and three to four hours of overlap with US East.
+Sources: About, Questions recruiters ask
+
+Q: What did Dhruv study at Harvard? (200 in 2.7 s)
+A: I do not have that in Dhruv's record. Dhruv studied at Sarvajanik College of Engineering and Technology in Gujarat, where he earned a Bachelor of Engineering in Computer Engineering with a CGPA of 8.74/10 from 2019 to 2023. For anything else, email dhruvgopani8@gmail.com.
+Sources: none (the model used the education section but did not cite it; the guards let the answer through because every number is in the record)
+
+Owner items: create a second OpenRouter key with a credit limit and swap it into Vercel; edit `src/content/knowledge/certifications.md`, `faq.md` and `improving-medchron.md`, which are drafts in his voice derived from the site.
+

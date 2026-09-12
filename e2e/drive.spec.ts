@@ -94,7 +94,8 @@ test.describe('The Drive', () => {
     const m = await page.evaluate(() => {
       const hud = document.querySelector('.hud.top')!.getBoundingClientRect()
       const hero = document.querySelector('section#start .panel')!.getBoundingClientRect()
-      const buttons = [...document.querySelectorAll<HTMLElement>('.hud.top a, section#start .btn')].map((b) => b.getBoundingClientRect().height)
+      // hidden links (the Resume label folds away on small phones) do not count
+      const buttons = [...document.querySelectorAll<HTMLElement>('.hud.top a, section#start .btn')].map((b) => b.getBoundingClientRect().height).filter((h) => h > 0)
       const overflow = document.documentElement.scrollWidth - innerWidth
       return { hudBottom: hud.bottom, heroTop: hero.top, hudRows: hud.height, minButton: Math.min(...buttons), overflow }
     })

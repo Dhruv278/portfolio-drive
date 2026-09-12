@@ -3,11 +3,13 @@ import Link from 'next/link'
 import { AskBot } from '@/components/bot/AskBot'
 import { ViewSwitch } from '@/components/ViewSwitch'
 import { identity, resume } from '@/content/profile'
+import { seo } from '@/content/seo'
 
 export const metadata: Metadata = {
-  title: `Resume, ${identity.name}`,
-  description: identity.headline,
+  title: seo.titles.resume,
+  description: seo.descriptions.resume,
   alternates: { canonical: '/resume' },
+  openGraph: { title: seo.titles.resume, description: seo.descriptions.resume, url: '/resume', type: 'website', images: ['/og.jpg'] },
 }
 
 export default function ResumePage() {

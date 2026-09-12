@@ -223,3 +223,11 @@ Everything in the audit report that did not need facts only the owner holds is d
 
 Still the owner's: team size and reporting line at Omnis AI, notice period and earliest start, and a capped second OpenRouter key.
 
+## Addendum: search and reach (12 September 2026)
+
+State found: Google had not indexed the site, a name search returned a stale data-broker page and other Gopanis, the GitHub profile still pointed at an older Firebase portfolio, and dhruvgopani.com and dhruvgopani.dev were both unregistered. The owner chose to stay on the vercel.app address for now, to leave the old site up, to have the GitHub website field and bio updated, and to take every in-repo item.
+
+Done in the repo: descriptions under 155 characters on every page, unique per page, from src/content/seo.ts and covered by the banned-pattern scan; one Person entity with a stable id, referenced by a WebSite node in the layout, a ProfilePage on the home page and Article plus BreadcrumbList on every write-up; a /writing index and an RSS feed at /feed.xml, linked from the home page, the article pages and the head; an SVG icon and a 180 px Apple touch icon; an IndexNow key served from public/ with a postbuild script that submits the fixed pages, the live sitemap and every article slug on production builds (Google ignores IndexNow, so Search Console covers Google); a verification hook that emits the Google or Bing tag when NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION or NEXT_PUBLIC_BING_SITE_VERIFICATION is set; the site address on the resume PDF header (still two pages); and the assistant dialog split from its launcher and loaded on hover, focus or touch, which took the home page from 57 to 72 on mobile Lighthouse performance and total blocking time from 1.69 s to 0.53 s.
+
+Owner steps that remain: create the Search Console property for the vercel.app address, choose the HTML tag method and hand over the content token; run gh auth refresh with the user scope so the GitHub website field and bio can be set, or set them by hand; put the address in the LinkedIn contact section and the email signature; buy dhruvgopani.com when ready, and the address changes in one place (NEXT_PUBLIC_SITE_URL) plus a redirect from the vercel.app host.
+

@@ -11,12 +11,14 @@ import { ViewMemory } from '@/components/ViewMemory'
 import { ViewSwitch } from '@/components/ViewSwitch'
 import { FinishButton } from '@/components/FinishButton'
 import { identity, stops } from '@/content/profile'
+import { seo } from '@/content/seo'
 import { track } from '@/content/track'
 import { articles } from '@/content/writing'
+import { jsonLd, profilePageJsonLd } from '@/lib/seo'
 
 export const metadata: Metadata = {
-  title: `${identity.name}, ${identity.shortHeadline}`,
-  description: `${identity.headline}. ${identity.location}. ${identity.availability}.`,
+  title: seo.titles.home,
+  description: seo.descriptions.home,
 }
 
 const TOTAL = 10
@@ -302,6 +304,10 @@ export default function Page() {
                 </li>
               ))}
             </ul>
+            <p className="tp-more">
+              <Link href="/writing">All writing</Link>
+              <a href="/feed.xml">RSS feed</a>
+            </p>
           </div>
         </section>
 
@@ -336,6 +342,7 @@ export default function Page() {
         <div className="tp-end" />
       </main>
       <AskBot page="track" />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(profilePageJsonLd()) }} />
     </div>
   )
 }

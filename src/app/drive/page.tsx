@@ -5,12 +5,13 @@ import { Hud } from '@/components/hud/Hud'
 import { SceneMount } from '@/components/scene/SceneMount'
 import { StopActivator } from '@/components/stops/StopActivator'
 import { Stops } from '@/components/stops/Stops'
-import { identity } from '@/content/profile'
+import { seo } from '@/content/seo'
 
 export const metadata: Metadata = {
-  title: `The 3D drive, ${identity.name}`,
-  description: 'Six stops down a road at night: the garage, MedChron, the products, the platforms, the skills and the pier. A WebGL scene built to run on a laptop with integrated graphics.',
+  title: seo.titles.drive,
+  description: seo.descriptions.drive,
   alternates: { canonical: '/drive' },
+  openGraph: { title: seo.titles.drive, description: seo.descriptions.drive, url: '/drive', type: 'website', images: ['/og.jpg'] },
 }
 
 export default function Page() {

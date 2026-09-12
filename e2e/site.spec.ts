@@ -1,3 +1,4 @@
+import { readdirSync } from 'node:fs'
 import { expect, test } from '@playwright/test'
 
 test.describe('site chrome', () => {
@@ -17,6 +18,38 @@ test.describe('site chrome', () => {
     expect(html).toContain('property="og:image"')
     expect(html).toContain('application/ld+json')
     expect(home.headers()['x-content-type-options']).toBe('nosniff')
+  })
+
+  test('the writing index, the feed, the icons, the IndexNow key and the structured data are served', async ({ request }, testInfo) => {
+    test.skip(testInfo.project.name !== 'desktop', 'one engine is enough')
+    const index = await request.get('/writing')
+    expect(index.status()).toBe(200)
+    const list = await index.text()
+    expect(list).toContain('/writing/cited-chronologies')
+    expect(list).toContain('/writing/three-js-on-integrated-graphics')
+    const feed = await request.get('/feed.xml')
+    expect(feed.status()).toBe(200)
+    expect(feed.headers()['content-type']).toContain('application/rss+xml')
+    expect(await feed.text()).toContain('<item>')
+    for (const [path, type] of [
+      ['/icon.svg', 'image/svg+xml'],
+      ['/apple-icon.png', 'image/png'],
+    ]) {
+      const r = await request.get(path)
+      expect(r.status(), path).toBe(200)
+      expect(r.headers()['content-type'], path).toContain(type)
+    }
+    const key = readdirSync('public').find((f) => /^[a-f0-9]{32}\.txt$/.test(f))
+    expect(key).toBeTruthy()
+    expect((await request.get(`/${key}`)).status()).toBe(200)
+    const home = await (await request.get('/')).text()
+    expect(home).toContain('application/rss+xml')
+    expect(home).toContain('"@type":"ProfilePage"')
+    expect(home).toContain('rel="apple-touch-icon"')
+    const article = await (await request.get('/writing/cited-chronologies')).text()
+    expect(article).toContain('"@type":"Article"')
+    expect(article).toContain('"@type":"BreadcrumbList"')
+    expect(article).toContain('property="og:image"')
   })
 
   test('the skip link lands on the content of the home page', async ({ page }, testInfo) => {

@@ -3,6 +3,8 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { identity } from '@/content/profile'
 import { articles } from '@/content/writing'
+import { articleJsonLd, breadcrumbJsonLd, jsonLd } from '@/lib/seo'
+import { SITE_URL } from '@/lib/site'
 
 type Props = { params: Promise<{ slug: string }> }
 
@@ -13,7 +15,13 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const a = articles.find((x) => x.slug === slug)
-  return a ? { title: `${a.title} | ${identity.name}`, description: a.standfirst, alternates: { canonical: `/writing/${a.slug}` }, openGraph: { title: a.title, description: a.standfirst, type: 'article' } } : {}
+  if (!a) return {}
+  return {
+    title: `${a.title} | ${identity.name}`,
+    description: a.standfirst,
+    alternates: { canonical: `/writing/${a.slug}` },
+    openGraph: { title: a.title, description: a.standfirst, type: 'article', url: `/writing/${a.slug}`, publishedTime: a.date, modifiedTime: a.date, authors: [SITE_URL], images: ['/og.jpg'] },
+  }
 }
 
 export default async function WritingPage({ params }: Props) {
@@ -28,7 +36,7 @@ export default async function WritingPage({ params }: Props) {
           {identity.name}
         </Link>
         <nav className="actions" aria-label="Site">
-          <Link className="btn" href="/#writing">
+          <Link className="btn" href="/writing">
             Writing
           </Link>
           <Link className="btn" href="/resume">
@@ -61,11 +69,24 @@ export default async function WritingPage({ params }: Props) {
               </section>
             ))}
             <p className="article-foot">
-              <Link href="/#writing">All writing</Link> <Link href="/">Home</Link>
+              <Link href="/writing">All writing</Link> <Link href="/">Home</Link>
             </p>
           </div>
         </article>
       </main>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(articleJsonLd(a)) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLd(
+            breadcrumbJsonLd([
+              { name: 'Home', path: '/' },
+              { name: 'Writing', path: '/writing' },
+              { name: a.title, path: `/writing/${a.slug}` },
+            ]),
+          ),
+        }}
+      />
     </>
   )
 }

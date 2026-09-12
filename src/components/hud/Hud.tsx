@@ -15,7 +15,8 @@ export function Hud() {
   // Escape leaves the drive, like closing a full-screen view.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') router.push('/')
+      // A modal panel (the assistant) owns Escape while it is open.
+      if (e.key === 'Escape' && !document.querySelector('[role="dialog"][aria-modal="true"]')) router.push('/')
     }
     addEventListener('keydown', onKey)
     return () => removeEventListener('keydown', onKey)

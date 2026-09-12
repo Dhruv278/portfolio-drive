@@ -4,6 +4,7 @@ import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { HeroRoad } from '@/components/track/HeroRoad'
 import { Starfield } from '@/components/track/Starfield'
+import { AskBot } from '@/components/bot/AskBot'
 import { TrackScene } from '@/components/track/TrackScene'
 import { ViewMemory } from '@/components/ViewMemory'
 import { ViewSwitch } from '@/components/ViewSwitch'
@@ -341,6 +342,7 @@ export default function Page() {
         </aside>
         <div className="tp-end" />
       </main>
+      <AskBot page="track" />
     </div>
   )
 }

@@ -1,3 +1,4 @@
+import { AskBot } from '@/components/bot/AskBot'
 import { DriveLoader } from '@/components/hud/DriveLoader'
 import { Hud } from '@/components/hud/Hud'
 import { SceneMount } from '@/components/scene/SceneMount'
@@ -12,6 +13,7 @@ export default function Page() {
       <Hud />
       <StopActivator />
       <Stops />
+      <AskBot page="other" />
     </div>
   )
 }

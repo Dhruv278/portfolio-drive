@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { AskBot } from '@/components/bot/AskBot'
 import { ViewSwitch } from '@/components/ViewSwitch'
 import { identity, resume } from '@/content/profile'
 
@@ -94,6 +95,7 @@ export default function ResumePage() {
         </p>
         <p>{resume.education.awards}</p>
       </article>
+      <AskBot page="other" />
     </>
   )
 }

@@ -37,6 +37,18 @@ describe('validateMessages', () => {
     expect(validateMessages({ messages: [user('   ')] }).ok).toBe(false)
   })
 
+  it('keeps a long earlier answer as history instead of rejecting the follow-up', () => {
+    const long = 'A grounded answer. '.repeat(60).trim()
+    expect(long.length).toBeGreaterThan(LIMITS.maxChars)
+    const r = validateMessages({ messages: [user('How does MedChron work?'), bot(long), user('And how long did that take?')] })
+    expect(r.ok).toBe(true)
+    if (r.ok) {
+      expect(r.turns).toHaveLength(3)
+      expect(r.turns[1].content.length).toBeLessThanOrEqual(LIMITS.maxAssistantChars)
+    }
+    expect(validateMessages({ messages: [user('x'.repeat(LIMITS.maxChars + 1))] }).ok).toBe(false)
+  })
+
   it('strips control characters', () => {
     const r = validateMessages({ messages: [user('Hello\u0007 there')] })
     expect(r.ok && r.turns[0].content).toBe('Hello there')

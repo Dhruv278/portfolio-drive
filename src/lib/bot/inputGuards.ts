@@ -4,7 +4,9 @@ import { hasOverride } from './prompt'
 export type Turn = { role: 'user' | 'assistant'; content: string }
 export type Validated = { ok: true; turns: Turn[]; flagged: boolean } | { ok: false; status: 400; reason: 'shape' | 'content' }
 
-export const LIMITS = { maxMessages: 12, maxChars: 600, maxTotal: 4000, keepTurns: 6 } as const
+// Visitor turns are capped at maxChars. The bot's own earlier answers come back as assistant turns
+// and may run to the answer limit (1200), so they are trimmed, not rejected.
+export const LIMITS = { maxMessages: 12, maxChars: 600, maxAssistantChars: 1200, maxTotal: 6000, keepTurns: 6 } as const
 
 const CONTROL = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g
 const URL_RE = /https?:\/\/|www\./i
@@ -30,17 +32,18 @@ export function validateMessages(input: unknown): Validated {
     const { role, content } = m as { role?: unknown; content?: unknown }
     if ((role !== 'user' && role !== 'assistant') || typeof content !== 'string') return fail('shape')
     const text = content.replace(CONTROL, '').trim()
-    if (text.length < 1 || text.length > LIMITS.maxChars) return fail('shape')
-    turns.push({ role, content: text })
+    if (text.length < 1) return fail('shape')
+    if (role === 'user' && text.length > LIMITS.maxChars) return fail('shape')
+    turns.push({ role, content: role === 'assistant' ? text.slice(0, LIMITS.maxAssistantChars) : text })
   }
   for (let i = 1; i < turns.length; i++) if (turns[i].role === turns[i - 1].role) return fail('shape')
   if (turns[turns.length - 1].role !== 'user') return fail('shape')
-  if (turns.reduce((n, t) => n + t.content.length, 0) > LIMITS.maxTotal) return fail('shape')
   const last = turns[turns.length - 1].content
   if (URL_RE.test(last) || mostlySymbols(last)) return fail('content')
   const previousUser = turns.slice(0, -1).filter((t) => t.role === 'user').pop()
   if (previousUser && previousUser.content === last) return fail('content')
   const kept = turns.slice(-LIMITS.keepTurns)
   while (kept.length && kept[0].role !== 'user') kept.shift()
+  if (kept.reduce((n, t) => n + t.content.length, 0) > LIMITS.maxTotal) return fail('shape')
   return { ok: true, turns: kept, flagged: hasOverride(last) }
 }

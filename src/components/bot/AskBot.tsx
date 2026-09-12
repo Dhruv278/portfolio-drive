@@ -53,7 +53,7 @@ function historyFor(msgs: Msg[], question: string): Turn[] {
   for (let i = 0; i < msgs.length - 1; i++) {
     const m = msgs[i]
     const n = msgs[i + 1]
-    if (m.role === 'user' && n.role === 'bot' && !n.error) pairs.push({ role: 'user', content: m.text }, { role: 'assistant', content: n.text })
+    if (m.role === 'user' && n.role === 'bot' && !n.error) pairs.push({ role: 'user', content: m.text }, { role: 'assistant', content: n.text.slice(0, 1200) })
   }
   return [...pairs.slice(-4), { role: 'user', content: question }]
 }

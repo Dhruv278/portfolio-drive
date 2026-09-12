@@ -343,7 +343,14 @@ export function Scene() {
         }}
         camera={{ fov: mobile ? 54 : 36, near: 0.1, far: 400, position: [0, 8, 14] }}
       >
-        <World stats={stats} fx={fx} onReady={() => setReady(true)} />
+        <World
+          stats={stats}
+          fx={fx}
+          onReady={() => {
+            setReady(true)
+            useDrive.getState().setSceneReady(true)
+          }}
+        />
       </Canvas>
     </div>
   )

@@ -1,16 +1,17 @@
 @import 'tailwindcss';
 
 :root {
-  --paper: #f6f2ea;
-  --paper-2: #ede7dc;
-  --sky: #dceaf4;
-  --ink: #1e2a38;
-  --ink-2: #55627a;
-  --cobalt-on-ink: #8fa9ff;
-  --cobalt: #2f5bea;
-  --cobalt-2: #1f44c0;
-  --road: #c9cdd2;
-  --shadow: #d9d3c6;
+  /* One dark theme. The older names below are aliases kept for the drive and resume rules. */
+  --paper: var(--tp-panel);
+  --paper-2: var(--tp-navy);
+  --sky: var(--tp-deep);
+  --ink: var(--tp-text);
+  --ink-2: var(--tp-muted);
+  --cobalt-on-ink: var(--tp-cobalt);
+  --cobalt: var(--tp-amber);
+  --cobalt-2: #d9922a;
+  --road: var(--tp-line);
+  --shadow: transparent;
   --tp-navy: #0b1630;
   --tp-deep: #070f22;
   --tp-panel: #101e3d;
@@ -77,15 +78,6 @@ a {
 .scene-root.ready {
   opacity: 1;
 }
-.loadstatus {
-  font-size: 11px;
-  color: var(--ink-2);
-  margin-top: 4px;
-  min-height: 14px;
-}
-.loadstatus:empty {
-  display: none;
-}
 .scene-root canvas {
   display: block;
 }
@@ -139,7 +131,6 @@ a {
   text-decoration: none;
   background: var(--paper);
   padding: 6px 12px;
-  box-shadow: 0 2px 0 var(--shadow);
 }
 .actions {
   display: flex;
@@ -154,7 +145,6 @@ a {
   background: var(--paper);
   color: var(--ink);
   text-decoration: none;
-  box-shadow: 0 2px 0 var(--shadow);
   cursor: pointer;
   display: inline-block;
   white-space: nowrap;
@@ -203,7 +193,6 @@ a {
   background: var(--cobalt);
   border-color: var(--cobalt);
   color: #fff;
-  box-shadow: 0 2px 0 var(--cobalt-2);
 }
 @media (hover: hover) {
   .btn:hover {
@@ -214,7 +203,6 @@ a {
   position: relative;
   background: var(--paper);
   padding: 8px 12px;
-  box-shadow: 0 2px 0 var(--shadow);
   font-size: 13px;
   min-width: 220px;
 }
@@ -250,7 +238,6 @@ a {
 .hint {
   background: var(--paper);
   padding: 8px 12px;
-  box-shadow: 0 2px 0 var(--shadow);
   font-size: 13px;
   color: var(--ink-2);
   transition: opacity 0.4s;
@@ -285,9 +272,6 @@ section.stop .panel {
   width: min(540px, 86vw);
   background: var(--paper);
   padding: 22px 26px 20px;
-  box-shadow:
-    0 3px 0 var(--shadow),
-    0 18px 40px rgba(30, 42, 56, 0.1);
 }
 /* Board panels. The cap keeps them clear of the odometer in a narrow window. */
 section.stop .panel.wide {
@@ -334,7 +318,6 @@ h1 span {
   display: inline-block;
   background: var(--paper);
   padding: 0 10px;
-  box-shadow: 0 3px 0 var(--shadow);
 }
 .hero .lede {
   font-family: var(--font-display);
@@ -349,7 +332,6 @@ h1 span {
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
   padding: 2px 8px;
-  box-shadow: 0 2px 0 var(--shadow);
 }
 .hero .meta {
   margin: 18px 0 20px;
@@ -361,7 +343,6 @@ h1 span {
   padding: 2px 8px;
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
-  box-shadow: 0 2px 0 var(--shadow);
 }
 .hero .actions {
   margin-top: 6px;
@@ -533,7 +514,6 @@ section.stop .contact a {
   height: 14px;
   margin-top: 3px;
   background: var(--cobalt);
-  box-shadow: 0 2px 0 var(--cobalt-2);
 }
 .skills p {
   font-size: 14px;
@@ -714,65 +694,49 @@ section.stop .contact a {
   }
 }
 
-/* ---------- The drive at night: the 3D page in the track's palette ---------- */
-.drive {
-  --paper: var(--tp-panel);
-  --paper-2: var(--tp-navy);
-  --ink: var(--tp-text);
-  --ink-2: var(--tp-muted);
-  --cobalt: var(--tp-amber);
-  --cobalt-2: #d9922a;
-  --cobalt-on-ink: var(--tp-cobalt);
-  --road: var(--tp-line);
-  --shadow: transparent;
-  color: var(--tp-text);
-}
-body:has(.drive) {
-  background: var(--tp-deep);
-}
-.drive .wordmark,
-.drive .btn,
-.drive .odometer,
-.drive .hint {
+/* ---------- Dark chrome shared by the drive, the resume and the writing pages ---------- */
+.wordmark,
+.btn,
+.odometer,
+.hint {
   background: rgba(16, 30, 61, 0.94);
   border: 1px solid var(--tp-line);
   border-radius: var(--tp-r-ui);
   box-shadow: none;
 }
-.drive .wordmark {
+.wordmark {
   color: var(--tp-text);
 }
-.drive .btn {
+.btn {
   color: var(--tp-text);
 }
-.drive .btn.primary {
+.btn.primary {
   background: var(--tp-amber);
   border-color: var(--tp-amber);
   color: var(--tp-deep);
 }
-.drive .odometer {
+.odometer {
   font: 500 12.5px var(--font-mono);
   color: var(--tp-muted);
 }
-.drive .odometer b {
+.odometer b {
   color: var(--tp-text);
   font: 600 14px var(--font-mono);
 }
-.drive .track {
+.track {
   background: var(--tp-line);
   border-radius: 3px;
 }
-.drive .track::after {
+.track::after {
   display: none;
 }
-.drive .track i {
+.track i {
   background: var(--tp-amber);
 }
-.drive .loadstatus,
-.drive .hint {
+.hint {
   color: var(--tp-muted);
 }
-.drive section.stop .panel {
+section.stop .panel {
   background: linear-gradient(180deg, rgba(20, 37, 74, 0.96), rgba(12, 22, 46, 0.96));
   border: 1px solid var(--tp-line);
   border-top-color: var(--tp-amber);
@@ -781,100 +745,100 @@ body:has(.drive) {
     0 30px 60px rgba(3, 8, 20, 0.5),
     0 0 0 1px rgba(255, 181, 71, 0.18);
 }
-.drive section.stop.hero .panel {
+section.stop.hero .panel {
   background: transparent;
   border: 0;
   box-shadow: none;
 }
-.drive .eyebrow {
+.eyebrow {
   font: 600 12px var(--font-mono);
   letter-spacing: 0.03em;
   color: var(--tp-amber);
 }
-.drive h1 span,
-.drive .hero .lede,
-.drive .hero .meta span {
+h1 span,
+.hero .lede,
+.hero .meta span {
   background: transparent;
   box-shadow: none;
   padding: 0;
 }
-.drive h1,
-.drive h2,
-.drive .hero .lede,
-.drive .panel p,
-.drive .panel li {
+h1,
+h2,
+.hero .lede,
+.panel p,
+.panel li {
   color: var(--tp-text);
 }
-.drive .hero .meta {
+.hero .meta {
   color: var(--tp-muted);
 }
-.drive .panel li b {
+.panel li b {
   color: #fff;
 }
-.drive .chip {
+.chip {
   border: 1px solid var(--tp-line);
   background: rgba(7, 15, 34, 0.35);
   color: var(--tp-muted);
   border-radius: var(--tp-r-chip);
 }
-.drive .chip.blue {
+.chip.blue {
   border-color: var(--tp-cobalt);
   color: var(--tp-cobalt);
 }
-.drive .card,
-.drive .contact a {
+.card,
+.contact a {
   border: 1px solid var(--tp-line);
   background: rgba(7, 15, 34, 0.45);
   border-radius: var(--tp-r-ui);
   color: var(--tp-text);
 }
-.drive .contact a span {
+.contact a span {
   color: var(--tp-muted);
 }
-.drive .contact a:hover {
+.contact a:hover {
   border-color: var(--tp-amber);
 }
-.drive .skillgroup h3 {
+.skillgroup h3 {
   color: var(--tp-amber);
   font: 600 12px var(--font-mono);
   letter-spacing: 0.08em;
 }
-.drive .habits {
+.habits {
   border-top-color: var(--tp-line);
   color: var(--tp-muted);
 }
-.drive .habits b {
+.habits b {
   color: var(--tp-text);
 }
-.drive .platforms li {
+.platforms li {
   border-top-color: var(--tp-line);
 }
-.drive .dot {
+.dot {
   background: var(--tp-amber);
   box-shadow: none;
   border-radius: 50%;
 }
-.drive .wheel {
+.wheel {
   background: var(--tp-amber-soft);
   border: 1px dashed rgba(255, 181, 71, 0.5);
   color: var(--tp-text);
   border-radius: var(--tp-r-ui);
 }
-.drive .wheel a {
+.wheel a {
   color: var(--tp-amber);
 }
-.drive .nogl {
+.nogl {
   background: linear-gradient(var(--tp-navy), var(--tp-deep));
   color: var(--tp-muted);
 }
-.drive :focus-visible {
+:focus-visible {
   outline-color: var(--tp-amber);
 }
 @media (max-width: 900px) and (orientation: portrait) {
-  .drive section.stop:not(.hero) .panel::before {
+  section.stop:not(.hero) .panel::before {
     background: var(--tp-line);
   }
-  .drive section.stop .panel {
+  section.stop .panel {
     scrollbar-color: var(--tp-line) transparent;
   }
 }
@@ -992,15 +956,110 @@ body:has(.drive) {
   border-radius: 10px;
 }
 
+/* ---------- Loading screen for the drive ---------- */
+.loader {
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at 1px 1px, rgba(148, 163, 196, 0.13) 1px, transparent 1.6px) 0 0 / 28px 28px,
+    var(--tp-deep);
+  color: var(--tp-text);
+  transition: opacity 0.6s ease;
+}
+.loader.done {
+  opacity: 0;
+  pointer-events: none;
+}
+.loader-box {
+  width: min(420px, calc(100% - 40px));
+  text-align: center;
+}
+.loader-road {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0 auto 14px;
+}
+.loader-road .tp-road {
+  stroke-width: 22;
+}
+.loader-road .tp-kerb {
+  stroke-width: 26;
+}
+.loader-road .tp-dash {
+  stroke-width: 1.6;
+  stroke-dasharray: 7 9;
+}
+.loader h2 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 28px;
+  letter-spacing: -0.02em;
+  margin: 0 0 6px;
+  color: var(--tp-text);
+}
+.loader-phase {
+  font: 600 12px var(--font-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--tp-amber);
+  margin: 0 0 14px;
+  min-height: 16px;
+}
+.loader-bar {
+  height: 6px;
+  background: var(--tp-line);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.loader-bar i {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--tp-amber);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+.loader-pct {
+  font: 600 13px var(--font-mono);
+  color: var(--tp-muted);
+  margin: 10px 0 18px;
+}
+.loader-skip {
+  font: 600 13px var(--font-body);
+  color: var(--tp-muted);
+  text-decoration: none;
+  border: 1px solid var(--tp-line);
+  border-radius: var(--tp-r-ui);
+  padding: 9px 14px;
+  display: inline-block;
+}
+.loader-skip:hover {
+  color: var(--tp-text);
+  border-color: var(--tp-cobalt);
+}
+@media (prefers-reduced-motion: reduce) {
+  .loader,
+  .loader-bar i {
+    transition: none;
+  }
+}
+
 /* ---------- Resume page ---------- */
 .resume {
   position: relative;
   z-index: 2;
   max-width: 860px;
-  margin: 0 auto;
-  padding: 96px 24px 80px;
-  background: var(--paper);
-  color: #111827;
+  margin: 96px auto 80px;
+  padding: 40px 44px 44px;
+  background: var(--tp-panel);
+  color: var(--tp-text);
+  border: 1px solid var(--tp-line);
+  border-top-color: var(--tp-amber);
+  border-radius: var(--tp-r-card);
   font-size: 14.5px;
   line-height: 1.45;
 }
@@ -1008,29 +1067,25 @@ body:has(.drive) {
   font-size: 34px;
   margin: 0 0 4px;
 }
-.resume h1 span {
-  box-shadow: none;
-  background: none;
-  padding: 0;
-}
 .resume .role {
   font-weight: 600;
   margin: 0 0 6px;
 }
 .resume .contactline {
-  color: #374151;
+  color: var(--tp-muted);
   font-size: 13px;
   margin: 0 0 16px;
   padding-bottom: 10px;
-  border-bottom: 1.5px solid #111827;
+  border-bottom: 1px solid var(--tp-line);
 }
 .resume h2 {
-  font-size: 13px;
-  letter-spacing: 0.04em;
+  font: 600 12px var(--font-mono);
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  margin: 18px 0 6px;
-  padding-bottom: 3px;
-  border-bottom: 1px solid #c9cfd8;
+  color: var(--tp-amber);
+  margin: 20px 0 8px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid var(--tp-line);
 }
 .resume .job {
   display: flex;
@@ -1041,15 +1096,14 @@ body:has(.drive) {
 }
 .resume .job b {
   font-weight: 600;
+  color: #fff;
 }
-.resume .job span {
-  color: #374151;
+.resume .job span,
+.resume .where {
+  color: var(--tp-muted);
   font-size: 13px;
 }
 .resume .where {
-  font-size: 13px;
-  color: #374151;
-  font-style: italic;
   margin: 0 0 4px;
 }
 .resume ul {
@@ -1062,9 +1116,18 @@ body:has(.drive) {
 .resume .skills p {
   margin: 0 0 3px;
 }
+@media (max-width: 640px) {
+  .resume {
+    margin: 84px 12px 40px;
+    padding: 24px 18px 28px;
+  }
+}
 
 @media print {
   .hud,
+  .topbar,
+  .view-switch,
+  .loader,
   .scene-root,
   .nogl,
   .skip {
@@ -1072,15 +1135,39 @@ body:has(.drive) {
   }
   body {
     background: #fff;
+    color: #111827;
   }
   .resume {
+    margin: 0;
     padding: 0;
     max-width: none;
     background: #fff;
+    color: #111827;
+    border: 0;
+    border-radius: 0;
     font-size: 10.5pt;
+  }
+  .resume h1,
+  .resume .job b {
+    color: #111827;
+  }
+  .resume h2 {
+    font: 700 11pt var(--font-body);
+    letter-spacing: 0.02em;
+    color: #111827;
+    border-bottom-color: #c9cfd8;
+  }
+  .resume .contactline,
+  .resume .job span,
+  .resume .where {
+    color: #374151;
+  }
+  .resume .contactline {
+    border-bottom-color: #111827;
   }
   a {
     text-decoration: none;
+    color: inherit;
   }
 }
 
@@ -1103,7 +1190,6 @@ body:has(.drive) {
 .home {
   position: relative;
   z-index: 2;
-  background: var(--paper);
 }
 .wrap {
   max-width: 1200px;
@@ -1128,7 +1214,7 @@ body:has(.drive) {
   max-width: 760px;
 }
 .writing-list li {
-  border-top: 1px solid var(--ink);
+  border-top: 1px solid var(--tp-line);
 }
 .writing-list a {
   display: block;
@@ -1204,7 +1290,7 @@ body:has(.drive) {
 .article-foot {
   margin-top: 48px;
   padding-top: 18px;
-  border-top: 1px solid var(--ink);
+  border-top: 1px solid var(--tp-line);
 }
 .article-foot a {
   font-weight: 600;
@@ -1221,9 +1307,6 @@ body:has(.drive) {
     radial-gradient(circle at 1px 1px, rgba(148, 163, 196, 0.13) 1px, transparent 1.6px) 0 0 / 28px 28px,
     radial-gradient(1200px 600px at 20% -10%, #14254a 0%, var(--tp-navy) 45%, var(--tp-deep) 100%) fixed;
   overflow-x: clip;
-}
-body:has(.tp) {
-  background: #070f22;
 }
 .tp a {
   color: var(--tp-cobalt);

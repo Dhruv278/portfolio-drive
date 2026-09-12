@@ -108,10 +108,14 @@ test.describe('The Drive', () => {
   test('plays the intro once and ends within six seconds', async ({ page }, testInfo) => {
     test.skip(!['desktop', 'phone'].includes(testInfo.project.name), 'needs a real WebGL scene')
     await page.goto('/drive?stats=1')
+    // the loading screen is up while the assets and shaders arrive, and gone once the scene is ready
+    await expect(page.getByTestId('drive-loader')).toBeVisible()
+    await expect(page.getByTestId('drive-loader-phase')).toContainText(/Loading assets|Warming up/)
     const scene = page.getByTestId('scene')
     await expect(scene).toHaveAttribute('data-ready', 'true', { timeout: 60_000 })
     await expect(scene).toHaveAttribute('data-intro', /playing|done/)
     await expect(scene).toHaveAttribute('data-intro', 'done', { timeout: 8_000 })
+    await expect(page.getByTestId('drive-loader')).toBeHidden({ timeout: 5_000 })
     // the intro left the car at the first stop
     await expect(page.getByTestId('odometer')).toContainText('Stop 1 of 6')
   })
@@ -296,7 +300,7 @@ test.describe('The Drive', () => {
       await expect(page.getByTestId('scene').locator('canvas')).toBeVisible({ timeout: 20_000 })
       // every model arrives and the canvas fades in
       await expect(page.getByTestId('scene')).toHaveAttribute('data-ready', 'true', { timeout: 60_000 })
-      await expect(page.getByTestId('loadstatus')).toHaveText('')
+      await expect(page.getByTestId('drive-loader')).toBeHidden()
     } else {
       // Firefox and WebKit headless builds differ in WebGL 2 support. Either outcome must leave the
       // content intact: the scene mounts, or the fallback note shows. Never a blank page or a crash.

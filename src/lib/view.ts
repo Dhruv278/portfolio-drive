@@ -19,7 +19,7 @@ export function shouldOpenDrive(pref: View | null, redirectedThisSession: boolea
 }
 
 // The 3D side of the switch beats on the 2D page until the visitor has seen the drive once.
-export function shouldPulse(current: View, seen: boolean): boolean {
+export function shouldPulse(current: View | null, seen: boolean): boolean {
   return current === '2d' && !seen
 }
 

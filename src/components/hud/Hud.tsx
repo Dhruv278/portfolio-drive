@@ -1,6 +1,5 @@
 'use client'
 
-import { useProgress } from '@react-three/drei'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
@@ -27,10 +26,7 @@ export function Hud() {
   const zone = zones[stopIndex]
   // True while the car is parked at the current stop. Read by the e2e suite.
   const parked = !!zone && scroll >= zone.a && scroll <= zone.b
-  const webglOk = useDrive((s) => s.webglOk)
-  const { active, progress } = useProgress()
   const stop = stops[stopIndex]
-  const loading = webglOk === true && (active || progress < 100)
 
   return (
     <>
@@ -57,9 +53,6 @@ export function Hud() {
           </b>
           <div className="track" aria-hidden="true">
             <i style={{ width: `${(scroll * 100).toFixed(1)}%` }} />
-          </div>
-          <div className="loadstatus" data-testid="loadstatus">
-            {loading ? `Loading the drive, ${Math.round(progress)}%` : ''}
           </div>
         </div>
         <div className={`hint${scroll > 0.02 ? ' gone' : ''}`} aria-hidden={scroll > 0.02}>

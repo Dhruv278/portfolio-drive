@@ -37,6 +37,7 @@ describe('shouldPulse', () => {
     expect(shouldPulse('2d', false)).toBe(true)
     expect(shouldPulse('2d', true)).toBe(false)
     expect(shouldPulse('3d', false)).toBe(false)
+    expect(shouldPulse(null, false)).toBe(false)
   })
 })
 

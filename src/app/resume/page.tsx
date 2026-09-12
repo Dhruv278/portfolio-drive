@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { ViewSwitch } from '@/components/ViewSwitch'
 import { identity, resume } from '@/content/profile'
 
 export const metadata: Metadata = {
@@ -15,9 +16,7 @@ export default function ResumePage() {
           {identity.name}
         </Link>
         <div className="actions">
-          <Link className="btn" href="/">
-            Back<span className="long"> to the drive</span>
-          </Link>
+          <ViewSwitch />
           <a className="btn primary" href={identity.resumePdf} download>
             PDF
           </a>
@@ -29,7 +28,7 @@ export default function ResumePage() {
         </h1>
         <p className="role">{identity.headline}</p>
         <p className="contactline">
-          {identity.location} ({identity.availability.toLowerCase()}) | {identity.phone} | {identity.email} | {identity.linkedin.href.replace('https://www.', '').replace(/\/$/, '')} | {identity.github.href.replace('https://', '')}
+          {identity.location}. {identity.availability}. | {identity.phone} | {identity.email} | {identity.linkedin.href.replace('https://www.', '').replace(/\/$/, '')} | {identity.github.href.replace('https://', '')}
         </p>
 
         <h2>Summary</h2>

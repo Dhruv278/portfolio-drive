@@ -5,7 +5,7 @@ export const bot = {
   name: 'DhruvBot',
   button: 'Ask DhruvBot',
   tagline: "Answers from Dhruv's record only. Every answer cites its source.",
-  placeholder: 'Ask about Dhruv, his work or how to reach him',
+  placeholder: 'Ask about Dhruv or his work',
   starters: ['How does MedChron work?', 'Why hire Dhruv?', 'What has he shipped on his own?', 'Is he open to relocation?'],
   lines: {
     resting: `DhruvBot is resting. Email Dhruv at ${identity.email}.`,

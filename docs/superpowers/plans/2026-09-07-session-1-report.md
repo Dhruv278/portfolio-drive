@@ -209,3 +209,11 @@ Sources: none (the model used the education section but did not cite it; the gua
 
 Owner items: create a second OpenRouter key with a credit limit and swap it into Vercel; edit `src/content/knowledge/certifications.md`, `faq.md` and `improving-medchron.md`, which are drafts in his voice derived from the site.
 
+## Addendum: DhruvBot speaks as Dhruv, and the drive starts at the garage (12 September 2026)
+
+The owner asked for the first person: the bot is his AI and should say "why hire me". Changed throughout: rules, starters ("Why should I hire you?"), every friendly line, section titles ("Why hire me", "How I work", "How I would improve MedChron next") and his markdown. One honest line stays: asked whether it is the real Dhruv, it says it is DhruvBot, his AI, answering as him from his record. A plain-text rule and an output guard now strip markdown emphasis and headings, which the model had started using. Live answers in the new voice confirmed with a real browser.
+
+He also reported the phone drive opening "scrolled to the bottom". Reproduced: scroll to the pier, reload, and the browser restores the scroll position, so the drive opened at the pier with the intro skipped. The drive now sets scroll restoration to manual and starts at the top unless a hash is present. Phone test added, verified live.
+
+Observation: after an hour of automated checks (polling the site every fifteen seconds through several deploys, plus smoke scripts), Vercel began serving its Security Checkpoint to this machine. Real browsers pass it in about three seconds and receive a cookie; the project has no firewall rules or attack mode configured, so this is Vercel's automatic protection and it clears on its own. Lesson: wait for deployments with the Vercel CLI, not by polling the site.
+

@@ -5,7 +5,7 @@ import { identity, resume, skillGroups } from './profile'
 export const track = {
   hero: {
     eyebrow: 'Senior full-stack engineer and product lead',
-    line: 'I build AI products for regulated work: medical records, legal cases, payments, licences. Products that have to be right before they are fast.',
+    line: 'I build AI products for regulated work: medical records, legal cases, payments, licenses. Products that have to be right before they are fast.',
     meta: `${identity.location}. ${identity.availability}. ${identity.current}.`,
     tiles: [
       { title: 'Product lead', body: 'Roadmap, specifications and priorities for MedChron at Omnis AI, and the core features behind them.' },
@@ -16,7 +16,7 @@ export const track = {
 
   why: {
     heading: 'What you get when you hire me.',
-    intro: 'Three and a half years across a solutions role, a product studio and a US legal-tech startup taught me one thing: features are cheap, trust is expensive. I build for the second.',
+    intro: 'Three roles since 2023, a solutions engineer, a product studio and a US legal-tech startup, taught me one thing: features are cheap, trust is expensive. I build for the second.',
     points: [
       {
         title: 'Product thinking, not ticket taking',
@@ -24,7 +24,7 @@ export const track = {
       },
       {
         title: 'AI features that survive scrutiny',
-        body: 'Citations or nothing. Deterministic guards ahead of the model. A replay evaluation before any prompt change. Cost per run known before launch. This is how MedChron went from a demo to a product attorneys rely on.',
+        body: 'Citations or nothing. Deterministic guards ahead of the model. A replay evaluation on the medications prompt, and I am extending it to every stage. Cost per run known before launch. This is how MedChron went from a demo to a product attorneys rely on.',
       },
       {
         title: 'Regulated-data habits by default',
@@ -97,7 +97,7 @@ export const track = {
     ],
     trust: [
       'Every fact cites its page or is dropped. Unverifiable output never reaches the attorney.',
-      'Prompts live in an append-only registry with versions and restore, and are replayed against known records before they ship.',
+      'Prompts live in an append-only registry with versions and restore. The medications prompt is replayed against known records before it ships, and I am extending that harness to every extraction stage.',
       'Patient identifiers are scrubbed before the models see the text. Tenant scoping and rate limits hold on every route.',
     ],
     role: 'My role: product lead and senior engineer. I own the roadmap, write the specifications, set priorities with leadership, and build the core features with the team.',
@@ -138,7 +138,7 @@ export const track = {
       {
         title: 'This site',
         kind: 'Own work, 2026',
-        body: 'A React Three Fiber scene that renders only on demand, compiles every shader before it fades in, and holds 35 frames a second on a laptop with integrated graphics. Tested across Chromium, Firefox and WebKit, and on phones.',
+        body: 'A React Three Fiber scene that renders only on demand, compiles every shader before it fades in, and holds 25 frames a second while driving on a laptop with integrated graphics. Tested across Chromium, Firefox and WebKit, and on phones.',
         stack: ['Next.js 16', 'React Three Fiber', 'three', 'zustand', 'Playwright', 'Vitest'],
         link: { label: 'Take the 3D drive', href: '/drive' },
       },
@@ -147,19 +147,16 @@ export const track = {
 
   platforms: {
     heading: 'Six platforms delivered, 2024 to 2026.',
-    intro: 'Multi-tenant B2B systems for real operations: wholesale trade, recycling, aviation licensing, payroll incentives, food supply, crypto exchange.',
+    intro: 'Multi-tenant B2B systems for real operations, built for the businesses that run them alongside my roles: wholesale trade, recycling, aviation licensing, payroll incentives, food supply, crypto exchange.',
   },
 
   skills: {
-    heading: 'Skills, all of them shipped to production.',
+    heading: 'Skills. Everything in the project cards has shipped to production.',
     groups: skillGroups,
     howHeading: 'How I work',
     how: [
-      'Written specification before code, with the acceptance criteria agreed up front.',
-      'Tenant scoping, rate limits and audit trails by default in anything multi-tenant.',
       'Evaluations and tests around the paths that can hurt a customer: AI output, payments, permissions.',
       'Claude Code, Codex and Cursor every day, and I write the prompts and tooling the team builds on.',
-      'A QA round is not done until the tracker says so.',
     ],
   },
 
@@ -167,8 +164,6 @@ export const track = {
     heading: 'Achievements.',
     work: [
       'Took MedChron from a working demo to a product US law firms rely on, as product lead and senior engineer, in the first eight months at Omnis AI.',
-      'Took Chi, the in-product assistant, from prototype to release candidate through three QA rounds, including two critical data-isolation fixes.',
-      'Closed every security finding raised against MedChron document and entity routes and wrote the eight-rule secure-coding SOP the team reviews against.',
       'Halved the share of extracted medication rows missing a start date in a replay evaluation, with no fabricated drugs or citations.',
       'Shipped Kwik Media to production, where studios sell albums from it today.',
       'Delivered six multi-tenant B2B platforms in two years across wholesale, government, HR, food and finance.',

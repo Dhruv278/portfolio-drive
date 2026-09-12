@@ -17,6 +17,7 @@ describe('knowledge base', () => {
   it('adds the owner markdown as sections titled by their first line, and skips a file with a title only', () => {
     expect(titles).toContain('How MedChron works')
     expect(titles).toContain('Questions recruiters ask')
+    expect(titles).toContain('Numbers on the site')
     expect(titles).not.toContain('Certifications')
   })
 
@@ -35,5 +36,7 @@ describe('knowledge base', () => {
     expect(text).toContain('Omnis AI')
     expect(text).toContain('dhruvgopani8@gmail.com')
     expect(text).toContain('Kwik Media')
+    expect(text).toContain('53 percent to 26 percent')
+    expect(text).not.toContain('+91')
   })
 })

@@ -63,7 +63,7 @@ describe('profile content', () => {
   it('keeps the bot copy and the knowledge markdown inside the writing rules', () => {
     const dir = join(process.cwd(), 'src', 'content', 'knowledge')
     const files = readdirSync(dir).filter((f) => f.endsWith('.md'))
-    expect(files.sort()).toEqual(['certifications.md', 'faq.md', 'how-medchron-works.md', 'improving-medchron.md', 'working-style.md'])
+    expect(files.sort()).toEqual(['certifications.md', 'faq.md', 'how-medchron-works.md', 'improving-medchron.md', 'numbers.md', 'working-style.md'])
     const texts = [...collectStrings(bot), ...files.map((f) => readFileSync(join(dir, f), 'utf8'))]
     for (const f of files) expect(readFileSync(join(dir, f), 'utf8').startsWith('# ')).toBe(true)
     for (const text of texts) {

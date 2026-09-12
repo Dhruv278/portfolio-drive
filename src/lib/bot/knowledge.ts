@@ -2,14 +2,14 @@
 // Pure: no file system here, so the pages' single source of truth stays the only source.
 import { identity, skillGroups, stops } from '@/content/profile'
 import { track } from '@/content/track'
+import { SITE_URL as SITE } from '@/lib/site'
 
 export type Section = { id: string; title: string; text: string }
 
-export const OWNER_FILES = ['how-medchron-works', 'improving-medchron', 'working-style', 'certifications', 'faq'] as const
+export const OWNER_FILES = ['how-medchron-works', 'improving-medchron', 'working-style', 'numbers', 'certifications', 'faq'] as const
 export type OwnerKey = (typeof OWNER_FILES)[number]
 export type OwnerFiles = Partial<Record<OwnerKey, string>>
 
-const SITE = 'https://portfolio-drive-mu.vercel.app'
 
 export function buildSections(owner: OwnerFiles): Section[] {
   const out: Section[] = []
@@ -60,7 +60,7 @@ export function buildSections(owner: OwnerFiles): Section[] {
   out.push({
     id: 'contact',
     title: 'Contact',
-    text: `Email ${identity.email}. Phone ${identity.phone}. LinkedIn ${identity.linkedin.href}. GitHub ${identity.github.href}. Resume PDF at ${SITE}${identity.resumePdf}. ${track.contact.line}`,
+    text: `Email ${identity.email}. LinkedIn ${identity.linkedin.href}. GitHub ${identity.github.href}. Resume PDF at ${SITE}${identity.resumePdf}. ${track.contact.line}`,
   })
   for (const key of OWNER_FILES) {
     const md = (owner[key] ?? '').replace(/<!--[\s\S]*?-->/g, '').trim()

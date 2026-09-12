@@ -89,7 +89,7 @@ export const stops: StopContent[] = [
     id: 'start',
     name: 'Start',
     eyebrow: identity.shortHeadline,
-    lede: 'AI products for medical records and legal workflows, built to be right, not just fast.',
+    lede: 'AI products for regulated work: medical records, legal cases, payments, licenses. Built to be right before they are fast.',
     meta: `${identity.location}. ${identity.availability}. ${identity.current}.`,
   },
   {
@@ -172,7 +172,7 @@ export const stops: StopContent[] = [
     id: 'how',
     name: 'Skills',
     eyebrow: 'Stop 5 of 6. Skills and how I work',
-    heading: 'Everything here has shipped to production.',
+    heading: 'Skills. Everything in the project cards has shipped to production.',
     groups: skillGroups,
     habits: 'Written specifications before code. Tenant scoping and rate limits by default. Claude Code, Codex and Cursor every day, and I write the prompts and tooling the team builds on. A QA round is not done until the tracker says so.',
   },
@@ -195,7 +195,7 @@ export const stops: StopContent[] = [
 // Resume page content. Mirrors the PDF section by section.
 export const resume = {
   summary:
-    'Full-stack engineer and product lead for AI products that handle regulated data. At Omnis AI I lead MedChron, a medical-chronology platform for US personal-injury law firms, where every extracted fact has to cite its page and every workflow has to survive an audit. TypeScript end to end (NestJS, Next.js, React, PostgreSQL, MongoDB, AWS, Kubernetes) with LLM pipelines on Gemini and Claude. I use Claude Code, Codex and Cursor every day and write the prompts, evaluations and tooling the team builds on. Before that, shipped SaaS products at a software studio.',
+    'Full-stack engineer and product lead for AI products that handle regulated data. At Omnis AI I lead MedChron, a medical-chronology platform for US personal-injury law firms, where every extracted fact has to cite its page and every workflow has to survive an audit. TypeScript end to end (NestJS, Next.js, React, PostgreSQL, MongoDB, AWS, Kubernetes) with LLM pipelines on Gemini and Claude. I use Claude Code, Codex and Cursor every day and write the prompts, evaluations and tooling the team builds on. Before that I shipped SaaS products at a software studio.',
   strengths:
     'Product roadmap, specifications and prioritization, cross-functional delivery, problem solving from vague requirement to shipped feature, LLM and RAG pipelines with source citations, LLM evaluation and prompt versioning, Model Context Protocol (MCP) and agent systems, multi-tenant B2B SaaS, PHI handling, security remediation, QA and acceptance cycles.',
   experience: [

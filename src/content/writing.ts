@@ -19,8 +19,8 @@ export const articles: Article[] = [
     title: 'Every fact cites its page, or it is dropped.',
     standfirst: 'How MedChron turns thousands of pages of medical records into a chronology an attorney can use, and how we measure whether it is right.',
     date: '2026-09-11',
-    readingMinutes: 7,
-    draft: true,
+    readingMinutes: 4,
+    draft: false,
     sections: [
       {
         heading: 'The problem is not extraction. It is trust.',
@@ -52,7 +52,7 @@ export const articles: Article[] = [
         list: [
           'Every prompt lives in an append-only registry with a version, so an evaluation result always names the prompt it measured.',
           'Patient identifiers are scrubbed before the chronology and bills prompts run.',
-          'Chi, the in-product assistant, answers questions about a patient only with cited facts from that patient’s file, and went through three QA rounds and 28 reported defects before release candidate, two of them data-isolation findings that were fixed and re-tested.',
+          'Chi, the in-product assistant, answers questions about a patient only with cited facts from the file of that patient, and went through three QA rounds and 28 reported defects before release candidate, two of them data-isolation findings that were fixed and re-tested.',
         ],
       },
       {
@@ -68,13 +68,13 @@ export const articles: Article[] = [
     title: 'Keeping a Three.js site at 35 fps on a laptop with integrated graphics.',
     standfirst: 'The measurements, the four start-up stalls that lost the WebGL context, and the rules this site now follows.',
     date: '2026-09-11',
-    readingMinutes: 8,
-    draft: true,
+    readingMinutes: 3,
+    draft: false,
     sections: [
       {
         heading: 'Measure on the slowest machine you own',
         paragraphs: [
-          'The home page of this site is a React Three Fiber scene: a road, a car, buildings, trees, a photographic sky. The first build ran at 32 frames per second on my Intel Iris Xe laptop and kept rendering while nobody scrolled, holding the GPU at over 90 percent. A performance trace showed a two-second synchronous shader compile right after load, and the renderer counters showed only 55 thousand triangles, so geometry was never the cost.',
+          'The 3D drive on this site is a React Three Fiber scene: a road, a car, buildings, trees, and at first a photographic sky. The first build ran at 32 frames per second on my Intel Iris Xe laptop and kept rendering while nobody scrolled, holding the GPU at over 90 percent. A performance trace showed a two-second synchronous shader compile right after load, and the renderer counters showed only 55 thousand triangles, so geometry was never the cost.',
           'Everything that follows came from measuring rather than guessing. The site exposes its renderer counters and its start-up timings behind a query flag, and every change was checked against them.',
         ],
       },
@@ -82,7 +82,7 @@ export const articles: Article[] = [
         heading: 'Render on demand, and mean it',
         paragraphs: [
           'The scene renders only when something has changed. A time-based damping loop eases the road position toward the scroll target and requests frames until it settles. An idle loop requests frames at 24 per second while the tab is visible and the visitor has interacted in the last 25 seconds, so the clouds drift and the exhaust puffs, then it sleeps. When the scene has scrolled out of view on the home page, it renders nothing at all.',
-          'Two things that looked like optimisations were not. Replacing the two headlight spotlights with additive cone meshes mattered because adding a light at dusk changed the light count and recompiled every material, a 1.2 second stall. Swapping the physically based materials on the kit models for Lambert mattered because the fragment cost on an integrated GPU is per pixel, and most pixels are buildings and ground.',
+          'Two things that looked like optimizations were not. Replacing the two headlight spotlights with additive cone meshes mattered because adding a light at dusk changed the light count and recompiled every material, a 1.2 second stall. Swapping the physically based materials on the kit models for Lambert mattered because the fragment cost on an integrated GPU is per pixel, and most pixels are buildings and ground.',
         ],
       },
       {
@@ -92,7 +92,7 @@ export const articles: Article[] = [
         ],
         list: [
           'The framework requested a frame the moment the loaded models were committed to the scene, and that frame drew everything with every shader still uncompiled: a 1.3 second stall. The canvas now runs with the frame loop switched off until the warm-up has finished.',
-          'Fifty small canvases (signs, boards, a road texture, a ground texture) were painted with Canvas 2D in the same task as that commit. Canvas 2D is GPU rasterised. Painting is now queued and drained one canvas per frame.',
+          'Fifty small canvases (signs, boards, a road texture, a ground texture) were painted with Canvas 2D in the same task as that commit. Canvas 2D is GPU rasterized. Painting is now queued and drained one canvas per frame.',
           'The first draw with each shader program still compiled driver-side variants, so drawing the whole scene in one frame after compilation took 1.2 seconds. The warm-up now reveals the scene one shader program at a time, 17 groups, the longest 150 milliseconds.',
           'The environment map arrived after the materials had compiled, so every physically based material recompiled at once. The sky is now decoded and prefiltered before compilation, each step in its own frame.',
         ],
@@ -100,7 +100,7 @@ export const articles: Article[] = [
       {
         heading: 'What it measures now',
         paragraphs: [
-          'On the same laptop, at a device pixel ratio of 1 and a 1280 by 800 window: 35 frames per second while driving on the development server and 50 on the production build, zero frames while idle, and a longest start-up frame of 150 milliseconds. Playwright runs the suite across Chromium, Firefox and WebKit, on a phone profile and with WebGL disabled, so the plain HTML fallback is tested too.',
+          'On the same laptop, at a device pixel ratio of 1 and a 1280 by 800 window: 35 frames per second while driving on the development server and 50 on the production build, zero frames while idle, and a longest start-up frame of 150 milliseconds. The night build that replaced the daylight scene in September measures 25 frames per second while driving on the production build. Playwright runs the suite across Chromium, Firefox and WebKit, on a phone profile and with WebGL disabled, so the plain HTML fallback is tested too.',
           'The rules that fell out of this are short. Nothing renders before every shader is compiled. Heavy GPU set-up gets its own frames. Light count, environment map, tone mapping and shadow type are fixed at creation and never change at runtime. And post-processing is gated on the renderer string, because an ambient-occlusion pass that costs two milliseconds on a discrete GPU cost this laptop 40 percent of its frame rate.',
         ],
       },

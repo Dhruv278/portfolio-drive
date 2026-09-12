@@ -5,6 +5,8 @@ const nextConfig: NextConfig = {
   // Dev only: allow the dev server to be opened as 127.0.0.1 as well as localhost
   // (Playwright and the DevTools bridge both use the IP form).
   allowedDevOrigins: ['127.0.0.1'],
+  // The bot's route reads the owner's markdown from disk; trace it into the serverless bundle.
+  outputFileTracingIncludes: { '/api/ask': ['./src/content/knowledge/*.md'] },
   async headers() {
     return [
       {

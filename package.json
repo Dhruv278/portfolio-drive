@@ -15,7 +15,7 @@
     "test:run": "vitest run",
     "test:e2e": "playwright test",
     "copy:models": "node scripts/copy-models.mjs",
-    "postbuild": "node scripts/indexnow.mjs"
+    "postbuild": "node scripts/indexnow.mjs || echo indexnow skipped"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.8",

@@ -4,6 +4,7 @@ e2e
 test-results
 playwright-report
 assets
-scripts
+scripts/*
+!scripts/indexnow.mjs
 .next
 node_modules

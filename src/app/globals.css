@@ -1952,8 +1952,11 @@ h2,
   color: var(--tp-deep);
   cursor: pointer;
 }
+/* Inactive: an outline, not a dimmed amber block that reads as brown on navy. */
 .dbot-send:disabled {
-  opacity: 0.45;
+  background: transparent;
+  border-color: var(--tp-line);
+  color: var(--tp-muted);
   cursor: default;
 }
 .dbot-foot {

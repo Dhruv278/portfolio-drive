@@ -13,7 +13,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const a = articles.find((x) => x.slug === slug)
-  return a ? { title: `${a.title} ${identity.name}`, description: a.standfirst } : {}
+  return a ? { title: `${a.title} | ${identity.name}`, description: a.standfirst, alternates: { canonical: `/writing/${a.slug}` }, openGraph: { title: a.title, description: a.standfirst, type: 'article' } } : {}
 }
 
 export default async function WritingPage({ params }: Props) {

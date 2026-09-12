@@ -21,7 +21,9 @@ export function mostlySymbols(text: string): boolean {
   return letters < text.replace(/\s/g, '').length / 2
 }
 
-export function validateMessages(input: unknown): Validated {
+export type Verify = (content: string, sig: unknown) => boolean
+
+export function validateMessages(input: unknown, verify?: Verify): Validated {
   const fail = (reason: 'shape' | 'content'): Validated => ({ ok: false, status: 400, reason })
   if (!input || typeof input !== 'object' || !Array.isArray((input as { messages?: unknown }).messages)) return fail('shape')
   const raw = (input as { messages: unknown[] }).messages
@@ -29,20 +31,33 @@ export function validateMessages(input: unknown): Validated {
   const turns: Turn[] = []
   for (const m of raw) {
     if (!m || typeof m !== 'object') return fail('shape')
-    const { role, content } = m as { role?: unknown; content?: unknown }
+    const { role, content, sig } = m as { role?: unknown; content?: unknown; sig?: unknown }
     if ((role !== 'user' && role !== 'assistant') || typeof content !== 'string') return fail('shape')
     const text = content.replace(CONTROL, '').trim()
     if (text.length < 1) return fail('shape')
-    if (role === 'user' && text.length > LIMITS.maxChars) return fail('shape')
-    turns.push({ role, content: role === 'assistant' ? text.slice(0, LIMITS.maxAssistantChars) : text })
+    if (role === 'user') {
+      if (text.length > LIMITS.maxChars) return fail('shape')
+      turns.push({ role, content: text })
+      continue
+    }
+    // An earlier answer comes back only with the signature the server issued for it. Anything else
+    // is a forgery or a stale thread and is dropped, together with its question below.
+    const kept = text.slice(0, LIMITS.maxAssistantChars)
+    if (verify && !verify(kept, sig)) continue
+    turns.push({ role, content: kept })
   }
-  for (let i = 1; i < turns.length; i++) if (turns[i].role === turns[i - 1].role) return fail('shape')
-  if (turns[turns.length - 1].role !== 'user') return fail('shape')
-  const last = turns[turns.length - 1].content
-  if (URL_RE.test(last) || mostlySymbols(last)) return fail('content')
-  const previousUser = turns.slice(0, -1).filter((t) => t.role === 'user').pop()
+  // Keep only the last of any run of same-role turns, so a dropped answer takes its question with it.
+  const alternating: Turn[] = []
+  for (const t of turns) {
+    if (alternating.length && alternating[alternating.length - 1].role === t.role) alternating[alternating.length - 1] = t
+    else alternating.push(t)
+  }
+  if (!alternating.length || alternating[alternating.length - 1].role !== 'user') return fail('shape')
+  const last = alternating[alternating.length - 1].content
+  if (last.length < 3 || URL_RE.test(last) || mostlySymbols(last)) return fail('content')
+  const previousUser = alternating.slice(0, -1).filter((t) => t.role === 'user').pop()
   if (previousUser && previousUser.content === last) return fail('content')
-  const kept = turns.slice(-LIMITS.keepTurns)
+  const kept = alternating.slice(-LIMITS.keepTurns)
   while (kept.length && kept[0].role !== 'user') kept.shift()
   if (kept.reduce((n, t) => n + t.content.length, 0) > LIMITS.maxTotal) return fail('shape')
   return { ok: true, turns: kept, flagged: hasOverride(last) }

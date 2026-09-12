@@ -15,6 +15,7 @@ export class UpstreamError extends Error {
 export async function askModel(opts: { apiKey: string; system: string; turns: Turn[]; site: string; model?: string }): Promise<string> {
   const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
     method: 'POST',
+    signal: AbortSignal.timeout(15_000),
     headers: { Authorization: `Bearer ${opts.apiKey}`, 'Content-Type': 'application/json', 'HTTP-Referer': opts.site, 'X-Title': 'DhruvBot' },
     body: JSON.stringify({
       model: opts.model ?? MODEL,

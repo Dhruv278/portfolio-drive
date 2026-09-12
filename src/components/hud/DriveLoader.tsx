@@ -41,7 +41,7 @@ export function DriveLoader() {
   const carX = 24 + (312 * pct) / 100
 
   return (
-    <div className={`loader${ready ? ' done' : ''}`} role="status" aria-live="polite" data-testid="drive-loader">
+    <div className={`loader${ready ? ' done' : ''}`} aria-busy={!ready} data-testid="drive-loader">
       <div className="loader-box">
         <svg className="loader-road" viewBox="0 0 360 70" aria-hidden="true">
           <path className="tp-kerb" d="M-10,40 C90,40 120,28 180,28 S270,44 370,44" />
@@ -63,13 +63,15 @@ export function DriveLoader() {
           </g>
         </svg>
         <h2>Loading the drive</h2>
-        <p className="loader-phase" data-testid="drive-loader-phase">
+        <p className="loader-phase" role="status" data-testid="drive-loader-phase">
           {phase}
         </p>
         <div className="loader-bar" aria-hidden="true">
           <i style={{ width: `${pct.toFixed(0)}%` }} />
         </div>
-        <p className="loader-pct">{pct.toFixed(0)}%</p>
+        <p className="loader-pct" aria-hidden="true">
+          {pct.toFixed(0)}%
+        </p>
         <Link className="loader-skip" href="/" onClick={() => writeView('2d')}>
           Skip to the 2D page
         </Link>

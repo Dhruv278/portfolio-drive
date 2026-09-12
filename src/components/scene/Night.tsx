@@ -37,7 +37,7 @@ function rng(seed: number) {
 
 // A soft round pool of light, white fading to nothing. Tinted by the material that uses it.
 export function usePoolTexture(): CanvasTexture {
-  return useMemo(
+  const tex = useMemo(
     () =>
       makeTexture(128, 128, (ctx, w, h) => {
         const g = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, w / 2)
@@ -49,6 +49,9 @@ export function usePoolTexture(): CanvasTexture {
       }),
     [],
   )
+  // The canvas remounts when a phone rotates; free the old texture.
+  useEffect(() => () => tex.dispose(), [tex])
+  return tex
 }
 
 // The sky: a sphere seen from inside, horizon navy at the rim rising to the deep navy overhead.
@@ -72,6 +75,7 @@ function SkyDome() {
     g.setAttribute('color', new Float32BufferAttribute(colors, 3))
     return g
   }, [])
+  useEffect(() => () => geometry.dispose(), [geometry])
   useFrame(({ camera }) => {
     mesh.current?.position.copy(camera.position)
   })
@@ -101,6 +105,7 @@ function Stars() {
     g.setAttribute('position', new Float32BufferAttribute(arr, 3))
     return g
   }, [])
+  useEffect(() => () => geometry.dispose(), [geometry])
   useFrame(({ camera }) => {
     group.current?.position.copy(camera.position)
   })

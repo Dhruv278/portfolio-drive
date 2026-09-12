@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { ViewMemory } from '@/components/ViewMemory'
 import { ViewSwitch } from '@/components/ViewSwitch'
@@ -11,7 +10,6 @@ import { useDrive } from '@/store/drive'
 
 export function Hud() {
   useScrollProgress()
-  const router = useRouter()
   // The drive starts at the garage. Browsers restore the last scroll position on reload, which on a
   // page this long meant opening at the pier with the intro skipped.
   useEffect(() => {
@@ -21,15 +19,6 @@ export function Hud() {
       if ('scrollRestoration' in history) history.scrollRestoration = 'auto'
     }
   }, [])
-  // Escape leaves the drive, like closing a full-screen view.
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      // A modal panel (the assistant) owns Escape while it is open.
-      if (e.key === 'Escape' && !document.querySelector('[role="dialog"][aria-modal="true"]')) router.push('/')
-    }
-    addEventListener('keydown', onKey)
-    return () => removeEventListener('keydown', onKey)
-  }, [router])
   const scroll = useDrive((s) => s.scroll)
   const stopIndex = useDrive((s) => s.stopIndex)
   const zones = useDrive((s) => s.zones)

@@ -5,9 +5,11 @@ import type { ReactNode } from 'react'
 import { HeroRoad } from '@/components/track/HeroRoad'
 import { Starfield } from '@/components/track/Starfield'
 import { AskBot } from '@/components/bot/AskBot'
+import { Clips } from '@/components/track/Clips'
 import { TrackScene } from '@/components/track/TrackScene'
 import { ViewMemory } from '@/components/ViewMemory'
 import { ViewSwitch } from '@/components/ViewSwitch'
+import { FinishButton } from '@/components/FinishButton'
 import { identity, stops } from '@/content/profile'
 import { track } from '@/content/track'
 import { articles } from '@/content/writing'
@@ -67,8 +69,8 @@ export default function Page() {
           </a>
         </nav>
       </header>
-      <TrackScene mainId="track-main" stopSelector="section.tp-stop" cardSelector=".tp-card" />
-      <main id="track-main" className="tp-main">
+      <TrackScene mainId="content" stopSelector="section.tp-stop" cardSelector=".tp-card" />
+      <main id="content" className="tp-main">
         {/* 1 */}
         <section className="tp-stop hero left on" id="top" data-name="Start">
           <Starfield />
@@ -86,7 +88,7 @@ export default function Page() {
               <a className="tp-btn primary" href="#why">
                 Start the drive
               </a>
-              <Link className="tp-btn" href="/drive">
+              <Link className="tp-btn" href="/drive" prefetch={false}>
                 Take the 3D drive
               </Link>
             </div>
@@ -198,13 +200,7 @@ export default function Page() {
                   <p className="tp-kind">{p.kind}</p>
                   <h3>{p.title}</h3>
                   <p>{p.body}</p>
-                  {'clips' in p && p.clips && (
-                    <div className="tp-clips" aria-label="Three shorts rendered by the pipeline, sound off">
-                      {[1, 2, 3].map((n) => (
-                        <video key={n} src={`/media/short-${n}.mp4`} poster={`/media/short-${n}.webp`} muted loop autoPlay playsInline preload="none" />
-                      ))}
-                    </div>
-                  )}
+                  {'clips' in p && p.clips && <Clips />}
                   <Chips items={p.stack} />
                   {'link' in p && p.link && (
                     <p className="tp-links">
@@ -251,7 +247,6 @@ export default function Page() {
                 </div>
               ))}
             </div>
-            <p className="tp-swipe">Swipe for more</p>
             <h3 className="tp-sub">{t.skills.howHeading}</h3>
             <ul className="tp-bullets">
               {t.skills.how.map((h) => (
@@ -336,9 +331,7 @@ export default function Page() {
           <p className="tp-eyebrow">{t.finish.eyebrow}</p>
           <h2>{t.finish.heading}</h2>
           <p>{t.finish.body}</p>
-          <Link className="tp-btn primary big pulse" href="/drive">
-            {t.finish.button}
-          </Link>
+          <FinishButton />
         </aside>
         <div className="tp-end" />
       </main>

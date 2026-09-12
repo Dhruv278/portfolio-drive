@@ -1,6 +1,6 @@
 # Portfolio audit, 12 September 2026
 
-Four independent reviewers, each on one dimension, against the production build at commit 909ab44. Content (hiring-manager read), UX and accessibility (real browser, 1440, 820 and 412 px), engineering (Lighthouse, security, tests, hygiene), and the assistant (ten adversarial questions). Their full reports are summarized here in one prioritized list. One finding was fixed the same day: the assistant rejected follow-ups after a long answer (commit "DhruvBot: follow-ups survive a long earlier answer").
+Four independent reviewers, each on one dimension, against the production build at commit 909ab44. Content (hiring-manager read), UX and accessibility (real browser, 1440, 820 and 412 px), engineering (Lighthouse, security, tests, hygiene), and the assistant (ten adversarial questions). Their full reports are summarized here in one prioritized list. Status, same day: every item below is done except 8 (team size and notice period, the owner's facts), the working-style trim in 30 (done), and the P3 hygiene items in 28 beyond the Node pin, cache headers, security headers and the powered-by header. See the session report addendum "the audit's fixes".
 
 ## Verdict in one paragraph
 

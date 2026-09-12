@@ -11,7 +11,7 @@ test.describe('DhruvBot', () => {
     await open.click()
     const dialog = page.getByRole('dialog', { name: 'DhruvBot' })
     await expect(dialog).toBeVisible()
-    await expect(dialog.getByText("Answers from Dhruv's record only")).toBeVisible()
+    await expect(dialog.getByText('from his record only')).toBeVisible()
     await dialog.getByRole('button', { name: 'How does MedChron work?' }).click()
     await expect(dialog.getByTestId('dbot-msg-user').first()).toHaveText('How does MedChron work?')
     await expect(dialog.getByTestId('dbot-msg-bot').first()).toContainText('product lead and senior engineer', { timeout: 10_000 })

@@ -293,23 +293,27 @@ export function TrackScene({ mainId, stopSelector, cardSelector }: Props) {
         </g>
       </svg>
       <div ref={barbg} className="tp-barbg" aria-hidden="true" />
-      <div ref={cap} className="tp-barcap" aria-live="polite" data-testid="track-caption">
+      <div ref={cap} className="tp-barcap" data-testid="track-caption">
         <span>
           checkpoint <b ref={capCp}>01 / 00</b>
         </span>
-        <b ref={capStop}>Start</b>
+        <b ref={capStop} aria-live="polite">
+          Start
+        </b>
       </div>
       <div className="tp-hud bottom">
-        <div className="tp-odo" aria-live="polite" data-testid="track-odometer">
+        <div className="tp-odo" data-testid="track-odometer">
           <div>
             <small>checkpoint</small>
             <b ref={odoCp}>01 / 00</b>
           </div>
           <div>
             <small>stop</small>
-            <b ref={odoStop}>Start</b>
+            <b ref={odoStop} aria-live="polite">
+              Start
+            </b>
           </div>
-          <div>
+          <div aria-hidden="true">
             <small>distance</small>
             <b ref={odoDist}>0 m</b>
           </div>

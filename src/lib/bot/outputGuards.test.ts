@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { fixTone, guardAnswer, hasPromptLeak, parseSources, trimLength, unknownNumbers } from './outputGuards'
+import { ensureEmail, fixTone, guardAnswer, hasPromptLeak, parseSources, trimLength, unknownNumbers } from './outputGuards'
 
 const titles = ['About', 'Experience', 'MedChron', 'Contact']
 const rules = 'You are DhruvBot, the assistant on the portfolio. Use only the record below. Never guess. Never invent a number, a date, an employer or a technology.'
@@ -47,6 +47,14 @@ describe('trimLength and fixTone', () => {
   })
   it('rewrites dashes and semicolons', () => {
     expect(fixTone('He shipped it — fast; very fast. From 2024–2025 he built two products - and more.')).toBe('He shipped it, fast, very fast. From 2024 to 2025 he built two products, and more.')
+  })
+})
+
+describe('ensureEmail', () => {
+  it('adds the email to a decline that forgot it and leaves other answers alone', () => {
+    expect(ensureEmail('That is not in my record.', 'a@b.c')).toBe('That is not in my record. Email me at a@b.c.')
+    expect(ensureEmail('That is not in my record. Email me at a@b.c.', 'a@b.c')).toBe('That is not in my record. Email me at a@b.c.')
+    expect(ensureEmail('I lead MedChron.', 'a@b.c')).toBe('I lead MedChron.')
   })
 })
 

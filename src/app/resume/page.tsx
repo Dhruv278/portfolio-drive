@@ -7,6 +7,7 @@ import { identity, resume } from '@/content/profile'
 export const metadata: Metadata = {
   title: `Resume, ${identity.name}`,
   description: identity.headline,
+  alternates: { canonical: '/resume' },
 }
 
 export default function ResumePage() {
@@ -23,6 +24,7 @@ export default function ResumePage() {
           </a>
         </div>
       </div>
+      <main>
       <article className="resume" id="content">
         <h1>
           <span>{identity.name}</span>
@@ -95,6 +97,7 @@ export default function ResumePage() {
         </p>
         <p>{resume.education.awards}</p>
       </article>
+      </main>
       <AskBot page="other" />
     </>
   )

@@ -191,7 +191,7 @@ export function Car() {
     <>
       <group ref={car} name="car">
         {/* Ground contact: a blurred top-down depth of the car, re-rendered only when a frame is requested. */}
-        {flags.contact && <ContactShadows position={[0, 0.005, 0]} scale={7} blur={2.4} far={1.5} opacity={0.5} resolution={256} frames={Infinity} color="#0a1020" />}
+        {flags.contact && <ContactShadows position={[0, 0.005, 0]} scale={7} blur={2.4} far={1.5} opacity={0.5} resolution={256} frames={1} color="#0a1020" />}
         {/* the amber pool under the car, like the one on the 2D track */}
         <mesh rotation-x={-Math.PI / 2} position={[0, 0.02, 0.4]}>
           <planeGeometry args={[6.5, 9]} />

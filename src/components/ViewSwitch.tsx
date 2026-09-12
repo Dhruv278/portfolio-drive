@@ -10,7 +10,7 @@ const subscribe = (onChange: () => void) => {
   addEventListener('storage', onChange)
   return () => removeEventListener('storage', onChange)
 }
-const useSeen3d = () => useSyncExternalStore(subscribe, seen3d, () => true)
+export const useSeen3d = () => useSyncExternalStore(subscribe, seen3d, () => true)
 
 // The 2D / 3D switch in both top bars. Clicking a side records it as the visitor's view, so the home
 // address opens their last view next time (see ViewMemory). On the 2D page the 3D side carries a
@@ -23,7 +23,7 @@ export function ViewSwitch({ current = null, exitTestId }: { current?: View | nu
       <Link href="/" aria-current={current === '2d' ? 'page' : undefined} onClick={() => writeView('2d')} data-testid={exitTestId}>
         2D
       </Link>
-      <Link href="/drive" className={pulse ? 'pulse' : undefined} aria-current={current === '3d' ? 'page' : undefined} onClick={() => writeView('3d')} title="Switch to the 3D drive">
+      <Link href="/drive" prefetch={false} className={pulse ? 'pulse' : undefined} aria-current={current === '3d' ? 'page' : undefined} onClick={() => writeView('3d')} title="Switch to the 3D drive">
         3D
       </Link>
     </nav>

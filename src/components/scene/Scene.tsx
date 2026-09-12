@@ -10,6 +10,7 @@ import { Car } from './Car'
 import { ChaseCamera } from './ChaseCamera'
 import { DebugStats } from './DebugStats'
 import { Effects } from './Effects'
+import { Fallback } from './Fallback'
 import { flushPaints, PaintPump, pendingPaints } from './paint'
 import { Billboards, Hills, Pier, PierPosts } from './Extras'
 import { Garage } from './pieces/Garage'
@@ -37,6 +38,8 @@ const HDRI = '/hdri/autumn_field_1k.hdr'
 // Render resolution, capped below the device ratio. Integrated GPUs pay per pixel.
 const DPR_DESKTOP = 1.25
 const DPR_PHONE = 1.25
+// Integrated graphics pay per pixel: a quarter fewer of them buys back most of the night's cost.
+const DPR_LOW_END = 1
 // If the warm-up takes longer than this after the models arrive, fade in anyway.
 const COMPILE_TIMEOUT_MS = 8000
 
@@ -65,7 +68,7 @@ function Atmosphere({ mobile }: { mobile: boolean }) {
         intensity={1.05}
         color={NIGHT.moon}
         castShadow={!mobile}
-        shadow-mapSize={mobile ? [1024, 1024] : [1536, 1536]}
+        shadow-mapSize={mobile || gpuInfo.lowEnd ? [1024, 1024] : [1536, 1536]}
         shadow-camera-near={1}
         shadow-camera-far={200}
         shadow-camera-left={-60}
@@ -312,8 +315,9 @@ export function Scene() {
   const stats = flags.stats
   // Post-processing is desktop only and skipped on integrated graphics unless forced with ?fx=1.
   const fx = !mobile && (flags.fx ?? !gpuInfo.lowEnd)
-  const dpr = Math.min(window.devicePixelRatio, mobile ? DPR_PHONE : DPR_DESKTOP)
+  const dpr = Math.min(window.devicePixelRatio, mobile ? DPR_PHONE : gpuInfo.lowEnd ? DPR_LOW_END : DPR_DESKTOP)
   const [ready, setReady] = useState(false)
+  const [lost, setLost] = useState(false)
   const intro = useDrive((s) => s.intro)
   const running = ready
 
@@ -325,6 +329,8 @@ export function Scene() {
     mq.addEventListener('change', onChange)
     return () => mq.removeEventListener('change', onChange)
   }, [])
+
+  if (lost) return <Fallback />
 
   return (
     <div className={`scene-root${ready ? ' ready' : ''}`} aria-hidden="true" data-testid="scene" data-ready={ready} data-intro={intro} data-running={running}>
@@ -340,6 +346,11 @@ export function Scene() {
         onCreated={({ gl }) => {
           // Set once, before any material compiles. Neutral keeps the cobalt hue where ACES drifts it.
           gl.toneMapping = NeutralToneMapping
+          // A lost context on integrated graphics used to leave a frozen canvas. Show the fallback instead.
+          gl.domElement.addEventListener('webglcontextlost', (e) => {
+            e.preventDefault()
+            setLost(true)
+          })
         }}
         camera={{ fov: mobile ? 54 : 36, near: 0.1, far: 400, position: [0, 8, 14] }}
       >

@@ -2,6 +2,7 @@ import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  poweredByHeader: false,
   // Dev only: allow the dev server to be opened as 127.0.0.1 as well as localhost
   // (Playwright and the DevTools bridge both use the IP form).
   allowedDevOrigins: ['127.0.0.1'],
@@ -17,6 +18,20 @@ const nextConfig: NextConfig = {
       {
         source: '/Dhruv_Gopani_Resume.pdf',
         headers: [{ key: 'Cache-Control', value: 'public, max-age=3600' }],
+      },
+      {
+        // Textures, the sky and the clips are as immutable as the models.
+        source: '/(textures|hdri|media)/:path*',
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
+      },
+      {
+        source: '/(.*)',
+        headers: [
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+          { key: 'X-Frame-Options', value: 'DENY' },
+        ],
       },
     ]
   },

@@ -225,7 +225,8 @@ test.describe('The Drive', () => {
     }))
     expect(m.overflow).toBe(0)
     expect(m.projectsSwipe).toBe(true)
-    expect(m.skillsSwipe).toBe(true)
+    // skills stack vertically on phones since the audit; only the projects row swipes
+    expect(m.skillsSwipe).toBe(false)
     expect(m.cardW).toBeGreaterThan(300)
   })
 

@@ -3,15 +3,17 @@
 // then the output guards. Message content is never logged.
 import { NextResponse } from 'next/server'
 import { bot } from '@/content/bot'
+import { identity } from '@/content/profile'
 import { fetchKeyUsage, shouldRest } from '@/lib/bot/budget'
-import { parseBucket, serializeBucket, takeFromBucket } from '@/lib/bot/bucket'
-import { checkOrigin, validateMessages } from '@/lib/bot/inputGuards'
+import { parseBucket, serializeBucket, sign, takeFromBucket } from '@/lib/bot/bucket'
+import { checkOrigin, LIMITS, validateMessages } from '@/lib/bot/inputGuards'
 import { hashIp, takeIp } from '@/lib/bot/ipBucket'
 import { buildSections, renderKnowledge } from '@/lib/bot/knowledge'
 import { loadKnowledgeFiles } from '@/lib/bot/knowledgeFiles'
 import { askModel, UpstreamError } from '@/lib/bot/openrouter'
-import { guardAnswer } from '@/lib/bot/outputGuards'
+import { ensureEmail, guardAnswer } from '@/lib/bot/outputGuards'
 import { buildSystemPrompt, REMINDER, RULES } from '@/lib/bot/prompt'
+import { SITE_URL } from '@/lib/site'
 
 export const runtime = 'nodejs'
 export const maxDuration = 30
@@ -21,8 +23,22 @@ const system = buildSystemPrompt(sections)
 const knowledgeText = renderKnowledge(sections)
 const titles = sections.map((s) => s.title)
 
-const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://portfolio-drive-mu.vercel.app'
-const ALLOWED = [SITE, 'http://localhost:3000', 'http://localhost:3777', 'http://localhost:3778', 'http://localhost:3779', 'http://127.0.0.1:3777']
+const SITE = SITE_URL
+const LOCAL = ['http://localhost:3000', 'http://localhost:3777', 'http://localhost:3778', 'http://localhost:3779', 'http://127.0.0.1:3777']
+const ALLOWED = process.env.NODE_ENV === 'production' ? [SITE] : [SITE, ...LOCAL]
+
+// The page's own origin: the allowlist, or the request's own host, so a custom domain or a preview
+// deployment works without a config change.
+function originOk(req: Request): boolean {
+  const origin = req.headers.get('origin')
+  if (!origin) return false
+  if (checkOrigin(origin, ALLOWED)) return true
+  try {
+    return new URL(origin).host === req.headers.get('host')
+  } catch {
+    return false
+  }
+}
 const COOKIE = 'dbot'
 const RESTING = new Set([401, 402, 429])
 
@@ -43,19 +59,19 @@ function cookieHeader(value: string): string {
 
 export async function POST(req: Request): Promise<Response> {
   const t0 = Date.now()
-  if (!checkOrigin(req.headers.get('origin'), ALLOWED) || req.headers.get('x-dhruvbot') !== '1') return err(403, bot.lines.origin)
+  if (!originOk(req) || req.headers.get('x-dhruvbot') !== '1') return err(403, bot.lines.origin)
   let body: unknown
   try {
     body = await req.json()
   } catch {
     return err(400, bot.lines.invalid)
   }
-  const v = validateMessages(body)
-  if (!v.ok) return err(400, bot.lines.invalid)
-
   const secret = process.env.BOT_COOKIE_SECRET ?? ''
   const apiKey = process.env.OPENROUTER_API_KEY
   if (!secret || !apiKey) return err(503, bot.lines.resting)
+  // Earlier answers are accepted back only with the signature this route issued for them.
+  const v = validateMessages(body, (content, sig) => typeof sig === 'string' && sig === sign(content, secret))
+  if (!v.ok) return err(400, bot.lines.invalid)
 
   const now = Date.now()
   const take = takeFromBucket(parseBucket(readCookie(req.headers.get('cookie'), COOKIE), secret), now)
@@ -83,6 +99,7 @@ export async function POST(req: Request): Promise<Response> {
 
   const userText = v.turns.filter((t) => t.role === 'user').map((t) => t.content).join('\n')
   const g = guardAnswer(raw, { rules: RULES, titles, known: `${knowledgeText}\n${userText}`, lines: bot.lines })
+  const answer = ensureEmail(g.answer, identity.email)
   console.log(`ask ok ${Date.now() - t0}ms flags=${g.flags.join(',') || 'none'}`)
-  return NextResponse.json({ answer: g.answer, sources: g.sources }, { headers: { ...setCookie, 'Cache-Control': 'no-store' } })
+  return NextResponse.json({ answer, sources: g.sources, sig: sign(answer.slice(0, LIMITS.maxAssistantChars), secret) }, { headers: { ...setCookie, 'Cache-Control': 'no-store' } })
 }

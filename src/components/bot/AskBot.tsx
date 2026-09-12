@@ -3,9 +3,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { bot } from '@/content/bot'
 import { identity } from '@/content/profile'
+import { useReducedMotion } from '@/lib/useReducedMotion'
 
-type Msg = { role: 'user' | 'bot'; text: string; sources?: string[]; error?: boolean }
-type Turn = { role: 'user' | 'assistant'; content: string }
+type Msg = { role: 'user' | 'bot'; text: string; sources?: string[]; sig?: string; error?: boolean }
+type Turn = { role: 'user' | 'assistant'; content: string; sig?: string }
 type Props = { page: 'track' | 'other' }
 
 // Section titles that map to a checkpoint on the 2D page.
@@ -16,6 +17,7 @@ const ANCHORS: Record<string, string> = {
   MedChron: 'medchron',
   'How MedChron works': 'medchron',
   'How I would improve MedChron next': 'medchron',
+  'Numbers on the site': 'medchron',
   Projects: 'projects',
   Platforms: 'platforms',
   Skills: 'skills',
@@ -26,7 +28,9 @@ const ANCHORS: Record<string, string> = {
 }
 const STORE = 'dhruvbot-thread'
 const MAX_CHARS = 600
+const MAX_ASSISTANT_CHARS = 1200
 const CHARS_PER_SECOND = 40
+const REQUEST_TIMEOUT_MS = 20_000
 const URL_RE = /https?:\/\/|www\./i
 
 function loadThread(): Msg[] {
@@ -47,13 +51,16 @@ function saveThread(msgs: Msg[]) {
 }
 
 // The turns the endpoint sees: complete question-and-answer pairs (failed replies dropped with their
-// question, so roles keep alternating), then the new question. Two pairs at most.
-function historyFor(msgs: Msg[], question: string): Turn[] {
+// question, so roles keep alternating), each answer with the signature the server gave it, then the
+// new question. Two pairs at most.
+export function historyFor(msgs: Msg[], question: string): Turn[] {
   const pairs: Turn[] = []
   for (let i = 0; i < msgs.length - 1; i++) {
     const m = msgs[i]
     const n = msgs[i + 1]
-    if (m.role === 'user' && n.role === 'bot' && !n.error) pairs.push({ role: 'user', content: m.text }, { role: 'assistant', content: n.text.slice(0, 1200) })
+    if (m.role === 'user' && n.role === 'bot' && !n.error && n.sig) {
+      pairs.push({ role: 'user', content: m.text }, { role: 'assistant', content: n.text.slice(0, MAX_ASSISTANT_CHARS), sig: n.sig })
+    }
   }
   return [...pairs.slice(-4), { role: 'user', content: question }]
 }
@@ -79,6 +86,7 @@ function Typed({ text, done }: { text: string; done: boolean }) {
 }
 
 export function AskBot({ page }: Props) {
+  const reduced = useReducedMotion()
   const [open, setOpen] = useState(false)
   const [msgs, setMsgs] = useState<Msg[]>([])
   const [input, setInput] = useState('')
@@ -130,6 +138,12 @@ export function AskBot({ page }: Props) {
     list.current?.scrollTo({ top: list.current.scrollHeight })
   }, [msgs, open, busy])
 
+  // The field grows with the question, up to the height the stylesheet allows.
+  const grow = (el: HTMLTextAreaElement) => {
+    el.style.height = 'auto'
+    el.style.height = `${Math.min(el.scrollHeight, 120)}px`
+  }
+
   const send = useCallback(
     async (text: string) => {
       const q = text.trim()
@@ -142,6 +156,7 @@ export function AskBot({ page }: Props) {
       const asked: Msg[] = [...msgs, { role: 'user', text: q }]
       setMsgs(asked)
       setInput('')
+      if (field.current) field.current.style.height = 'auto'
       setBusy(true)
       let reply: Msg
       try {
@@ -149,9 +164,10 @@ export function AskBot({ page }: Props) {
           method: 'POST',
           headers: { 'content-type': 'application/json', 'x-dhruvbot': '1' },
           body: JSON.stringify({ messages: historyFor(msgs, q) }),
+          signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
         })
-        const json = (await res.json()) as { answer?: string; sources?: string[]; error?: string }
-        reply = res.ok && json.answer ? { role: 'bot', text: json.answer, sources: json.sources ?? [] } : { role: 'bot', text: json.error ?? bot.lines.failed, error: true }
+        const json = (await res.json()) as { answer?: string; sources?: string[]; sig?: string; error?: string }
+        reply = res.ok && json.answer ? { role: 'bot', text: json.answer, sources: json.sources ?? [], sig: json.sig } : { role: 'bot', text: json.error ?? bot.lines.failed, error: true }
       } catch {
         reply = { role: 'bot', text: bot.lines.failed, error: true }
       }
@@ -166,7 +182,7 @@ export function AskBot({ page }: Props) {
   const onSource = (title: string) => {
     const id = ANCHORS[title]
     if (page !== 'track' || !id) return
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    document.getElementById(id)?.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' })
     close()
   }
 
@@ -179,10 +195,10 @@ export function AskBot({ page }: Props) {
         <span className="dbot-open-label">{bot.button}</span>
       </button>
       {open && (
-        <div ref={dialog} className="dbot" role="dialog" aria-modal="true" aria-label={bot.name} data-testid="dbot">
+        <div ref={dialog} className="dbot" role="dialog" aria-modal="true" aria-labelledby="dbot-title" data-testid="dbot">
           <header className="dbot-head">
             <div>
-              <b>{bot.name}</b>
+              <b id="dbot-title">{bot.name}</b>
               <span>{bot.tagline}</span>
             </div>
             <button type="button" className="dbot-close" onClick={close} aria-label="Close">
@@ -201,15 +217,21 @@ export function AskBot({ page }: Props) {
             )}
             {msgs.map((m, i) => (
               <div key={i} className={`dbot-msg ${m.role}${m.error ? ' error' : ''}`} data-testid={`dbot-msg-${m.role}`} onClick={() => setRevealed((r) => new Set(r).add(i))}>
-                <p>{m.role === 'bot' && !m.error ? <Typed text={m.text} done={revealed.has(i)} /> : m.text}</p>
+                <p>{m.role === 'bot' && !m.error ? <Typed text={m.text} done={reduced || revealed.has(i)} /> : m.text}</p>
                 {m.role === 'bot' && !m.error && (
                   <div className="dbot-sources">
                     {m.sources && m.sources.length > 0 ? (
-                      m.sources.map((s) => (
-                        <button key={s} type="button" className="dbot-chip" onClick={() => onSource(s)} aria-label={`Source: ${s}`} disabled={page !== 'track' || !ANCHORS[s]}>
-                          {s}
-                        </button>
-                      ))
+                      m.sources.map((s) =>
+                        page === 'track' && ANCHORS[s] ? (
+                          <button key={s} type="button" className="dbot-chip" onClick={() => onSource(s)} aria-label={`Source: ${s}`}>
+                            {s}
+                          </button>
+                        ) : (
+                          <span key={s} className="dbot-chip plain">
+                            {s}
+                          </span>
+                        ),
+                      )
                     ) : (
                       <span className="dbot-chip muted">{bot.lines.noSources}</span>
                     )}
@@ -218,8 +240,8 @@ export function AskBot({ page }: Props) {
               </div>
             ))}
             {busy && (
-              <div className="dbot-msg bot" aria-label="Thinking">
-                <p className="dbot-dots">
+              <div className="dbot-msg bot" role="status" aria-label="Thinking">
+                <p className="dbot-dots" aria-hidden="true">
                   <i />
                   <i />
                   <i />
@@ -237,7 +259,10 @@ export function AskBot({ page }: Props) {
             <textarea
               ref={field}
               value={input}
-              onChange={(e) => setInput(e.target.value.slice(0, MAX_CHARS))}
+              onChange={(e) => {
+                setInput(e.target.value.slice(0, MAX_CHARS))
+                grow(e.target)
+              }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                   e.preventDefault()

@@ -73,6 +73,12 @@ export function fixTone(answer: string): string {
     .replace(/;/g, ',')
 }
 
+// Declines and "not in my record" answers always carry the email, even when the model forgot it.
+export function ensureEmail(answer: string, email: string): string {
+  const needs = /not in my record|only (cover|answer)|discuss that directly/i.test(answer) && !answer.includes(email)
+  return needs ? `${answer.trim()} Email me at ${email}.` : answer
+}
+
 export function guardAnswer(raw: string, ctx: { rules: string; titles: readonly string[]; known: string; lines: { decline: string; unverified: string } }): Guarded {
   if (hasPromptLeak(raw, ctx.rules)) return { answer: ctx.lines.decline, sources: [], flags: ['leak'] }
   const flags: string[] = []

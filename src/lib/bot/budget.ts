@@ -15,7 +15,7 @@ let cache: { at: number; usage: KeyUsage | null } = { at: 0, usage: null }
 export async function fetchKeyUsage(apiKey: string, now = Date.now(), ttlMs = 60_000): Promise<KeyUsage | null> {
   if (cache.at && now - cache.at < ttlMs) return cache.usage
   try {
-    const res = await fetch('https://openrouter.ai/api/v1/auth/key', { headers: { Authorization: `Bearer ${apiKey}` }, cache: 'no-store' })
+    const res = await fetch('https://openrouter.ai/api/v1/auth/key', { headers: { Authorization: `Bearer ${apiKey}` }, cache: 'no-store', signal: AbortSignal.timeout(4_000) })
     const json = res.ok ? ((await res.json()) as { data?: KeyUsage }) : null
     cache = { at: now, usage: json?.data ?? null }
   } catch {

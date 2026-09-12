@@ -1,4 +1,7 @@
 import { describe, expect, it } from 'vitest'
+import { readdirSync, readFileSync } from 'node:fs'
+import { join } from 'node:path'
+import { bot } from './bot'
 import { bannedPatterns, identity, milestones, resume, setPieces, stops } from './profile'
 import { track } from './track'
 import { articles } from './writing'
@@ -55,5 +58,19 @@ describe('profile content', () => {
   it('numbers the eyebrows two to six for the non-hero stops', () => {
     const nums = stops.filter((s) => s.kind !== 'hero').map((s) => s.eyebrow.match(/^Stop (\d) of 6/)?.[1])
     expect(nums).toEqual(['2', '3', '4', '5', '6'])
+  })
+
+  it('keeps the bot copy and the knowledge markdown inside the writing rules', () => {
+    const dir = join(process.cwd(), 'src', 'content', 'knowledge')
+    const files = readdirSync(dir).filter((f) => f.endsWith('.md'))
+    expect(files.sort()).toEqual(['certifications.md', 'faq.md', 'how-medchron-works.md', 'improving-medchron.md', 'working-style.md'])
+    const texts = [...collectStrings(bot), ...files.map((f) => readFileSync(join(dir, f), 'utf8'))]
+    for (const f of files) expect(readFileSync(join(dir, f), 'utf8').startsWith('# ')).toBe(true)
+    for (const text of texts) {
+      for (const re of bannedPatterns) {
+        expect(text, `${re} in: ${text.slice(0, 80)}`).not.toMatch(re)
+      }
+    }
+    expect(bot.starters).toHaveLength(4)
   })
 })

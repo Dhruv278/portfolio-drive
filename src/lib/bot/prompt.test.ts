@@ -16,7 +16,8 @@ describe('system prompt', () => {
 
   it('states the citation contract, the unknown line and the decline', () => {
     expect(RULES).toContain('Sources: ')
-    expect(RULES).toContain('I do not have that in Dhruv')
+    expect(RULES).toContain('That is not in my record')
+    expect(RULES).toContain('first person')
     expect(RULES).toContain('Decline in one sentence')
   })
 

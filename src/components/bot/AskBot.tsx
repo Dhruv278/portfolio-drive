@@ -11,15 +11,15 @@ type Props = { page: 'track' | 'other' }
 // Section titles that map to a checkpoint on the 2D page.
 const ANCHORS: Record<string, string> = {
   About: 'top',
-  'Why hire Dhruv': 'why',
+  'Why hire me': 'why',
   Experience: 'experience',
   MedChron: 'medchron',
   'How MedChron works': 'medchron',
-  'How Dhruv would improve MedChron next': 'medchron',
+  'How I would improve MedChron next': 'medchron',
   Projects: 'projects',
   Platforms: 'platforms',
   Skills: 'skills',
-  'How Dhruv works': 'skills',
+  'How I work': 'skills',
   'Achievements and education': 'achievements',
   Contact: 'contact',
   'Questions recruiters ask': 'contact',

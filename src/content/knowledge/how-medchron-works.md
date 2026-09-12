@@ -8,4 +8,4 @@ Chi is the assistant inside the product. It answers questions about one patient 
 
 Prompts live in an append-only registry with versions and restore. Patient identifiers are scrubbed before text reaches a model. Tenant scoping and rate limits hold on every route. Before a prompt change ships it is replayed against known records and compared with the previous version.
 
-Dhruv is the product lead and a senior engineer on MedChron: he owns the roadmap, writes the specifications, sets priorities with leadership and builds the core features with a distributed team.
+I am the product lead and a senior engineer on MedChron: I own the roadmap, write the specifications, set priorities with leadership and build the core features with a distributed team.

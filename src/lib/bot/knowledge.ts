@@ -45,7 +45,7 @@ export function buildSections(owner: OwnerFiles): Section[] {
   out.push({
     id: 'skills',
     title: 'Skills',
-    text: [...skillGroups.map((g) => `${g.label}: ${g.items.join(', ')}`), 'How Dhruv works:', ...track.skills.how.map((h) => `- ${h}`)].join('\n'),
+    text: [...skillGroups.map((g) => `${g.label}: ${g.items.join(', ')}`), 'How I work:', ...track.skills.how.map((h) => `- ${h}`)].join('\n'),
   })
   out.push({
     id: 'achievements',
@@ -54,7 +54,7 @@ export function buildSections(owner: OwnerFiles): Section[] {
   })
   out.push({
     id: 'why',
-    title: 'Why hire Dhruv',
+    title: 'Why hire me',
     text: [track.why.intro, ...track.why.points.map((p) => `${p.title}: ${p.body}`), `${track.why.planHeading}:`, ...track.why.plan.map((p, i) => `${i + 1}. ${p}`)].join('\n'),
   })
   out.push({

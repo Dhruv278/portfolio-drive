@@ -42,6 +42,9 @@ describe('trimLength and fixTone', () => {
     expect(cut.length).toBeLessThanOrEqual(300)
     expect(cut.endsWith('.')).toBe(true)
   })
+  it('strips markdown emphasis and headings', () => {
+    expect(fixTone('**Product thinking.** I own the roadmap.\n## Next\n__soon__')).toBe('Product thinking. I own the roadmap.\nNext\nsoon')
+  })
   it('rewrites dashes and semicolons', () => {
     expect(fixTone('He shipped it — fast; very fast. From 2024–2025 he built two products - and more.')).toBe('He shipped it, fast, very fast. From 2024 to 2025 he built two products, and more.')
   })

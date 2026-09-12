@@ -8,7 +8,7 @@ describe('knowledge base', () => {
   const titles = sections.map((s) => s.title)
 
   it('generates every section from the content modules', () => {
-    for (const t of ['About', 'Experience', 'MedChron', 'Projects', 'Platforms', 'Skills', 'Achievements and education', 'Why hire Dhruv', 'Contact']) {
+    for (const t of ['About', 'Experience', 'MedChron', 'Projects', 'Platforms', 'Skills', 'Achievements and education', 'Why hire me', 'Contact']) {
       expect(titles).toContain(t)
     }
     for (const s of sections) expect(s.text.trim().length).toBeGreaterThan(20)

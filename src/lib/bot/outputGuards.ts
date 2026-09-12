@@ -61,9 +61,12 @@ export function trimLength(answer: string, max = 1200): string {
   return end > max / 4 ? cut.slice(0, end + 1) : cut.trimEnd()
 }
 
-// The site's writing rules: no dashes as punctuation, no semicolons. Ranges become "to".
+// The site's writing rules: no dashes as punctuation, no semicolons, and plain text, so markdown
+// emphasis and headings are removed. Ranges become "to".
 export function fixTone(answer: string): string {
   return answer
+    .replace(/\*\*|__/g, '')
+    .replace(/^#{1,6}\s+/gm, '')
     .replace(/(\d)\s*[–—-]\s*(\d)/g, '$1 to $2')
     .replace(/\s*[–—]\s*/g, ', ')
     .replace(/ - /g, ', ')

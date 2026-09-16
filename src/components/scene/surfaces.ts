@@ -104,7 +104,7 @@ function paintGround(ctx: CanvasRenderingContext2D, grass: CanvasImageSource, n:
     ctx.fillRect(0, 0, size, size)
   }
   // Night: grass reads as a dark blue-green under the moon.
-  ctx.fillStyle = 'rgba(7,15,34,0.5)'
+  ctx.fillStyle = 'rgba(12,16,18,0.5)'
   ctx.fillRect(0, 0, size, size)
 }
 
@@ -126,7 +126,7 @@ function paintStrip(ctx: CanvasRenderingContext2D, asphalt: CanvasImageSource) {
   }
   drawAsphalt()
   // Night: the asphalt sits under a navy wash.
-  ctx.fillStyle = 'rgba(7,15,34,0.42)'
+  ctx.fillStyle = 'rgba(12,16,18,0.42)'
   ctx.fillRect(0, 0, STRIP_W, STRIP_H)
 
   // Tyre wear: each lane centre sits 1.6 m from the crown, wheels 0.75 m either side of it.
@@ -143,7 +143,7 @@ function paintStrip(ctx: CanvasRenderingContext2D, asphalt: CanvasImageSource) {
   }
 
   // Markings.
-  ctx.fillStyle = 'rgba(255,238,205,0.92)'
+  ctx.fillStyle = 'rgba(230,234,220,0.92)'
   const lw = LINE_WIDTH * px
   ctx.fillRect(EDGE_INSET * px - lw / 2, 0, lw, STRIP_H)
   ctx.fillRect(STRIP_W - EDGE_INSET * px - lw / 2, 0, lw, STRIP_H)
@@ -153,6 +153,6 @@ function paintStrip(ctx: CanvasRenderingContext2D, asphalt: CanvasImageSource) {
   ctx.globalAlpha = 0.22
   drawAsphalt()
   ctx.globalAlpha = 1
-  ctx.fillStyle = 'rgba(7,15,34,0.2)'
+  ctx.fillStyle = 'rgba(12,16,18,0.2)'
   ctx.fillRect(0, 0, STRIP_W, STRIP_H)
 }

@@ -19,6 +19,9 @@ const gate = { open: false }
 export function openRenderGate() {
   gate.open = true
 }
+export function closeRenderGate() {
+  gate.open = false
+}
 export function renderGateOpen(): boolean {
   return gate.open
 }
@@ -125,7 +128,7 @@ export function IdleLoop({ fps = 24, sleepAfterMs = 25_000 }: { fps?: number; sl
     const events = ['scroll', 'pointermove', 'pointerdown', 'keydown', 'touchstart', 'wheel'] as const
     events.forEach((e) => addEventListener(e, bump, { passive: true }))
     const id = setInterval(() => {
-      if (gate.open && document.visibilityState === 'visible' && performance.now() - last < sleepAfterMs) invalidate()
+      if (gate.open && !useDrive.getState().reducedMotion && document.visibilityState === 'visible' && performance.now() - last < sleepAfterMs) invalidate()
     }, 1000 / fps)
     return () => {
       clearInterval(id)

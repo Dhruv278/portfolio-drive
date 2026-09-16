@@ -8,7 +8,7 @@ import { CanvasTexture, SRGBColorSpace } from 'three'
 import type { ChronologyCard } from '@/content/profile'
 import { wrapText } from '@/lib/pieceMath'
 
-export const PALETTE = { panel: '#101e3d', panel2: '#0b1630', text: '#e8edf7', muted: '#94a3c4', amber: '#ffb547', cobalt: '#6f93ff', line: '#1e2f58' } as const
+export const PALETTE = { panel: '#1b2326', panel2: '#14191b', text: '#edf0e9', muted: '#a5b3b5', amber: '#d6ed83', cobalt: '#a2c9d3', line: '#344247' } as const
 
 type Draw = (ctx: CanvasRenderingContext2D, w: number, h: number) => void
 

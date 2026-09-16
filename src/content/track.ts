@@ -1,12 +1,12 @@
 // Copy for the track page. Every claim traces to the resume or to work on disk; the banned-word test
 // covers this file too. Product stories over metrics: the numbers stay in the resume and the reports.
-import { identity, resume, skillGroups } from './profile'
+import { portfolioStory, resume, skillGroups } from './profile'
 
 export const track = {
   hero: {
     eyebrow: 'Senior full-stack engineer and product lead',
-    line: 'I build AI products for regulated work: medical records, legal cases, payments, licenses. Products that have to be right before they are fast.',
-    meta: `${identity.location}. ${identity.availability}. ${identity.current}.`,
+    line: portfolioStory.headline,
+    meta: portfolioStory.introduction,
     tiles: [
       { title: 'Product lead', body: 'Roadmap, specifications and priorities for MedChron at Omnis AI, and the core features behind them.' },
       { title: 'AI you can cite', body: 'Every extracted fact carries the page it came from, or it is dropped. Evaluations before a prompt ships.' },
@@ -15,11 +15,11 @@ export const track = {
   },
 
   why: {
-    heading: 'What you get when you hire me.',
-    intro: 'Three roles since 2023, a solutions engineer, a product studio and a US legal-tech startup, taught me one thing: features are cheap, trust is expensive. I build for the second.',
+    heading: portfolioStory.leadershipHeading,
+    intro: portfolioStory.leadership,
     points: [
       {
-        title: 'Product thinking, not ticket taking',
+        title: 'Before we write the code',
         body: 'I own the roadmap and write the specification before the code. Every feature gets an acceptance cycle with the people who will use it, and a QA round is not done until the tracker says so.',
       },
       {
@@ -31,8 +31,8 @@ export const track = {
         body: 'Tenant scoping, rate limits, audit trails and identifier scrubbing go in on day one, not after the first security ticket. I wrote the secure-coding rules my current team reviews every change against.',
       },
       {
-        title: 'The whole feature, delivered',
-        body: 'Backend, frontend, data, deployment and tests from one engineer who has shipped six B2B platforms and two products of my own. No hand-offs, no gaps between layers.',
+        title: 'Through to release',
+        body: 'I work across the backend, frontend, data and deployment. That helps me follow a problem across the stack and stay with the team until the feature is ready to ship.',
       },
     ],
     planHeading: 'The first thirty days on your product',
@@ -84,9 +84,9 @@ export const track = {
 
   medchron: {
     eyebrow: 'Omnis AI, January 2026 to now',
-    heading: 'MedChron: a case file in, a chronology the attorney can trust out.',
+    heading: portfolioStory.medchronHeading,
     what: [
-      'MedChron is the medical-records product of a US legal-technology platform for personal-injury law firms. A case arrives as thousands of pages from many providers: emergency room notes, orthopedic visits, therapy logs, imaging, pharmacy records, bills.',
+      portfolioStory.medchronProblem,
       'MedChron reads all of it and produces a coded chronology, the dated story of what happened to the patient, with every fact tied to the page it came from. Attorneys use it to understand the injury, build the demand and answer questions about the history without reading the file again.',
     ],
     parts: [
@@ -100,7 +100,7 @@ export const track = {
       'Prompts live in an append-only registry with versions and restore. The medications prompt is replayed against known records before it ships, and I am extending that harness to every extraction stage.',
       'Patient identifiers are scrubbed before the models see the text. Tenant scoping and rate limits hold on every route.',
     ],
-    role: 'My role: product lead and senior engineer. I own the roadmap, write the specifications, set priorities with leadership, and build the core features with the team.',
+    role: portfolioStory.medchronRole,
     stack: ['NestJS', 'MongoDB', 'Gemini 2.5', 'Claude', 'BullMQ', 'Redis', 'Socket.io', 'React', 'AWS S3', 'Kubernetes on EKS', 'Better-Auth', 'Prometheus'],
   },
 
@@ -138,7 +138,7 @@ export const track = {
       {
         title: 'This site',
         kind: 'Own work, 2026',
-        body: 'A React Three Fiber scene that renders only on demand, compiles every shader before it fades in, and holds 25 frames a second while driving on a laptop with integrated graphics. Tested across Chromium, Firefox and WebKit, and on phones.',
+        body: 'I wanted the work to feel like a place you could explore. This site follows a car through the project stories, with an illustrated route and a 3D drive built in React Three Fiber. The engineering challenge is keeping the scenery moving while the work stays easy to read.',
         stack: ['Next.js 16', 'React Three Fiber', 'three', 'zustand', 'Playwright', 'Vitest'],
         link: { label: 'Take the 3D drive', href: '/drive' },
       },
@@ -185,7 +185,7 @@ export const track = {
   },
 
   contact: {
-    heading: 'Say hello.',
-    line: 'Email is fastest. I answer within a day, and I am happy to walk through any of this on a call.',
+    heading: portfolioStory.contactHeading,
+    line: portfolioStory.contact,
   },
 } as const

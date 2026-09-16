@@ -5,7 +5,7 @@
 // board that counts up the resume's numbers when the car parks.
 import { useFrame, useThree } from '@react-three/fiber'
 import { useCallback, useMemo, useRef } from 'react'
-import { Color, InstancedMesh, Matrix4, Quaternion, Vector3, type CanvasTexture } from 'three'
+import { Color, InstancedMesh, Matrix4, Quaternion, Vector3, type CanvasTexture, type MeshStandardMaterial } from 'three'
 import { setPieces } from '@/content/profile'
 import { MEDCHRON } from '@/content/route'
 import { conveyorU, counterValue } from '@/lib/pieceMath'
@@ -79,6 +79,7 @@ export function MedChron() {
   )
 
   const sheets = useRef<InstancedMesh>(null)
+  const arrivalLight = useRef<MeshStandardMaterial>(null)
   const count = useRef({ started: -1, k: 0, lastPaint: 0, finished: false })
 
   useRepaintOnFonts(
@@ -93,7 +94,7 @@ export function MedChron() {
     }, [signTex, archTex, cardTex, lastTex, boardTex, md]),
   )
 
-  useFrame(() => {
+  useFrame((_, delta) => {
     const { s, reduced } = readRoadT()
     // Wall time: the fiber clock restarts when the frameloop switches on at ready.
     const now = performance.now() / 1000
@@ -118,6 +119,11 @@ export function MedChron() {
     // The board counts up once, when the car first parks here.
     const c = count.current
     const parked = parkedStop(s, useDrive.getState().zones) === 1
+    if (arrivalLight.current) {
+      const target = parked ? 1.6 : 0.12
+      const material = arrivalLight.current
+      material.emissiveIntensity += (target - material.emissiveIntensity) * (reduced ? 1 : 1 - Math.exp(-4 * delta))
+    }
     if (parked && c.started < 0) c.started = now
     if (c.started >= 0 && !c.finished) {
       c.k = reduced ? 1 : Math.min(1, (now - c.started) / COUNT_SECONDS)
@@ -143,6 +149,10 @@ export function MedChron() {
         <Mass w={5} h={1.1} d={2.4} x={-bw * 0.28} z={6.4} diff={tex.concreteDiff} nor={tex.concreteNor} metres={2} color="#b9b6ae" />
         <Glow w={4.6} h={3.2} d={0.3} x={-bw * 0.28} y={2.8} z={5.3} color="#ffe2b8" opacity={0.12} />
         <Sign texture={signTex} w={6} h={1.5} x={-bw * 0.24} y={5.3} z={5.9} postHeight={0.1} />
+        <mesh position={[-bw * 0.24, 6.15, 5.9]}>
+          <boxGeometry args={[6, 0.08, 0.08]} />
+          <meshStandardMaterial ref={arrivalLight} color="#d6ed83" emissive="#d6ed83" emissiveIntensity={0.12} toneMapped={false} />
+        </mesh>
         <Screen texture={boardTex} w={5.6} h={3.5} x={bw * 0.24} y={3.6} z={5.4} />
       </group>
 

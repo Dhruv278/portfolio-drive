@@ -24,7 +24,7 @@ import { flags } from '@/lib/flags'
 import { gpuInfo } from '@/lib/gpu'
 import { MOBILE_QUERY } from '@/lib/layout'
 import { useDrive } from '@/store/drive'
-import { DriveClock, IdleLoop, openRenderGate, readRoadT, startIntro, useIsMobile } from './useDriveFrame'
+import { closeRenderGate, DriveClock, IdleLoop, openRenderGate, readRoadT, startIntro, useIsMobile } from './useDriveFrame'
 
 // Start every model download the moment the scene bundle arrives, not when each item first renders.
 for (const m of usedModels()) useGLTF.preload(`/models/${m}.glb`)
@@ -32,7 +32,7 @@ for (const m of usedModels()) useGLTF.preload(`/models/${m}.glb`)
 const carPos = new Vector3() // module-level scratch, never handed to React
 // Night. The sky photo is no longer visible; it only feeds reflections, at low strength. The sky
 // itself is the gradient dome in Night.tsx, in the page's navy.
-const ENV_NIGHT = 0.22
+const ENV_NIGHT = 0.32
 const HDRI = '/hdri/autumn_field_1k.hdr'
 
 // Render resolution, capped below the device ratio. Integrated GPUs pay per pixel.
@@ -67,7 +67,7 @@ function Atmosphere({ mobile }: { mobile: boolean }) {
         position={[-26, 46, 24]}
         intensity={1.05}
         color={NIGHT.moon}
-        castShadow={!mobile}
+        castShadow={!mobile && !gpuInfo.lowEnd}
         shadow-mapSize={mobile || gpuInfo.lowEnd ? [1024, 1024] : [1536, 1536]}
         shadow-camera-near={1}
         shadow-camera-far={200}
@@ -341,9 +341,11 @@ export function Scene() {
         // shader uncompiled, a 1.3 s stall that lost the WebGL context on Intel graphics.
         frameloop={running ? 'demand' : 'never'}
         dpr={dpr}
-        shadows={mobile ? false : 'percentage'}
+        shadows={mobile || gpuInfo.lowEnd ? false : 'percentage'}
         gl={{ antialias: !fx, powerPreference: 'high-performance' }}
         onCreated={({ gl }) => {
+          // A new Canvas needs its own warm-up, including when returning from the 2D view.
+          closeRenderGate()
           // Set once, before any material compiles. Neutral keeps the cobalt hue where ACES drifts it.
           gl.toneMapping = NeutralToneMapping
           // A lost context on integrated graphics used to leave a frozen canvas. Show the fallback instead.
@@ -352,7 +354,7 @@ export function Scene() {
             setLost(true)
           })
         }}
-        camera={{ fov: mobile ? 54 : 36, near: 0.1, far: 400, position: [0, 8, 14] }}
+        camera={{ fov: mobile ? 66 : 36, near: 0.1, far: 400, position: [0, 8, 14] }}
       >
         <World
           stats={stats}

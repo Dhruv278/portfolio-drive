@@ -38,6 +38,23 @@ export const identity = {
   resumePdf: '/Dhruv_Gopani_Resume.pdf',
 } as const
 
+// Shared story for the illustrated route and the 3D drive.
+export const portfolioStory = {
+  greeting: "I'm Dhruv.",
+  headline: 'I build products and help steer what comes next.',
+  introduction: "I'm a full-stack engineer and product lead. These days, I'm working on MedChron at Omnis AI, helping turn thousands of pages of medical records into something an attorney can actually use.",
+  ownership: 'I work through the details with the team, make the difficult calls, and write the code that gets us there.',
+  journey: "A few stops. Some hard problems. Here's what I built along the way.",
+  leadershipHeading: 'The work around the code matters too.',
+  leadership: 'I write specifications, work through priorities with stakeholders, review changes, and stay involved through QA. Taking responsibility for a feature means following it all the way to release.',
+  medchronHeading: 'A case arrives. So do thousands of pages.',
+  medchronProblem: 'Somewhere in those records is the detail an attorney needs. Finding it takes time. Trusting an AI-generated answer takes evidence.',
+  medchronRole: 'At MedChron, I lead the product roadmap and build core features with the engineering team. One rule guides our extraction pipeline: every fact needs a page to back it up. If we cannot verify the reference, we drop the fact.',
+  decision: 'We chose to leave out facts whose references we could not verify. That can make the chronology less complete, but it gives the attorney a record they can check. I built the citation checks and merge guards around that decision.',
+  contactHeading: 'Got something worth building?',
+  contact: "Tell me what you're working on, where things are getting stuck, and what you need from the person joining your team. I'd be happy to talk it through.",
+} as const
+
 export const milestones = [
   { label: 'The Coding Studio, 2024 to 2025', t: 0.115, side: 1 },
   { label: 'OTPless, 2023', t: 0.15, side: -1 },
@@ -89,17 +106,17 @@ export const stops: StopContent[] = [
     id: 'start',
     name: 'Start',
     eyebrow: identity.shortHeadline,
-    lede: 'AI products for regulated work: medical records, legal cases, payments, licenses. Built to be right before they are fast.',
-    meta: `${identity.location}. ${identity.availability}. ${identity.current}.`,
+    lede: portfolioStory.headline,
+    meta: portfolioStory.introduction,
   },
   {
     kind: 'bullets',
     id: 'medchron',
     name: 'Omnis AI, MedChron',
     eyebrow: 'Stop 2 of 6. Omnis AI, January 2026 to now',
-    heading: 'MedChron: medical records in, cited chronology out.',
+    heading: portfolioStory.medchronHeading,
     intro:
-      'Personal-injury firms spent days reading thousands of pages of records to build a case chronology. I lead the product that does it in hours: roadmap, specifications, priorities, and the core features.',
+      portfolioStory.medchronProblem,
     bullets: [
       { lead: 'Rebuilt', text: 'the deduplication and extraction stages of the Gemini pipeline so a file from many providers comes back as one clean timeline.' },
       { lead: 'Introduced', text: 'page-level citations with a resolver that drops anything it cannot verify. An attorney cannot use a fact without its page.' },
@@ -174,21 +191,21 @@ export const stops: StopContent[] = [
     eyebrow: 'Stop 5 of 6. Skills and how I work',
     heading: 'Skills. Everything in the project cards has shipped to production.',
     groups: skillGroups,
-    habits: 'Written specifications before code. Tenant scoping and rate limits by default. Claude Code, Codex and Cursor every day, and I write the prompts and tooling the team builds on. A QA round is not done until the tracker says so.',
+    habits: portfolioStory.leadership,
   },
   {
     kind: 'contact',
     id: 'contact',
     name: 'Contact',
     eyebrow: 'Stop 6 of 6. Contact',
-    heading: 'The road ends at the pier. Say hello.',
+    heading: portfolioStory.contactHeading,
     links: [
       { label: 'Email', value: identity.email, href: `mailto:${identity.email}` },
       { label: 'LinkedIn', value: identity.linkedin.label, href: identity.linkedin.href },
       { label: 'GitHub', value: identity.github.label, href: identity.github.href },
       { label: 'Resume', value: 'PDF, two pages', href: identity.resumePdf },
     ],
-    wheel: 'The road ends here. The inbox does not.',
+    wheel: 'Thanks for coming along for the drive.',
   },
 ]
 

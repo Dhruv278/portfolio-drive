@@ -148,7 +148,8 @@ export const ARRIVAL_POSES: CameraPose[] = [
   { back: 18, side: -9, up: 10.5, lookSide: 5, lookAhead: 6, lookY: 2.2 }, // skills
   { back: 17, side: -7, up: 10, lookSide: 2, lookAhead: 12, lookY: 2.0 }, // contact
 ]
-export const ARRIVAL_POSE_PHONE: CameraPose = { back: 12, side: -3, up: 13, lookSide: 4.5, lookAhead: 7, lookY: -2 }
+// Keep the rear perspective at checkpoints too; a high arrival pose would undo the chase view.
+export const ARRIVAL_POSE_PHONE: CameraPose = { back: 16, side: -3.5, up: 5.8, lookSide: 2, lookAhead: 9, lookY: 1.8 }
 
 // The garage the car starts in, in the road frame at t = 0: local +z is forward along the road.
 // It stands behind the road's origin so the chase camera at the first stop is never inside it.

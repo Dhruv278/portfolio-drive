@@ -49,6 +49,7 @@ export function TrackScene({ mainId, stopSelector, cardSelector }: Props) {
     let raf = 0
     let lastIdx = -1
     let lastTick = 0
+    let live = true
     const ticked = new Set<Element>()
     const total = String(stops.length).padStart(2, '0')
 
@@ -68,6 +69,7 @@ export function TrackScene({ mainId, stopSelector, cardSelector }: Props) {
         const t0 = performance.now()
         const dur = 1400
         const step = (now: number) => {
+          if (!live) return
           const k = Math.min(1, (now - t0) / dur)
           const e = 1 - Math.pow(1 - k, 3)
           el.textContent = fmt(from + (to - from) * e)
@@ -212,6 +214,7 @@ export function TrackScene({ mainId, stopSelector, cardSelector }: Props) {
 
     const tick = (now: number) => {
       raf = 0
+      if (!live || !svg.current) return
       const dt = lastTick ? Math.min(0.1, (now - lastTick) / 1000) : 1 / 60
       lastTick = now
       // Time-based easing: the same feel at any frame rate, and a big catch-up after a paused tab.
@@ -224,6 +227,7 @@ export function TrackScene({ mainId, stopSelector, cardSelector }: Props) {
     }
 
     const onScroll = () => {
+      if (!live || !svg.current) return
       const y = scrollY
       const len = lengthForScroll(y, cpScroll, cpLen)
       target = len
@@ -238,6 +242,7 @@ export function TrackScene({ mainId, stopSelector, cardSelector }: Props) {
     }
 
     const onResize = () => {
+      if (!live || !svg.current) return
       layout()
       onScroll()
     }
@@ -249,6 +254,7 @@ export function TrackScene({ mainId, stopSelector, cardSelector }: Props) {
     document.fonts.ready.then(onResize)
     onResize()
     return () => {
+      live = false
       ro.disconnect()
       removeEventListener('resize', onResize)
       narrowQuery.removeEventListener('change', onResize)
@@ -262,12 +268,12 @@ export function TrackScene({ mainId, stopSelector, cardSelector }: Props) {
       <svg ref={svg} className="tp-track" aria-hidden="true" data-testid="track-road">
         <defs>
           <radialGradient id="tp-pool">
-            <stop offset="0" stopColor="#ffb547" stopOpacity="0.22" />
-            <stop offset="1" stopColor="#ffb547" stopOpacity="0" />
+            <stop offset="0" stopColor="#d6ed83" stopOpacity="0.22" />
+            <stop offset="1" stopColor="#d6ed83" stopOpacity="0" />
           </radialGradient>
           <linearGradient id="tp-beam" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#ffb547" stopOpacity="0.55" />
-            <stop offset="1" stopColor="#ffb547" stopOpacity="0" />
+            <stop offset="0" stopColor="#d6ed83" stopOpacity="0.55" />
+            <stop offset="1" stopColor="#d6ed83" stopOpacity="0" />
           </linearGradient>
         </defs>
         <g ref={bigs} />
@@ -283,9 +289,11 @@ export function TrackScene({ mainId, stopSelector, cardSelector }: Props) {
           <rect className="tyre" x="9" y="-18" width="6" height="12" rx="2" />
           <rect className="tyre" x="-15" y="8" width="6" height="12" rx="2" />
           <rect className="tyre" x="9" y="8" width="6" height="12" rx="2" />
-          <rect className="body" x="-13" y="-24" width="26" height="48" rx="7" />
+          <path className="body" d="M-8,-25 Q-13,-24 -13,-16 L-13,17 Q-13,24 -8,25 L8,25 Q13,24 13,17 L13,-16 Q13,-24 8,-25 Z" />
           <rect className="roof" x="-9" y="-6" width="18" height="18" rx="3" />
-          <rect className="glass" x="-9" y="-13" width="18" height="6" rx="2" />
+          <path className="glass" d="M-8,-14 L8,-14 L10,-6 L-10,-6 Z" />
+          <path className="glass" d="M-9,13 L9,13 L8,18 L-8,18 Z" />
+          <path className="trim" d="M-8,-19 H8 M-10,-4 V10 M10,-4 V10" />
           <circle className="lamp" cx="-8" cy="-22" r="2.4" />
           <circle className="lamp" cx="8" cy="-22" r="2.4" />
           <rect className="tail" x="-11" y="21" width="6" height="2.5" />

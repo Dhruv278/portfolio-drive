@@ -13,14 +13,14 @@ import { poseAt, roadCurve } from './roadCurve'
 
 // The page palette, as the scene sees it.
 export const NIGHT = {
-  zenith: '#070f22',
-  horizon: '#12224a',
-  fog: '#0f1d3d',
-  skyLight: '#2b4384',
-  groundLight: '#0b1630',
-  moon: '#b7c6ff',
-  amber: '#ffb547',
-  post: '#1e2f58',
+  zenith: '#0c1012',
+  horizon: '#263b41',
+  fog: '#19262a',
+  skyLight: '#aecad0',
+  groundLight: '#14191b',
+  moon: '#e0ece9',
+  amber: '#d6ed83',
+  post: '#344247',
 } as const
 
 const SKY_RADIUS = 380

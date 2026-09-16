@@ -49,7 +49,7 @@ export function Starfield() {
         }
         const r = 0.6 + p.z * 1.1
         const a = 0.25 + p.z * 0.45
-        ctx.fillStyle = p.z > 0.9 ? `rgba(255, 181, 71, ${a * 0.9})` : `rgba(148, 163, 196, ${a})`
+        ctx.fillStyle = p.z > 0.9 ? `rgba(214, 237, 131, ${a * 0.9})` : `rgba(165, 179, 181, ${a})`
         ctx.beginPath()
         ctx.arc(p.x * w, p.y * h, r, 0, Math.PI * 2)
         ctx.fill()

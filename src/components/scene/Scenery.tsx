@@ -7,7 +7,7 @@ import { Box3, Group, Material, Mesh, Vector3 } from 'three'
 import { buildPlacements, REVEAL_LEAD, type Fit, type Placement } from '@/content/route'
 import { lambertFor, tintedLambert } from './materials'
 import { poseAt } from './roadCurve'
-import { readRoadT, useIsMobile } from './useDriveFrame'
+import { readRoadT, renderGateOpen, useIsMobile } from './useDriveFrame'
 
 type LoadedGltf = { scene: Group }
 
@@ -16,9 +16,9 @@ const SHADOW_MIN_HEIGHT = 3
 
 // The nature kit's palette is mint and peach. Multiplied by this it reads as green leaves and brown
 // trunks against the photographic ground.
-const NATURE_TINT = '#4f6068'
+const NATURE_TINT = '#9b855b'
 // Buildings and props from the kits: cooled and dimmed into the night.
-const KIT_TINT = '#8b95ad'
+const KIT_TINT = '#b0bab3'
 
 // Clone a loaded model and size it to the fit spec, footprint centred, base on the ground.
 // Swaps PBR materials for Lambert and limits shadow casting, both for integrated GPUs.
@@ -65,13 +65,18 @@ function Placed({ p, lat }: { p: Placement; lat: number }) {
 
   const spins = /windmill/.test(p.model)
 
-  useFrame(({ clock }) => {
+  useFrame(({ clock, camera }, delta) => {
     const g = group.current
     if (!g) return
     const { t, reduced } = readRoadT()
     const target = t > p.t - REVEAL_LEAD ? 1 : 0
     if (reduced) k.current = target
-    else k.current += (target - k.current) * 0.09
+    else k.current += (target - k.current) * (1 - Math.pow(0.91, Math.min(delta, 0.1) * 60))
+    // Fully concealed props and props beyond the fog need no draw or shadow pass.
+    // Keep the groups mounted so reverse scrolling reveals the same models immediately.
+    // During warm-up, still draw every shader variant before enabling runtime culling.
+    g.visible = !renderGateOpen() || (k.current > 0.002 && camera.position.distanceToSquared(pose.position) < 190 * 190)
+    if (!g.visible) return
     const x = k.current
     const e = x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2
     g.scale.y = Math.max(0.001, e)

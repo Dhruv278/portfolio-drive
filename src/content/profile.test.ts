@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { bot } from './bot'
-import { bannedPatterns, identity, milestones, resume, setPieces, stops } from './profile'
+import { bannedPatterns, identity, milestones, portfolioStory, resume, setPieces, stops } from './profile'
 import { seo } from './seo'
 import { track } from './track'
 import { articles } from './writing'
@@ -15,7 +15,7 @@ function collectStrings(value: unknown, out: string[] = []): string[] {
 }
 
 describe('profile content', () => {
-  const all = collectStrings({ identity, milestones, stops, resume, setPieces, articles, track, seo })
+  const all = collectStrings({ identity, milestones, portfolioStory, stops, resume, setPieces, articles, track, seo })
 
   it('has six stops with unique ids in the agreed order', () => {
     expect(stops.map((s) => s.id)).toEqual(['start', 'medchron', 'products', 'platforms', 'how', 'contact'])

@@ -3,7 +3,7 @@
 import { ContactShadows, useGLTF } from '@react-three/drei'
 import { useFrame, useThree } from '@react-three/fiber'
 import { useMemo, useRef } from 'react'
-import { AdditiveBlending, Box3, CanvasTexture, DoubleSide, Group, Material, Mesh, MeshBasicMaterial, MeshStandardMaterial, NearestFilter, Object3D, SRGBColorSpace, Vector3 } from 'three'
+import { AdditiveBlending, Box3, CanvasTexture, Group, Material, Mesh, MeshBasicMaterial, MeshStandardMaterial, NearestFilter, Object3D, SRGBColorSpace, Vector3 } from 'three'
 import { CAR_LENGTH, CAR_MODEL } from '@/content/route'
 import { flags } from '@/lib/flags'
 import { recolorRedCells } from '@/lib/recolor'
@@ -12,10 +12,7 @@ import { roadCurve, UP } from './roadCurve'
 import { readIntro, readRoadT } from './useDriveFrame'
 
 const MODEL_URL = `/models/${CAR_MODEL}.glb`
-const COBALT: [number, number, number] = [47, 91, 234]
-const BEAM_LENGTH = 9
-const BEAM_RADIUS = 1.25
-const BEAM_MAX_OPACITY = 0.16
+const BODY_PAINT: [number, number, number] = [199, 214, 190]
 // Exhaust: a small pool of puffs recycled while the car moves.
 const PUFFS = 12
 const PUFF_EVERY = 0.09 // seconds between puffs at speed
@@ -25,7 +22,7 @@ useGLTF.preload(MODEL_URL)
 
 type LoadedGltf = { scene: Group }
 
-// Build a cobalt PBR copy of the kit's palette material. Runs once per source material.
+// Build a ceramic PBR copy of the kit's palette material. Runs once per source material.
 function recolorMaterial(mat: MeshStandardMaterial): Material {
   const img = mat.map?.image as CanvasImageSource & { width?: number; height?: number }
   const w = img?.width ?? 0
@@ -38,7 +35,17 @@ function recolorMaterial(mat: MeshStandardMaterial): Material {
   if (!ctx) return mat
   ctx.drawImage(img, 0, 0)
   const data = ctx.getImageData(0, 0, w, h)
-  const out = recolorRedCells(data.data, COBALT)
+  const out = recolorRedCells(data.data, BODY_PAINT)
+  // The kit's pale blue window cells read as white panels at night. Give the glass depth
+  // while retaining the separate grey trim and the original paint shading.
+  for (let i = 0; i < out.length; i += 4) {
+    const r = data.data[i], g = data.data[i + 1], b = data.data[i + 2]
+    if (r > 100 && b > r * 1.08 && g > r * 1.02) {
+      out[i] = 46
+      out[i + 1] = 66
+      out[i + 2] = 73
+    }
+  }
   const repainted = ctx.createImageData(w, h)
   repainted.data.set(out)
   ctx.putImageData(repainted, 0, 0)
@@ -47,7 +54,7 @@ function recolorMaterial(mat: MeshStandardMaterial): Material {
   tex.colorSpace = SRGBColorSpace
   tex.magFilter = NearestFilter
   tex.minFilter = mat.map.minFilter
-  return new MeshStandardMaterial({ map: tex, color: mat.color, roughness: 0.38, metalness: 0.12 })
+  return new MeshStandardMaterial({ map: tex, color: mat.color, roughness: 0.3, metalness: 0.22 })
 }
 
 export function Car() {
@@ -59,12 +66,6 @@ export function Car() {
   const state = useRef({ prevT: 0, prevSpeed: 0, spin: 0, steer: 0, roll: 0, pitch: 0, lastPuff: 0, next: 0 })
   const wheels = useRef<Object3D[]>([])
   const frontWheels = useRef<Object3D[]>([])
-  const lampMat = useRef<MeshStandardMaterial>(null)
-  const tailMat = useRef<MeshStandardMaterial>(null)
-  // Headlight beams are unlit translucent cones that fade in at dusk. Real spotlights would change
-  // the scene's light count and force every material to recompile mid-drive.
-  const beamL = useRef<MeshBasicMaterial>(null)
-  const beamR = useRef<MeshBasicMaterial>(null)
   const puffs = useRef<(Mesh | null)[]>([])
   const puffLife = useRef<number[]>(Array.from({ length: PUFFS }, () => 0))
 
@@ -78,7 +79,7 @@ export function Car() {
     box.setFromObject(m)
     const center = box.getCenter(new Vector3())
     m.position.set(-center.x, -box.min.y, -center.z)
-    const repainted = new Map<Material, Material>()
+    const repainted = new Map<string, Material>()
     m.traverse((o) => {
       if ((o as Mesh).isMesh) {
         const mesh = o as Mesh
@@ -86,8 +87,12 @@ export function Car() {
         mesh.receiveShadow = false
         const mat = mesh.material as MeshStandardMaterial
         if (mat && mat.map) {
-          if (!repainted.has(mat)) repainted.set(mat, recolorMaterial(mat))
-          mesh.material = repainted.get(mat)!
+          const rubber = /^wheel/.test(mesh.name)
+          const key = mat.uuid + (rubber ? ':wheel' : ':body')
+          if (!repainted.has(key)) repainted.set(key, rubber
+            ? new MeshStandardMaterial({ map: mat.map, color: mat.color, roughness: 0.88, metalness: 0.04 })
+            : recolorMaterial(mat))
+          mesh.material = repainted.get(key)!
         }
       }
     })
@@ -112,8 +117,9 @@ export function Car() {
     }
     const { t, reduced } = readRoadT()
     const st = state.current
-    const speed = t - st.prevT
-    const accel = speed - st.prevSpeed
+    const travel = t - st.prevT
+    const speed = travel / Math.max(delta, 1 / 240) / 60
+    const accel = (speed - st.prevSpeed) / Math.max(delta, 1 / 240) / 60
     st.prevT = t
     st.prevSpeed = speed
 
@@ -132,24 +138,16 @@ export function Car() {
     curve.getTangentAt(Math.min(1, t + 0.01), tmp.tanAhead).setY(0).normalize()
     const turn = Math.atan2(tmp.tan.x * tmp.tanAhead.z - tmp.tan.z * tmp.tanAhead.x, tmp.tan.dot(tmp.tanAhead))
     const targetSteer = Math.max(-0.45, Math.min(0.45, -turn * 6))
-    st.steer += (targetSteer - st.steer) * (reduced ? 1 : 0.15)
+    st.steer += (targetSteer - st.steer) * (reduced ? 1 : 1 - Math.exp(-9.75 * Math.min(delta, 0.1)))
     for (const w of frontWheels.current) w.rotation.y = st.steer
 
     const sp = Math.min(1, Math.abs(speed) * 2600)
-    st.roll += (-st.steer * 0.3 * sp - st.roll) * 0.1
-    st.pitch += (-accel * 1400 - st.pitch) * 0.12
+    st.roll += (-st.steer * 0.3 * sp - st.roll) * (1 - Math.exp(-6.3 * Math.min(delta, 0.1)))
+    st.pitch += (-accel * 1400 - st.pitch) * (1 - Math.exp(-7.7 * Math.min(delta, 0.1)))
     ch.rotation.set(reduced ? 0 : Math.max(-0.07, Math.min(0.07, st.pitch)), 0, reduced ? 0 : st.roll)
 
-    st.spin += speed * 900
+    st.spin += travel * 900
     for (const w of wheels.current) w.rotation.x = st.spin
-
-    // Night: lamps and beams are always on.
-    const lit = 1
-    const beam = 0.8 * BEAM_MAX_OPACITY
-    if (beamL.current) beamL.current.opacity = beam
-    if (beamR.current) beamR.current.opacity = beam
-    if (lampMat.current) lampMat.current.emissiveIntensity = 0.5 + lit * 1.8
-    if (tailMat.current) tailMat.current.emissiveIntensity = 0.6 + lit * 1.2
 
     // Exhaust. Spawn behind the right rear while moving, age every live puff, keep frames coming
     // until the last one has faded.
@@ -191,11 +189,11 @@ export function Car() {
     <>
       <group ref={car} name="car">
         {/* Ground contact: a blurred top-down depth of the car, re-rendered only when a frame is requested. */}
-        {flags.contact && <ContactShadows position={[0, 0.005, 0]} scale={7} blur={2.4} far={1.5} opacity={0.5} resolution={256} frames={1} color="#0a1020" />}
-        {/* the amber pool under the car, like the one on the 2D track */}
+        {flags.contact && <ContactShadows position={[0, 0.005, 0]} scale={7} blur={2.4} far={1.5} opacity={0.5} resolution={256} frames={1} color="#090e10" />}
+        {/* The restrained citron pool matches the 2D track. */}
         <mesh rotation-x={-Math.PI / 2} position={[0, 0.02, 0.4]}>
           <planeGeometry args={[6.5, 9]} />
-          <meshBasicMaterial map={pool} color={NIGHT.amber} transparent opacity={0.3} depthWrite={false} blending={AdditiveBlending} toneMapped={false} fog={false} />
+          <meshBasicMaterial map={pool} color={NIGHT.amber} transparent opacity={0.1} depthWrite={false} blending={AdditiveBlending} toneMapped={false} fog={false} />
         </mesh>
         <group ref={chassis}>
           <primitive object={model} />
@@ -203,16 +201,16 @@ export function Car() {
             <group key={sx}>
               <mesh position={[sx * (halfW - 0.45), lampY, front + 0.02]}>
                 <boxGeometry args={[0.34, 0.14, 0.06]} />
-                <meshStandardMaterial ref={sx === 1 ? lampMat : undefined} color="#FFF3C4" emissive="#FFE9A8" emissiveIntensity={0.5} roughness={0.4} />
+                <meshStandardMaterial color="#f2f5df" emissive="#e4edce" emissiveIntensity={1.4} roughness={0.4} />
               </mesh>
               <mesh position={[sx * (halfW - 0.45), lampY + 0.1, back - 0.02]}>
                 <boxGeometry args={[0.32, 0.12, 0.05]} />
-                <meshStandardMaterial ref={sx === 1 ? tailMat : undefined} color="#D9463F" emissive="#B0231D" emissiveIntensity={0.6} roughness={0.4} />
+                <meshStandardMaterial color="#ee806b" emissive="#d45c46" emissiveIntensity={1.1} roughness={0.4} />
               </mesh>
-              {/* cone apex sits on the lamp, base lands on the road ahead */}
-              <mesh position={[sx * (halfW - 0.45), lampY - 0.35, front + BEAM_LENGTH / 2]} rotation={[-Math.PI / 2 + 0.06, 0, 0]}>
-                <coneGeometry args={[BEAM_RADIUS, BEAM_LENGTH, 14, 1, true]} />
-                <meshBasicMaterial ref={sx === 1 ? beamL : beamR} color="#ffc46b" transparent opacity={0} depthWrite={false} blending={AdditiveBlending} side={DoubleSide} fog={false} toneMapped={false} />
+              {/* A soft pool on the asphalt avoids the solid-cone look and transparent overdraw. */}
+              <mesh position={[sx * (halfW - 0.45), 0.025, front + 3.2]} rotation-x={-Math.PI / 2}>
+                <planeGeometry args={[2.6, 7.5]} />
+                <meshBasicMaterial map={pool} color="#edf4dc" transparent opacity={0.24} depthWrite={false} blending={AdditiveBlending} toneMapped={false} />
               </mesh>
             </group>
           ))}

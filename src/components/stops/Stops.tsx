@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import type { CSSProperties } from 'react'
-import { identity, stops, type StopContent } from '@/content/profile'
+import { identity, portfolioStory, stops, type StopContent } from '@/content/profile'
+import { ProjectDecision } from './ProjectDecision'
 
 // Stagger index for the reveal animation. Read by CSS as var(--i).
 const at = (i: number) => ({ '--i': i } as CSSProperties)
@@ -21,21 +22,20 @@ function Hero({ stop }: { stop: Extract<StopContent, { kind: 'hero' }> }) {
   return (
     <div className="panel">
       <p className="eyebrow">{stop.eyebrow}</p>
-      <h1>
-        <span>{identity.first}</span> <span>{identity.last}</span>
-      </h1>
+      <h1>{portfolioStory.greeting}</h1>
       <p className="lede">{stop.lede}</p>
       <p className="meta">
         <span>{stop.meta}</span>
       </p>
       <div className="actions">
-        <a className="btn primary" href={identity.resumePdf} download>
-          Download resume
+        <a className="btn primary" href={`#${stops[1].id}`}>
+          See what I&apos;ve built
         </a>
-        <a className="btn" href={`#${stops[1].id}`}>
-          Start the drive
+        <a className="btn" href={identity.resumePdf} download>
+          Download my resume
         </a>
       </div>
+      <p className="journey-note">{portfolioStory.journey}</p>
     </div>
   )
 }
@@ -45,7 +45,9 @@ function Bullets({ stop }: { stop: Extract<StopContent, { kind: 'bullets' }> }) 
     <div className="panel">
       <p className="eyebrow">{stop.eyebrow}</p>
       <h2>{stop.heading}</h2>
+      <h3>Why we built it</h3>
       <p>{stop.intro}</p>
+      <ProjectDecision />
       <ul>
         {stop.bullets.map((b, i) => (
           <li key={b.lead} style={at(i)}>
@@ -117,7 +119,7 @@ function Skills({ stop }: { stop: Extract<StopContent, { kind: 'skills' }> }) {
         ))}
       </div>
       <p className="habits">
-        <b>How I work.</b> {stop.habits}
+        <b>{portfolioStory.leadershipHeading}</b> {stop.habits}
       </p>
     </div>
   )
@@ -128,6 +130,7 @@ function Contact({ stop }: { stop: Extract<StopContent, { kind: 'contact' }> }) 
     <div className="panel">
       <p className="eyebrow">{stop.eyebrow}</p>
       <h2>{stop.heading}</h2>
+      <p>{portfolioStory.contact}</p>
       <div className="contact">
         {stop.links.map((l, i) => (
           <a key={l.label} href={l.href} style={at(i)} {...(l.href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>

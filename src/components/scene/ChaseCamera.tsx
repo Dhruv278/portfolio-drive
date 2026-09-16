@@ -12,8 +12,8 @@ import { readIntro, readRoadT, useIsMobile } from './useDriveFrame'
 // Chase poses. Look target raised so the horizon sits about 15 percent down from the top of the
 // frame: enough sky for clouds and birds, while the car and road keep the lower two thirds.
 const DESKTOP: CameraPose = { back: 15.5, side: -6.5, up: 8.6, lookSide: 1.5, lookAhead: 14, lookY: 2.2 }
-const PHONE: CameraPose = { back: 12.5, side: -1.6, up: 12.5, lookSide: 0.3, lookAhead: 1.5, lookY: -4.5 }
-const PHONE_HERO: CameraPose = { back: 14, side: -1.6, up: 8.5, lookSide: 0.3, lookAhead: 9, lookY: 0.4 }
+// Portrait uses a low rear chase, with enough distance to see the roadside facades.
+const PHONE: CameraPose = { back: 14, side: -2.4, up: 5, lookSide: 0.3, lookAhead: 9, lookY: 1.5 }
 // Parked at a stop the camera eases toward the arrival pose; this is how fast.
 const ARRIVAL_RATE = 0.045
 
@@ -49,16 +49,16 @@ export function ChaseCamera() {
   )
   const origin = useMemo<Frame>(() => frameAt(0), [])
 
-  useFrame(({ camera }) => {
+  useFrame(({ camera }, delta) => {
+    const dt = Math.min(delta, 0.1)
     const { s, t, reduced } = readRoadT()
     const { zones, stopIndex } = useDrive.getState()
-    const heroCam = mobile && zones.length > 1 && s < zones[1].a * 0.6
-    const chase = heroCam ? PHONE_HERO : mobile ? PHONE : DESKTOP
+    const chase = mobile ? PHONE : DESKTOP
 
     // Arrival blend: toward 1 while parked at a stop, back to 0 while driving.
     const parked = parkedStop(s, zones)
     const target = parked >= 0 ? 1 : 0
-    arrival.current = reduced ? target : arrival.current + (target - arrival.current) * ARRIVAL_RATE
+    arrival.current = reduced ? target : arrival.current + (target - arrival.current) * (1 - Math.pow(1 - ARRIVAL_RATE, dt * 60))
     const arrivalPose = mobile ? ARRIVAL_POSE_PHONE : ARRIVAL_POSES[parked >= 0 ? parked : stopIndex] ?? ARRIVAL_POSES[0]
     const c = mixPose(chase, arrivalPose, arrival.current)
 
@@ -83,8 +83,8 @@ export function ChaseCamera() {
       v.camLook.copy(v.look)
       first.current = false
     } else {
-      v.camPos.lerp(v.desired, 0.07)
-      v.camLook.lerp(v.look, 0.09)
+      v.camPos.lerp(v.desired, 1 - Math.pow(1 - 0.07, dt * 60))
+      v.camLook.lerp(v.look, 1 - Math.pow(1 - 0.09, dt * 60))
     }
     camera.position.copy(v.camPos)
     camera.lookAt(v.camLook)

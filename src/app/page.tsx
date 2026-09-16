@@ -10,7 +10,8 @@ import { TrackScene } from '@/components/track/TrackScene'
 import { ViewMemory } from '@/components/ViewMemory'
 import { ViewSwitch } from '@/components/ViewSwitch'
 import { FinishButton } from '@/components/FinishButton'
-import { identity, stops } from '@/content/profile'
+import { identity, portfolioStory, stops } from '@/content/profile'
+import { ProjectDecision } from '@/components/stops/ProjectDecision'
 import { seo } from '@/content/seo'
 import { track } from '@/content/track'
 import { articles } from '@/content/writing'
@@ -78,22 +79,20 @@ export default function Page() {
           <Starfield />
           <div className="tp-card">
             <p className="tp-eyebrow">{cp(1, t.hero.eyebrow)}</p>
-            <h1>
-              {identity.first}
-              <br />
-              {identity.last}
-            </h1>
+            <h1>{portfolioStory.greeting}</h1>
             <HeroRoad />
             <p className="tp-lede">{t.hero.line}</p>
             <p className="tp-meta">{t.hero.meta}</p>
+            <p className="tp-meta">{portfolioStory.ownership}</p>
             <div className="tp-actions">
               <a className="tp-btn primary" href="#why">
-                Start the drive
+                See what I&apos;ve built
               </a>
-              <Link className="tp-btn" href="/drive" prefetch={false}>
-                Take the 3D drive
-              </Link>
+              <a className="tp-btn" href={identity.resumePdf} download>
+                Download my resume
+              </a>
             </div>
+            <p className="journey-note">{portfolioStory.journey}</p>
             <ul className="tp-tiles">
               {t.hero.tiles.map((x) => (
                 <li key={x.title}>
@@ -160,6 +159,7 @@ export default function Page() {
           <div className="tp-card wide">
             <p className="tp-eyebrow">{cp(4, t.medchron.eyebrow)}</p>
             <h2>{t.medchron.heading}</h2>
+            <h3 className="tp-sub">Why we built it</h3>
             <div className="tp-split">
               <div>
                 {t.medchron.what.map((p) => (
@@ -172,6 +172,7 @@ export default function Page() {
                 <figcaption>Illustrative screen drawn for this portfolio. Not a product screenshot. Sample data.</figcaption>
               </figure>
             </div>
+            <ProjectDecision />
             <div className="tp-grid2 parts">
               {t.medchron.parts.map((p) => (
                 <div key={p.title} className="tp-point">
@@ -320,7 +321,7 @@ export default function Page() {
                 <div>
                   <h2>{t.contact.heading}</h2>
                   <p className="tp-muted">{t.contact.line}</p>
-                  <p className="tp-muted">{t.hero.meta}</p>
+                  <p className="tp-muted">{identity.location}. {identity.availability}.</p>
                 </div>
                 <div className="tp-contact">
                   {contact.links.map((l) => (

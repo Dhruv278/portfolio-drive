@@ -4,8 +4,8 @@
 // All are time-based and cheap. They render only while the IdleLoop is awake.
 import { Cloud, Clouds as CloudField } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
-import { useMemo, useRef } from 'react'
-import { Group, Mesh, MeshLambertMaterial, MeshStandardMaterial, PlaneGeometry, Vector3 } from 'three'
+import { useEffect, useMemo, useRef } from 'react'
+import { Group, Mesh, MeshLambertMaterial, MeshStandardMaterial, Vector3 } from 'three'
 import { WATER } from '@/content/route'
 import { COLORS } from './Road'
 import { roadCurve } from './roadCurve'
@@ -18,6 +18,7 @@ const WATER_TILE = 9 // metres per repeat of the normal map
 function WaterSheet({ x, z, w, d }: { x: number; z: number; w: number; d: number }) {
   const mesh = useRef<Mesh>(null)
   const mat = useRef<MeshStandardMaterial>(null)
+  const waveTime = useRef({ value: 0 })
   const s = useSurfaces()
   const segs = useMemo(() => [Math.max(8, Math.round(w / 6)), Math.max(8, Math.round(d / 6))] as const, [w, d])
   // Each sheet has its own copy of the normal map so the ripple scale stays in metres.
@@ -27,21 +28,16 @@ function WaterSheet({ x, z, w, d }: { x: number; z: number; w: number; d: number
     t.needsUpdate = true
     return t
   }, [s.waterNor, w, d])
+  useEffect(() => () => normal.dispose(), [normal])
 
   useFrame(({ clock }) => {
     const m = mesh.current
     if (!m) return
     const { reduced } = readRoadT()
     if (reduced) return
-    const geo = m.geometry as PlaneGeometry
-    const pos = geo.attributes.position
     const t = clock.elapsedTime
-    for (let i = 0; i < pos.count; i++) {
-      const px = pos.getX(i)
-      const py = pos.getY(i)
-      pos.setZ(i, Math.sin(px * 0.35 + t * 1.1) * 0.07 + Math.cos(py * 0.28 + t * 0.8) * 0.06)
-    }
-    pos.needsUpdate = true
+    // Displace on the GPU: no per-vertex JavaScript loop or geometry upload each frame.
+    waveTime.current.value = t
     // The normal map drifts slowly so the sky reflection shimmers.
     const nm = mat.current?.normalMap
     if (nm) nm.offset.set(t * 0.011, t * 0.007)
@@ -49,7 +45,23 @@ function WaterSheet({ x, z, w, d }: { x: number; z: number; w: number; d: number
   return (
     <mesh ref={mesh} rotation-x={-Math.PI / 2} position={[x, 0.02, z]}>
       <planeGeometry args={[w, d, segs[0], segs[1]]} />
-      <meshStandardMaterial ref={mat} color={COLORS.water} roughness={0.12} metalness={0} normalMap={normal} normalScale={[0.35, 0.35]} envMapIntensity={1.3} transparent opacity={0.94} />
+      <meshStandardMaterial
+        ref={mat}
+        color={COLORS.water}
+        roughness={0.24}
+        metalness={0}
+        normalMap={normal}
+        normalScale={[0.25, 0.25]}
+        envMapIntensity={1.1}
+        onBeforeCompile={(shader) => {
+          shader.uniforms.uWaveTime = waveTime.current
+          shader.vertexShader = 'uniform float uWaveTime;\n' + shader.vertexShader.replace(
+            '#include <begin_vertex>',
+            '#include <begin_vertex>\ntransformed.z += sin(position.x * 0.35 + uWaveTime * 1.1) * 0.07 + cos(position.y * 0.28 + uWaveTime * 0.8) * 0.06;',
+          )
+        }}
+        customProgramCacheKey={() => 'drive-water-waves-v1'}
+      />
     </mesh>
   )
 }
@@ -109,7 +121,7 @@ export function Clouds() {
           speed={0.12}
           opacity={0.38}
           fade={40}
-          color="#22345f"
+          color="#394e52"
         />
       ))}
     </CloudField>

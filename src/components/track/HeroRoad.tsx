@@ -6,12 +6,12 @@ export function HeroRoad() {
     <svg className="tp-heroroad" viewBox="0 0 360 90" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
       <defs>
         <radialGradient id="tp-hero-pool">
-          <stop offset="0" stopColor="#ffb547" stopOpacity="0.28" />
-          <stop offset="1" stopColor="#ffb547" stopOpacity="0" />
+          <stop offset="0" stopColor="#d6ed83" stopOpacity="0.28" />
+          <stop offset="1" stopColor="#d6ed83" stopOpacity="0" />
         </radialGradient>
         <linearGradient id="tp-hero-beam" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stopColor="#ffb547" stopOpacity="0.5" />
-          <stop offset="1" stopColor="#ffb547" stopOpacity="0" />
+          <stop offset="0" stopColor="#d6ed83" stopOpacity="0.5" />
+          <stop offset="1" stopColor="#d6ed83" stopOpacity="0" />
         </linearGradient>
       </defs>
       <path className="tp-kerb" d="M-10,58 C80,58 110,30 180,30 S280,60 370,60" />
@@ -24,9 +24,11 @@ export function HeroRoad() {
         <rect className="tyre" x="9" y="-18" width="6" height="12" rx="2" />
         <rect className="tyre" x="-15" y="8" width="6" height="12" rx="2" />
         <rect className="tyre" x="9" y="8" width="6" height="12" rx="2" />
-        <rect className="body" x="-13" y="-24" width="26" height="48" rx="7" />
+        <path className="body" d="M-8,-25 Q-13,-24 -13,-16 L-13,17 Q-13,24 -8,25 L8,25 Q13,24 13,17 L13,-16 Q13,-24 8,-25 Z" />
         <rect className="roof" x="-9" y="-6" width="18" height="18" rx="3" />
-        <rect className="glass" x="-9" y="-13" width="18" height="6" rx="2" />
+        <path className="glass" d="M-8,-14 L8,-14 L10,-6 L-10,-6 Z" />
+          <path className="glass" d="M-9,13 L9,13 L8,18 L-8,18 Z" />
+          <path className="trim" d="M-8,-19 H8 M-10,-4 V10 M10,-4 V10" />
         <circle className="lamp" cx="-8" cy="-22" r="2.4" />
         <circle className="lamp" cx="8" cy="-22" r="2.4" />
         <rect className="tail" x="-11" y="21" width="6" height="2.5" />

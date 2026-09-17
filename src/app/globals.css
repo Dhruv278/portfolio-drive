@@ -1331,13 +1331,11 @@ h2,
 .tp-pool { fill: url(#tp-pool); }
 .tp-car { will-change: transform; }
 .tp-car .beam { fill: url(#tp-beam); opacity: 0.9; }
-.tp-car .body { fill: #dae2d5; stroke: #f2f5e8; stroke-width: 1.2; }
-.tp-car .roof { fill: #b3c2b6; }
-.tp-car .glass { fill: #30474e; }
-.tp-car .lamp { fill: var(--tp-amber); filter: drop-shadow(0 0 6px var(--tp-amber)); }
-.tp-car .trim { fill: none; stroke: #739081; stroke-width: 0.8; }
-.tp-car .tail { fill: #ee806b; }
-.tp-car .tyre { fill: #0b1012; }
+.tp-car .tyre { fill: #090c0e; }
+.tp-car .lamp { fill: #f7fbe6; }
+.tp-car .tail { fill: #ff6a52; }
+.tp-streaks { opacity: 0; }
+.tp-streaks rect { fill: url(#tp-streak); }
 
 .tp-hud {
   position: fixed;

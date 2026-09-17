@@ -1,3 +1,5 @@
+import { CarGlyph } from './CarGlyph'
+
 // The road under the name on phones and tablets: a wide S-bend with the car parked at Start. Static
 // SVG, server rendered; the track scene fades it out when the fixed route bar takes over. Hidden on
 // desktop by the stylesheet, where the page-tall road carries the drive instead.
@@ -19,20 +21,8 @@ export function HeroRoad() {
       <path className="tp-dash" d="M-10,58 C80,58 110,30 180,30 S280,60 370,60" />
       <circle cx="48" cy="57" r="46" fill="url(#tp-hero-pool)" />
       <polygon points="60,49 150,38 150,74 60,64" fill="url(#tp-hero-beam)" opacity="0.9" />
-      <g className="tp-car" transform="translate(48,57.5) rotate(90) scale(0.62)">
-        <rect className="tyre" x="-15" y="-18" width="6" height="12" rx="2" />
-        <rect className="tyre" x="9" y="-18" width="6" height="12" rx="2" />
-        <rect className="tyre" x="-15" y="8" width="6" height="12" rx="2" />
-        <rect className="tyre" x="9" y="8" width="6" height="12" rx="2" />
-        <path className="body" d="M-8,-25 Q-13,-24 -13,-16 L-13,17 Q-13,24 -8,25 L8,25 Q13,24 13,17 L13,-16 Q13,-24 8,-25 Z" />
-        <rect className="roof" x="-9" y="-6" width="18" height="18" rx="3" />
-        <path className="glass" d="M-8,-14 L8,-14 L10,-6 L-10,-6 Z" />
-          <path className="glass" d="M-9,13 L9,13 L8,18 L-8,18 Z" />
-          <path className="trim" d="M-8,-19 H8 M-10,-4 V10 M10,-4 V10" />
-        <circle className="lamp" cx="-8" cy="-22" r="2.4" />
-        <circle className="lamp" cx="8" cy="-22" r="2.4" />
-        <rect className="tail" x="-11" y="21" width="6" height="2.5" />
-        <rect className="tail" x="5" y="21" width="6" height="2.5" />
+      <g className="tp-car" transform="translate(48,57.5) rotate(90) scale(0.3)">
+        <CarGlyph id="tp-hero-car" />
       </g>
       {[48, 118, 188, 258, 328].map((x, i) => {
         // dots along the bend: the first is Start and lit, the rest wait ahead

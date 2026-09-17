@@ -53,3 +53,46 @@ export function barPath(width: number, height: number, inset = 22): string {
   const f = (n: number) => Number(n.toFixed(1))
   return `M${f(x0)},${f(y)} C${f(c1)},${f(y - amp)} ${f(c2)},${f(y + amp)} ${f(x1)},${f(y)}`
 }
+
+// Hero approach: the road enters from a horizon and widens to full size at the Start checkpoint.
+// 0 at the horizon, 1 from Start onward. The power makes it grow faster near the viewer, like a
+// road seen from above and behind.
+export function perspective(len: number, heroLen: number): number {
+  if (heroLen <= 0 || len >= heroLen) return 1
+  return Math.pow(Math.max(0, len / heroLen), 1.7)
+}
+
+export function roadWidthAt(len: number, heroLen: number, minW: number, maxW: number): number {
+  return minW + (maxW - minW) * perspective(len, heroLen)
+}
+
+const fmt = (n: number) => n.toFixed(1)
+
+export type Sample = { x: number; y: number; l: number }
+
+// Offsets a sampled centre line to a left and a right edge (as "x,y" strings) and returns the
+// closed polygon that runs down the left edge and back up the right. halfWidthAt gets the length
+// along the road so the hero approach can taper.
+export function outlinePath(samples: Sample[], halfWidthAt: (l: number) => number): { left: string[]; right: string[]; d: string } {
+  const left: string[] = []
+  const right: string[] = []
+  const n = samples.length
+  for (let i = 0; i < n; i++) {
+    const a = samples[Math.max(0, i - 1)]
+    const b = samples[Math.min(n - 1, i + 1)]
+    let tx = b.x - a.x
+    let ty = b.y - a.y
+    const m = Math.hypot(tx, ty) || 1
+    tx /= m
+    ty /= m
+    const w = halfWidthAt(samples[i].l)
+    left.push(`${fmt(samples[i].x - ty * w)},${fmt(samples[i].y + tx * w)}`)
+    right.push(`${fmt(samples[i].x + ty * w)},${fmt(samples[i].y - tx * w)}`)
+  }
+  const d = n ? `M${left.join('L')}L${[...right].reverse().join('L')}Z` : ''
+  return { left, right, d }
+}
+
+export function polylinePath(points: string[]): string {
+  return points.length ? `M${points.join('L')}` : ''
+}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { barCheckpointLengths, barPath, checkpointAt, lengthForScroll, NARROW_QUERY } from './track'
+import { barCheckpointLengths, barPath, checkpointAt, lengthForScroll, NARROW_QUERY, outlinePath, perspective, polylinePath, roadWidthAt } from './track'
 
 describe('lengthForScroll', () => {
   const cpScroll = [0, 1000, 2000, 3500]
@@ -79,4 +79,55 @@ describe('barPath', () => {
 
 it('treats everything below 1024 pixels as narrow', () => {
   expect(NARROW_QUERY).toBe('(max-width: 1023px)')
+})
+
+describe('perspective', () => {
+  it('is zero at the horizon and one from the Start checkpoint onward', () => {
+    expect(perspective(0, 400)).toBe(0)
+    expect(perspective(400, 400)).toBe(1)
+    expect(perspective(900, 400)).toBe(1)
+  })
+  it('grows faster near the start than a straight line, like a road coming toward the camera', () => {
+    expect(perspective(200, 400)).toBeLessThan(0.5)
+    expect(perspective(200, 400)).toBeGreaterThan(0)
+  })
+  it('treats a missing hero segment as full size', () => {
+    expect(perspective(10, 0)).toBe(1)
+  })
+})
+
+describe('roadWidthAt', () => {
+  it('interpolates between the horizon width and the full width', () => {
+    expect(roadWidthAt(0, 400, 6, 62)).toBe(6)
+    expect(roadWidthAt(400, 400, 6, 62)).toBe(62)
+    expect(roadWidthAt(2000, 400, 6, 62)).toBe(62)
+  })
+})
+
+describe('outlinePath', () => {
+  const samples = [
+    { x: 0, y: 0, l: 0 },
+    { x: 0, y: 10, l: 10 },
+    { x: 0, y: 20, l: 20 },
+  ]
+  it('offsets a vertical centre line to a left and a right edge', () => {
+    const o = outlinePath(samples, () => 5)
+    expect(o.left).toEqual(['-5.0,0.0', '-5.0,10.0', '-5.0,20.0'])
+    expect(o.right).toEqual(['5.0,0.0', '5.0,10.0', '5.0,20.0'])
+  })
+  it('closes the polygon down the left edge and back up the right', () => {
+    const o = outlinePath(samples, () => 5)
+    expect(o.d).toBe('M-5.0,0.0L-5.0,10.0L-5.0,20.0L5.0,20.0L5.0,10.0L5.0,0.0Z')
+  })
+  it('uses the width function at each sample', () => {
+    const o = outlinePath(samples, (l) => (l >= 20 ? 10 : 5))
+    expect(o.left[2]).toBe('-10.0,20.0')
+  })
+})
+
+describe('polylinePath', () => {
+  it('joins points with line commands', () => {
+    expect(polylinePath(['1.0,2.0', '3.0,4.0'])).toBe('M1.0,2.0L3.0,4.0')
+    expect(polylinePath([])).toBe('')
+  })
 })

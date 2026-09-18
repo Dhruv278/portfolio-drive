@@ -201,7 +201,7 @@ test.describe('The Drive', () => {
     test.skip(testInfo.project.name !== 'phone', 'phone layout only')
     await page.goto('/')
     const road = page.getByTestId('track-road')
-    const carX = () => page.evaluate(() => parseFloat(document.querySelector('[data-testid=track-car]')!.getAttribute('transform')!.match(/translate\(([-\d.]+)/)![1]))
+    const carX = () => page.evaluate(() => document.querySelector('[data-testid=track-car]')!.getBoundingClientRect().left)
     await expect(road).toHaveClass(/bar/)
     await expect(road).not.toHaveClass(/shown/)
     await expect(page.locator('.tp-heroroad')).toBeVisible()

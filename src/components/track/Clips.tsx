@@ -34,12 +34,31 @@ export function Clips() {
     return () => io.disconnect()
   }, [narrow])
 
+  // Decode only while on screen. Three clips looping off screen kept the decoder and the compositor
+  // busy for the rest of the page and showed up as a stall while scrolling past them.
+  useEffect(() => {
+    const el = box.current
+    if (!el || !near) return
+    const videos = [...el.querySelectorAll('video')]
+    const io = new IntersectionObserver(
+      ([e]) => {
+        for (const v of videos) {
+          if (e.isIntersecting) v.play().catch(() => {})
+          else v.pause()
+        }
+      },
+      { threshold: 0.2 },
+    )
+    io.observe(el)
+    return () => io.disconnect()
+  }, [near])
+
   if (narrow) return null
   return (
     <div ref={box} className="tp-clips" role="group" aria-label="Three shorts rendered by the pipeline, sound off">
       {CLIPS.map((n) =>
         near ? (
-          <video key={n} src={`/media/short-${n}.mp4`} poster={`/media/short-${n}.webp`} muted loop autoPlay playsInline preload="none" />
+          <video key={n} src={`/media/short-${n}.mp4`} poster={`/media/short-${n}.webp`} muted loop playsInline preload="none" />
         ) : (
           <Image key={n} src={`/media/short-${n}.webp`} alt="" width={270} height={480} sizes="180px" />
         ),

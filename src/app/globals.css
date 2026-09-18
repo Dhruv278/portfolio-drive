@@ -1311,10 +1311,18 @@ h2,
   position: relative;
   min-height: 100vh;
   color: var(--tp-text);
-  background:
-    radial-gradient(circle at 1px 1px, rgba(165, 179, 181, 0.13) 1px, transparent 1.6px) 0 0 / 28px 28px,
-    radial-gradient(1200px 600px at 20% -10%, #202b2f 0%, var(--tp-navy) 45%, var(--tp-deep) 100%) fixed;
+  background: radial-gradient(circle at 1px 1px, rgba(165, 179, 181, 0.13) 1px, transparent 1.6px) 0 0 / 28px 28px;
   overflow-x: clip;
+}
+/* The soft light at the top left sits on its own fixed layer. As a fixed background-attachment on
+   the page it repainted the whole viewport on every scroll frame. */
+.tp::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(1200px 600px at 20% -10%, #202b2f 0%, var(--tp-navy) 45%, var(--tp-deep) 100%);
+  pointer-events: none;
 }
 .tp a {
   color: var(--tp-cobalt);
@@ -1326,6 +1334,11 @@ h2,
   pointer-events: none;
   z-index: 0;
 }
+/* The lit edges: a static SVG drawn once, clipped by a box whose height follows the car. */
+.tp-litbox { position: absolute; top: 0; left: 0; width: 0; height: 0; overflow: hidden; pointer-events: none; z-index: 0; contain: strict; }
+.tp-litsvg { display: block; will-change: transform; }
+/* The car: a small SVG moved with a CSS transform, compositor work only. */
+.tp-carsvg { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 0; will-change: transform; transform-origin: 200px 260px; overflow: visible; }
 .tp-art {
   position: absolute;
   inset: 0 auto auto 0;
@@ -1336,21 +1349,23 @@ h2,
   mask-image: linear-gradient(to right, transparent 26%, #000 54%), linear-gradient(to bottom, #000 60%, transparent 100%);
   mask-composite: intersect;
 }
+/* No filters and no dash offsets on anything page-tall: both repaint the whole viewport per frame. */
 .tp-kerb { fill: #0d1518; }
 .tp-road { fill: #1a262a; }
-.tp-grain { fill: url(#tp-grain); }
-.tp-dash { fill: none; stroke: #8ea0a3; stroke-width: 2.4; stroke-dasharray: 16 20; stroke-linecap: round; animation: tp-flow 1.8s linear infinite; }
-@keyframes tp-flow { to { stroke-dashoffset: -36; } }
+.tp-dash { fill: none; stroke: #8ea0a3; stroke-width: 2.4; stroke-dasharray: 16 20; stroke-linecap: round; }
 .tp-edge { fill: none; stroke-width: 2; stroke-linecap: round; opacity: 0.32; }
 .tp-edge.l { stroke: var(--tp-amber); }
 .tp-edge.r { stroke: var(--tp-cobalt); }
-.tp-lit { fill: none; stroke-width: 3; stroke-linecap: round; filter: url(#tp-glow); }
+.tp-lit { fill: none; stroke-width: 3; stroke-linecap: round; }
 .tp-lit.l { stroke: var(--tp-amber); }
 .tp-lit.r { stroke: var(--tp-cobalt); }
+.tp-lit-glow { fill: none; stroke-width: 10; stroke-linecap: round; opacity: 0.2; }
+.tp-lit-glow.l { stroke: var(--tp-amber); }
+.tp-lit-glow.r { stroke: var(--tp-cobalt); }
 .tp-cp { fill: var(--tp-navy); stroke: #577077; stroke-width: 2.5; }
-.tp-cp.on { fill: var(--tp-amber); stroke: var(--tp-amber); filter: drop-shadow(0 0 10px rgba(214, 237, 131, 0.7)); }
+.tp-cp.on { fill: var(--tp-amber); stroke: var(--tp-amber); }
 .tp-node { fill: var(--tp-navy); stroke: #577077; stroke-width: 2.5; }
-.tp-node.on { fill: var(--tp-amber); stroke: var(--tp-amber); filter: url(#tp-glow); }
+.tp-node.on { fill: var(--tp-amber); stroke: rgba(214, 237, 131, 0.45); stroke-width: 7; }
 .tp-link { stroke: #577077; stroke-width: 1.5; opacity: 0.7; }
 .tp-link.on { stroke: var(--tp-amber); }
 .tp-pool { fill: url(#tp-pool); }
@@ -1410,7 +1425,7 @@ h2,
 .tp-btn.primary { background: var(--tp-amber); border-color: var(--tp-amber); color: var(--tp-deep); }
 .tp-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 .tp-odo {
-  background: rgba(27, 35, 38, 0.85);
+  background: rgba(27, 35, 38, 0.96);
   border: 1px solid var(--tp-line);
   padding: 10px 14px;
   font: 500 12.5px var(--font-mono);
@@ -1420,7 +1435,6 @@ h2,
   grid-template-columns: auto auto auto;
   gap: 4px 22px;
   border-radius: var(--tp-r-ui);
-  backdrop-filter: blur(6px);
   opacity: 0;
   transform: translateY(8px);
   transition: opacity 0.4s, transform 0.4s;
@@ -1449,20 +1463,22 @@ h2,
   background: linear-gradient(180deg, rgba(30, 40, 43, 0.92), rgba(18, 25, 28, 0.92));
   border: 1px solid var(--tp-line);
   border-top-color: rgba(162, 201, 211, 0.55);
-  box-shadow: 0 30px 60px rgba(4, 8, 10, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  box-shadow: 0 20px 40px rgba(4, 8, 10, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.04);
   padding: 30px 32px 28px;
   border-radius: var(--tp-r-card);
-  backdrop-filter: blur(8px);
+  /* No backdrop blur: the card is nearly opaque, and ten blurred backdrops cost a frame each scroll. */
   opacity: 0.45;
   transform: translateY(18px);
-  transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.4s, box-shadow 0.4s;
+  /* Only opacity and transform animate: they run on the compositor. Animating the shadow or the
+     border repainted the whole card, blurred shadow included, on every frame of the transition. */
+  transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .tp-card.wide { width: min(780px, 100%, calc(72vw - 72px)); }
 .tp-split { display: grid; grid-template-columns: 1.15fr 1fr; gap: 22px 26px; align-items: start; }
 .tp-split h2 { font-size: clamp(22px, 2.2vw, 30px); }
 .tp-split > figure { position: sticky; top: 96px; }
 .tp-tiles { list-style: none; margin: 30px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; max-width: 760px; }
-.tp-tiles li { position: relative; border: 1px solid var(--tp-line); border-radius: var(--tp-r-card); padding: 16px 18px 24px; background: rgba(27, 35, 38, 0.7); backdrop-filter: blur(6px); overflow: hidden; }
+.tp-tiles li { position: relative; border: 1px solid var(--tp-line); border-radius: var(--tp-r-card); padding: 16px 18px 24px; background: rgba(27, 35, 38, 0.86); overflow: hidden; }
 .tp-tiles li::after { content: ""; position: absolute; left: 18px; bottom: 12px; width: 38px; height: 3px; border-radius: 2px; background: var(--tp-bar, var(--tp-amber)); }
 .tp-tiles li:nth-child(2) { --tp-bar: var(--tp-cobalt); }
 .tp-tiles li:nth-child(3) { --tp-bar: #dfe6d9; }
@@ -1474,14 +1490,14 @@ h2,
 .tp-tiles span { display: block; font-size: 13px; color: var(--tp-muted); margin-top: 8px; line-height: 1.4; }
 .tp-glyph { width: 16px; height: 16px; flex: none; }
 .tp-big { font: 800 clamp(96px, 10.5vw, 150px) var(--font-display); letter-spacing: -0.04em; fill: none; stroke: rgba(165, 179, 181, 0.3); stroke-width: 1.5; paint-order: stroke; }
-.tp-big.on { fill: url(#tp-num); stroke: none; filter: url(#tp-glow); }
+.tp-big.on { fill: url(#tp-num); stroke: none; }
 .tp-bigname { font: 600 13px var(--font-mono); letter-spacing: 0.3em; text-transform: uppercase; fill: rgba(165, 179, 181, 0.5); }
 .tp-bigname.on { fill: var(--tp-amber); }
 .tp-stop.on .tp-card {
   opacity: 1;
   transform: none;
   border-top-color: var(--tp-amber);
-  box-shadow: 0 30px 60px rgba(4, 8, 10, 0.5), 0 0 0 1px rgba(214, 237, 131, 0.25), 0 -18px 50px -30px rgba(214, 237, 131, 0.6);
+  box-shadow: 0 20px 40px rgba(4, 8, 10, 0.45), 0 0 0 1px rgba(214, 237, 131, 0.25);
 }
 .tp-stop.hero .tp-card { background: transparent; border: 0; padding: 0; backdrop-filter: none; width: min(760px, 100%, calc(72vw - 72px)); opacity: 1; transform: none; box-shadow: none; }
 .tp-eyebrow { font: 600 12px var(--font-mono); letter-spacing: 0.03em; color: var(--tp-amber); margin: 0 0 10px; }
@@ -1553,6 +1569,16 @@ h2,
     pointer-events: none;
   }
   .tp-track.bar.shown { opacity: 1; transform: none; }
+  .tp-litbox.bar, .tp-carsvg.bar {
+    position: fixed;
+    top: var(--tp-bar-top);
+    left: 0;
+    z-index: 4;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    pointer-events: none;
+  }
+  .tp-litbox.bar.shown, .tp-carsvg.bar.shown { opacity: 1; }
   .tp-barbg {
     position: fixed;
     top: 0;
@@ -1569,7 +1595,8 @@ h2,
   .tp-barbg.shown { opacity: 1; }
   .tp-track.bar .tp-dash { stroke-width: 1.5; stroke-dasharray: 6 8; }
   .tp-track.bar .tp-edge { stroke-width: 1.2; }
-  .tp-track.bar .tp-lit { stroke-width: 1.8; filter: none; }
+  .tp-track.bar .tp-lit { stroke-width: 1.8; }
+  .tp-track.bar .tp-lit-glow { stroke-width: 5; }
   .tp-track.bar .tp-cp { stroke-width: 2; }
   .tp-track.bar .tp-cp.on { filter: drop-shadow(0 0 6px rgba(214, 237, 131, 0.8)); }
   .tp-track.bar .tp-pool { r: 40; }

@@ -11,7 +11,7 @@ import { readIntro, readRoadT, useIsMobile } from './useDriveFrame'
 
 // Chase poses. Look target raised so the horizon sits about 15 percent down from the top of the
 // frame: enough sky for clouds and birds, while the car and road keep the lower two thirds.
-const DESKTOP: CameraPose = { back: 13, side: -5.6, up: 6.6, lookSide: 1.3, lookAhead: 13, lookY: 2 }
+const DESKTOP: CameraPose = { back: 13.5, side: -5.6, up: 6.6, lookSide: 1.3, lookAhead: 11, lookY: 1.4 }
 // Portrait uses a low rear chase, with enough distance to see the roadside facades.
 const PHONE: CameraPose = { back: 14, side: -2.4, up: 5, lookSide: 0.3, lookAhead: 9, lookY: 1.5 }
 // Parked at a stop the camera eases toward the arrival pose; this is how fast.

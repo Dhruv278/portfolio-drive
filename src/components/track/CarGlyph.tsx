@@ -1,22 +1,29 @@
 // The car as an illustration: paint with side highlights, tinted glass with a reflection streak,
-// roof panel, door seams, mirrors, headlight wedges and tail lights with glow, a blurred shadow.
+// roof panel, door seams, mirrors, headlight wedges and tail lights with glow, a soft shadow.
 // Faces up (negative y), 44 units wide, 96 long, origin at its centre. Server rendered SVG; the
-// gradient ids take a prefix so two glyphs can share one document.
+// gradient ids take a prefix so two glyphs can share one document. No SVG filters: the glyph moves
+// every frame, and a Gaussian blur re-rendered per frame cost more than the rest of the track. The
+// glows and the shadow are radial gradients instead.
 export function CarGlyph({ id }: { id: string }) {
   const body = 'M-15,-48 C-20,-48 -22,-44 -22,-39 L-22,39 C-22,44 -19,48 -14,48 L14,48 C19,48 22,44 22,39 L22,-39 C22,-44 20,-48 15,-48 Z'
   return (
     <>
       <defs>
-        <filter id={`${id}-glow`} x="-60%" y="-60%" width="220%" height="220%">
-          <feGaussianBlur stdDeviation="4" result="b" />
-          <feMerge>
-            <feMergeNode in="b" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-        <filter id={`${id}-shadow`} x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="5" />
-        </filter>
+        <radialGradient id={`${id}-shade`}>
+          <stop offset="0" stopColor="#000" stopOpacity=".55" />
+          <stop offset=".7" stopColor="#000" stopOpacity=".35" />
+          <stop offset="1" stopColor="#000" stopOpacity="0" />
+        </radialGradient>
+        <radialGradient id={`${id}-lampGlow`}>
+          <stop offset="0" stopColor="#f7fbe6" stopOpacity=".9" />
+          <stop offset=".45" stopColor="#f7fbe6" stopOpacity=".35" />
+          <stop offset="1" stopColor="#f7fbe6" stopOpacity="0" />
+        </radialGradient>
+        <radialGradient id={`${id}-tailGlow`}>
+          <stop offset="0" stopColor="#ff6a52" stopOpacity=".85" />
+          <stop offset=".45" stopColor="#ff6a52" stopOpacity=".3" />
+          <stop offset="1" stopColor="#ff6a52" stopOpacity="0" />
+        </radialGradient>
         <linearGradient id={`${id}-paint`} x1="0" y1="0" x2="1" y2="0">
           <stop offset="0" stopColor="#7f9188" />
           <stop offset=".16" stopColor="#e9efe3" />
@@ -44,7 +51,7 @@ export function CarGlyph({ id }: { id: string }) {
         </linearGradient>
       </defs>
       <g className="tp-car-body">
-        <ellipse cx="-3" cy="6" rx="25" ry="50" fill="#000" opacity=".55" filter={`url(#${id}-shadow)`} />
+        <ellipse cx="-3" cy="6" rx="30" ry="56" fill={`url(#${id}-shade)`} />
         <rect className="tyre" x="-24.5" y="-36" width="7" height="16" rx="2.5" />
         <rect className="tyre" x="17.5" y="-36" width="7" height="16" rx="2.5" />
         <rect className="tyre" x="-24.5" y="20" width="7" height="16" rx="2.5" />
@@ -62,11 +69,15 @@ export function CarGlyph({ id }: { id: string }) {
         <path d="M-22,-4 V16 M22,-4 V16" stroke="#75857c" strokeWidth=".9" opacity=".8" />
         <rect x="-27.5" y="-10" width="6" height="4" rx="1.5" fill="#c1cdc2" stroke="#33413c" strokeWidth=".5" />
         <rect x="21.5" y="-10" width="6" height="4" rx="1.5" fill="#c1cdc2" stroke="#33413c" strokeWidth=".5" />
-        <path className="lamp" d="M-19,-46 L-8,-45 L-8,-42 L-18,-42 Z" filter={`url(#${id}-glow)`} />
-        <path className="lamp" d="M19,-46 L8,-45 L8,-42 L18,-42 Z" filter={`url(#${id}-glow)`} />
+        <ellipse cx="-13" cy="-44" rx="10" ry="6" fill={`url(#${id}-lampGlow)`} />
+        <ellipse cx="13" cy="-44" rx="10" ry="6" fill={`url(#${id}-lampGlow)`} />
+        <path className="lamp" d="M-19,-46 L-8,-45 L-8,-42 L-18,-42 Z" />
+        <path className="lamp" d="M19,-46 L8,-45 L8,-42 L18,-42 Z" />
         <rect x="-7" y="-46" width="14" height="3" rx="1" fill="#141c20" />
-        <rect className="tail" x="-20" y="43" width="12" height="3.5" rx="1" filter={`url(#${id}-glow)`} />
-        <rect className="tail" x="8" y="43" width="12" height="3.5" rx="1" filter={`url(#${id}-glow)`} />
+        <ellipse cx="-14" cy="45" rx="10" ry="5.5" fill={`url(#${id}-tailGlow)`} />
+        <ellipse cx="14" cy="45" rx="10" ry="5.5" fill={`url(#${id}-tailGlow)`} />
+        <rect className="tail" x="-20" y="43" width="12" height="3.5" rx="1" />
+        <rect className="tail" x="8" y="43" width="12" height="3.5" rx="1" />
         <rect x="-5" y="43.5" width="10" height="3" rx=".5" fill="#e9eee6" opacity=".85" />
       </g>
     </>

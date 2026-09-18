@@ -132,7 +132,12 @@ export const HILLS: { t: number; lateral: number; r: number; h: number; dark: bo
 ]
 export const HILL_CLEARANCE = 4 // metres between a hill's edge and the kerb, at minimum
 
+// The kit sedan: phones and low-end GPUs, and the fallback everywhere else.
 export const CAR_MODEL = 'car/sedan'
+// The real car for desktop: a Draco-compressed PBR model loaded by Car.tsx on demand, never preloaded
+// with the kit models so phones never fetch it. See LICENSE-ASSETS.md for its licence.
+export const CAR_MODEL_PBR = 'car/ferrari'
+export const DRACO_PATH = '/draco/'
 export const CAR_LENGTH = 4.4
 
 // Camera poses. back and side are metres from the car along and across the road (negative side is

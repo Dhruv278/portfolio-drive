@@ -38,3 +38,9 @@ From Poly Haven (https://polyhaven.com), all CC0 1.0. Converted to 1k WebP for t
 Bricolage Grotesque (SIL Open Font License) and IBM Plex Sans (SIL Open Font License), served through `next/font`.
 
 Everything else in this repository is by Dhruv Gopani.
+
+## The desktop car
+
+`public/models/car/ferrari.glb` is the "Ferrari 458 Italia" model by vicent091036, as shipped in the three.js examples (https://github.com/mrdoob/three.js/tree/dev/examples/models/gltf), Creative Commons Attribution 4.0 (https://sketchfab.com/3d-models/ferrari-458-italia-57bf6cc56931426e87494f554df1dab6). Attribution is given here. It is a real car design: this is a personal, non-commercial portfolio, and the model is replaceable by any glTF with the same node names (body, glass, wheel_fl, wheel_fr, wheel_rl, wheel_rr, lights, lights_red). Phones and low-end GPUs load the Kenney sedan instead.
+
+`public/draco/` holds the Draco decoder from three.js (`examples/jsm/libs/draco/gltf`), Apache License 2.0, Google.

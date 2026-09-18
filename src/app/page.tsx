@@ -6,6 +6,7 @@ import { HeroRoad } from '@/components/track/HeroRoad'
 import { Starfield } from '@/components/track/Starfield'
 import { AskBot } from '@/components/bot/AskBot'
 import { Clips } from '@/components/track/Clips'
+import { TileIcon } from '@/components/track/TileIcon'
 import { TrackScene } from '@/components/track/TrackScene'
 import { ViewMemory } from '@/components/ViewMemory'
 import { ViewSwitch } from '@/components/ViewSwitch'
@@ -87,8 +88,14 @@ export default function Page() {
             <div className="tp-actions">
               <a className="tp-btn primary" href="#why">
                 See what I&apos;ve built
+                <svg className="tp-glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M5 12h14m-6-6l6 6-6 6" />
+                </svg>
               </a>
               <a className="tp-btn" href={identity.resumePdf} download>
+                <svg className="tp-glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v3h16v-3" />
+                </svg>
                 Download my resume
               </a>
             </div>
@@ -96,6 +103,7 @@ export default function Page() {
             <ul className="tp-tiles">
               {t.hero.tiles.map((x) => (
                 <li key={x.title}>
+                  <TileIcon name={x.icon} />
                   <b>{x.title}</b>
                   <span>{x.body}</span>
                 </li>

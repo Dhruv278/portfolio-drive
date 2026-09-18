@@ -8,10 +8,10 @@ export const track = {
     line: portfolioStory.headline,
     meta: portfolioStory.introduction,
     tiles: [
-      { title: 'Product lead', body: 'Roadmap, specifications and priorities for MedChron at Omnis AI, and the core features behind them.' },
-      { title: 'AI you can cite', body: 'Every extracted fact carries the page it came from, or it is dropped. Evaluations before a prompt ships.' },
-      { title: 'Ships end to end', body: 'TypeScript from NestJS to Next.js, PostgreSQL and MongoDB, AWS and Kubernetes, tests included.' },
-    ],
+      { icon: 'target', title: 'Product lead', body: 'Roadmap, specifications and priorities for MedChron at Omnis AI, and the core features behind them.' },
+      { icon: 'sparkles', title: 'AI you can cite', body: 'Every extracted fact carries the page it came from, or it is dropped. Evaluations before a prompt ships.' },
+      { icon: 'cube', title: 'Ships end to end', body: 'TypeScript from NestJS to Next.js, PostgreSQL and MongoDB, AWS and Kubernetes, tests included.' },
+    ] as const,
   },
 
   why: {

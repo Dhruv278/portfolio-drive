@@ -126,9 +126,15 @@ function buildPbr(scene: Group): Built {
   const detail = new MeshStandardMaterial({ color: '#b9bfb8', metalness: 1, roughness: 0.5 })
   const tail = new MeshStandardMaterial({ color: '#7a0c08', emissive: '#ff3a24', emissiveIntensity: 3, roughness: 0.35, metalness: 0.1, toneMapped: false })
   const head = new MeshStandardMaterial({ color: '#dfe6cf', emissive: '#f4f7e3', emissiveIntensity: 2.4, roughness: 0.3, metalness: 0.1, toneMapped: false })
+  // The cockpit is a few pixels at chase distance and its trim is a third of the model's triangles.
+  const interior = /^(interior_|leather|carpet|steering_|nuts)/
   inner.traverse((o) => {
     if (!(o as Mesh).isMesh) return
     const mesh = o as Mesh
+    if (interior.test(mesh.name)) {
+      mesh.visible = false
+      return
+    }
     mesh.receiveShadow = false
     // Only the shell casts a shadow: the interior would double the shadow pass for nothing visible.
     mesh.castShadow = mesh.name === 'body'

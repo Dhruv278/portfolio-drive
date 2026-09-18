@@ -284,7 +284,7 @@ function World({ stats, fx, onReady }: { stats: boolean; fx: boolean; onReady: (
     <>
       {stats && <DebugStats />}
       <PaintPump />
-      <DriveClock />
+      <DriveClock scaleInMotion={mobile || gpuInfo.lowEnd} />
       <IdleLoop />
       <Atmosphere mobile={mobile} />
       <Night />

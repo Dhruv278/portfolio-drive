@@ -3,7 +3,7 @@
 import { ContactShadows, useGLTF } from '@react-three/drei'
 import { useFrame, useThree } from '@react-three/fiber'
 import { useMemo, useRef } from 'react'
-import { AdditiveBlending, Box3, CanvasTexture, Group, Material, Mesh, MeshBasicMaterial, MeshStandardMaterial, NearestFilter, Object3D, SRGBColorSpace, Vector3 } from 'three'
+import { AdditiveBlending, Box3, CanvasTexture, Group, Material, Mesh, MeshBasicMaterial, MeshPhysicalMaterial, MeshStandardMaterial, NearestFilter, Object3D, SRGBColorSpace, Vector3 } from 'three'
 import { CAR_LENGTH, CAR_MODEL } from '@/content/route'
 import { flags } from '@/lib/flags'
 import { recolorRedCells } from '@/lib/recolor'
@@ -12,7 +12,8 @@ import { roadCurve, UP } from './roadCurve'
 import { readIntro, readRoadT } from './useDriveFrame'
 
 const MODEL_URL = `/models/${CAR_MODEL}.glb`
-const BODY_PAINT: [number, number, number] = [199, 214, 190]
+// Slate. A real paint reads dark at night; the earlier ceramic glared under the sky light.
+const BODY_PAINT: [number, number, number] = [79, 95, 99]
 // Exhaust: a small pool of puffs recycled while the car moves.
 const PUFFS = 12
 const PUFF_EVERY = 0.09 // seconds between puffs at speed
@@ -22,7 +23,7 @@ useGLTF.preload(MODEL_URL)
 
 type LoadedGltf = { scene: Group }
 
-// Build a ceramic PBR copy of the kit's palette material. Runs once per source material.
+// Build a clearcoat PBR copy of the kit's palette material. Runs once per source material.
 function recolorMaterial(mat: MeshStandardMaterial): Material {
   const img = mat.map?.image as CanvasImageSource & { width?: number; height?: number }
   const w = img?.width ?? 0
@@ -54,7 +55,9 @@ function recolorMaterial(mat: MeshStandardMaterial): Material {
   tex.colorSpace = SRGBColorSpace
   tex.magFilter = NearestFilter
   tex.minFilter = mat.map.minFilter
-  return new MeshStandardMaterial({ map: tex, color: mat.color, roughness: 0.3, metalness: 0.22 })
+  // Clearcoat over a mid-metal base: soft highlights that move with the camera, no glare. Reflection
+  // strength comes from scene.environmentIntensity in Scene.tsx, not from this material.
+  return new MeshPhysicalMaterial({ map: tex, color: mat.color, roughness: 0.38, metalness: 0.55, clearcoat: 1, clearcoatRoughness: 0.14 })
 }
 
 export function Car() {
@@ -199,22 +202,27 @@ export function Car() {
           <primitive object={model} />
           {[1, -1].map((sx) => (
             <group key={sx}>
+              {/* Lamps bright enough for bloom to catch: headlights warm white, tail lamps coral. */}
               <mesh position={[sx * (halfW - 0.45), lampY, front + 0.02]}>
                 <boxGeometry args={[0.34, 0.14, 0.06]} />
-                <meshStandardMaterial color="#f2f5df" emissive="#e4edce" emissiveIntensity={1.4} roughness={0.4} />
+                <meshStandardMaterial color="#f2f5df" emissive="#e4edce" emissiveIntensity={3} roughness={0.4} toneMapped={false} />
               </mesh>
               <mesh position={[sx * (halfW - 0.45), lampY + 0.1, back - 0.02]}>
                 <boxGeometry args={[0.32, 0.12, 0.05]} />
-                <meshStandardMaterial color="#ee806b" emissive="#d45c46" emissiveIntensity={1.1} roughness={0.4} />
-              </mesh>
-              {/* A soft pool on the asphalt avoids the solid-cone look and transparent overdraw. */}
-              <mesh position={[sx * (halfW - 0.45), 0.025, front + 3.2]} rotation-x={-Math.PI / 2}>
-                <planeGeometry args={[2.6, 7.5]} />
-                <meshBasicMaterial map={pool} color="#edf4dc" transparent opacity={0.24} depthWrite={false} blending={AdditiveBlending} toneMapped={false} />
+                <meshStandardMaterial color="#ee806b" emissive="#d45c46" emissiveIntensity={2.4} roughness={0.4} toneMapped={false} />
               </mesh>
             </group>
           ))}
         </group>
+        {/* Light pools hang off the road-following group, not the chassis: a pitch under acceleration
+            used to dip them below the asphalt and switch the beams off mid-scroll. A soft pool avoids
+            the solid-cone look and transparent overdraw. */}
+        {[1, -1].map((sx) => (
+          <mesh key={sx} position={[sx * (halfW - 0.45), 0.025, front + 3.2]} rotation-x={-Math.PI / 2}>
+            <planeGeometry args={[2.6, 7.5]} />
+            <meshBasicMaterial map={pool} color="#edf4dc" transparent opacity={0.24} depthWrite={false} blending={AdditiveBlending} toneMapped={false} />
+          </mesh>
+        ))}
       </group>
       {Array.from({ length: PUFFS }, (_, i) => (
         <mesh

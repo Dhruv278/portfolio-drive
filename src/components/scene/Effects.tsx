@@ -7,7 +7,8 @@ import { Bloom, EffectComposer, SMAA, Vignette } from '@react-three/postprocessi
 export function Effects() {
   return (
     <EffectComposer multisampling={0} enableNormalPass={false}>
-      <Bloom mipmapBlur intensity={0.2} luminanceThreshold={1} luminanceSmoothing={0.2} />
+      {/* Threshold at one: only lamps, lamp heads and the lit road edges bloom, never lit paint. */}
+      <Bloom mipmapBlur intensity={0.45} luminanceThreshold={1} luminanceSmoothing={0.2} />
       <SMAA />
       <Vignette eskil={false} offset={0.22} darkness={0.3} />
     </EffectComposer>

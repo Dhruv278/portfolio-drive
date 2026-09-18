@@ -179,11 +179,40 @@ function Lamps() {
   )
 }
 
+// The last of the sunset, low on the horizon in the road's general direction. An additive plane
+// that follows the camera with the dome. Faces +z; the camera looks roughly toward -z.
+function Afterglow() {
+  const mesh = useRef<Mesh>(null)
+  const tex = useMemo(
+    () =>
+      makeTexture(256, 128, (ctx, w, h) => {
+        const g = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, w / 2)
+        g.addColorStop(0, 'rgba(240,197,122,0.55)')
+        g.addColorStop(0.5, 'rgba(226,169,94,0.18)')
+        g.addColorStop(1, 'rgba(226,169,94,0)')
+        ctx.fillStyle = g
+        ctx.fillRect(0, 0, w, h)
+      }),
+    [],
+  )
+  useEffect(() => () => tex.dispose(), [tex])
+  useFrame(({ camera }) => {
+    mesh.current?.position.set(camera.position.x + 40, camera.position.y + 6, camera.position.z - 330)
+  })
+  return (
+    <mesh ref={mesh} frustumCulled={false} renderOrder={-1}>
+      <planeGeometry args={[520, 240]} />
+      <meshBasicMaterial map={tex} transparent depthWrite={false} blending={AdditiveBlending} fog={false} toneMapped={false} />
+    </mesh>
+  )
+}
+
 export function Night() {
   return (
     <>
       <SkyDome />
       <Stars />
+      <Afterglow />
       <Lamps />
     </>
   )

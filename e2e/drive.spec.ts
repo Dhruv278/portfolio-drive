@@ -133,6 +133,10 @@ test.describe('The Drive', () => {
   test('skips the intro when the visitor has already scrolled', async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== 'desktop', 'one engine is enough')
     await page.goto('/drive?stats=1')
+    // The HUD scrolls to the top when it mounts (the drive starts at the garage on every load), so a
+    // scroll before that is undone. It also switches scroll restoration to manual at that moment, so
+    // wait for that, then scroll as a visitor would during loading.
+    await page.waitForFunction(() => history.scrollRestoration === 'manual')
     await page.evaluate(() => window.scrollTo(0, 600))
     await expect(page.getByTestId('scene')).toHaveAttribute('data-ready', 'true', { timeout: 60_000 })
     await expect(page.getByTestId('scene')).toHaveAttribute('data-intro', 'skipped', { timeout: 8_000 })

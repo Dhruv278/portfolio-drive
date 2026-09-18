@@ -7,6 +7,7 @@ const FORWARD = new Vector3(0, 0, 1)
 function ribbon(curve: Curve<Vector3>, segments: number, y: number, innerAt: (right: Vector3, p: Vector3) => Vector3, outerAt: (right: Vector3, p: Vector3) => Vector3): BufferGeometry {
   const pos: number[] = []
   const uv: number[] = []
+  const prog: number[] = []
   const idx: number[] = []
   const right = new Vector3()
   const length = curve.getLength()
@@ -20,6 +21,8 @@ function ribbon(curve: Curve<Vector3>, segments: number, y: number, innerAt: (ri
     pos.push(a.x, y, a.z, b.x, y, b.z)
     // u runs across the ribbon, v is the distance along it in metres, so textures tile at world scale
     uv.push(0, t * length, 1, t * length)
+    // progress is the road parameter, 0 at the start and 1 at the end, for shaders that light the travelled part
+    prog.push(t, t)
     if (i < segments) {
       const k = i * 2
       idx.push(k, k + 1, k + 2, k + 1, k + 3, k + 2)
@@ -28,6 +31,7 @@ function ribbon(curve: Curve<Vector3>, segments: number, y: number, innerAt: (ri
   const geo = new BufferGeometry()
   geo.setAttribute('position', new Float32BufferAttribute(pos, 3))
   geo.setAttribute('uv', new Float32BufferAttribute(uv, 2))
+  geo.setAttribute('progress', new Float32BufferAttribute(prog, 1))
   geo.setIndex(idx)
   geo.computeVertexNormals()
   return geo
@@ -50,6 +54,18 @@ export function buildKerbGeometry(curve: Curve<Vector3>, halfWidth: number, kerb
     y,
     (right, p) => p.clone().addScaledVector(right, side * halfWidth),
     (right, p) => p.clone().addScaledVector(right, side * (halfWidth + kerbWidth)),
+  )
+}
+
+// A thin strip just inside the kerb, for the lit edge. `progress` lets a shader light the part the
+// car has travelled.
+export function buildEdgeGeometry(curve: Curve<Vector3>, halfWidth: number, inset: number, width: number, side: 1 | -1, segments = 700, y = 0.045): BufferGeometry {
+  return ribbon(
+    curve,
+    segments,
+    y,
+    (right, p) => p.clone().addScaledVector(right, side * (halfWidth - inset - width)),
+    (right, p) => p.clone().addScaledVector(right, side * (halfWidth - inset)),
   )
 }
 

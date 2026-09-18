@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { CatmullRomCurve3, Vector3 } from 'three'
-import { buildKerbGeometry, buildRoadGeometry, dashMatrices } from './road'
+import { buildEdgeGeometry, buildKerbGeometry, buildRoadGeometry, dashMatrices } from './road'
 
 const curve = new CatmullRomCurve3(
   [
@@ -45,5 +45,25 @@ describe('dashMatrices', () => {
     expect(p.x).toBeCloseTo(c.x, 6)
     expect(p.z).toBeCloseTo(c.z, 6)
     expect(p.y).toBeCloseTo(0.05, 6)
+  })
+})
+
+describe('buildEdgeGeometry', () => {
+  const straight = new CatmullRomCurve3([new Vector3(0, 0, 0), new Vector3(0, 0, -50), new Vector3(0, 0, -100)])
+  it('is a ribbon with a progress attribute running 0 to 1', () => {
+    const g = buildEdgeGeometry(straight, 3.2, 0.5, 0.12, 1, 10, 0.05)
+    expect(g.getAttribute('position').count).toBe(22)
+    const prog = g.getAttribute('progress')
+    expect(prog.itemSize).toBe(1)
+    expect(prog.getX(0)).toBe(0)
+    expect(prog.getX(21)).toBe(1)
+  })
+  it('sits inside the kerb at the given inset', () => {
+    const g = buildEdgeGeometry(straight, 3.2, 0.5, 0.12, 1, 10, 0.05)
+    const pos = g.getAttribute('position')
+    const x0 = Math.abs(pos.getX(0))
+    const x1 = Math.abs(pos.getX(1))
+    expect(Math.min(x0, x1)).toBeCloseTo(3.2 - 0.5 - 0.12, 5)
+    expect(Math.max(x0, x1)).toBeCloseTo(3.2 - 0.5, 5)
   })
 })

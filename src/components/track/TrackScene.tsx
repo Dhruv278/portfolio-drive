@@ -151,10 +151,13 @@ export function TrackScene({ mainId, stopSelector, cardSelector }: Props) {
       dash.current!.setAttribute('d', polylinePath(samples.slice(i0).map((sm) => `${sm.x.toFixed(1)},${sm.y.toFixed(1)}`)))
     }
 
+    // Every layer measures the page in CSS pixels of the document's client width, the width without
+    // the scrollbar, and none of the SVGs is scaled by CSS. Three separate layers must agree to the
+    // pixel: a scaled road under an unscaled car drifted apart by the scrollbar's share of the width.
     // Desktop: the road enters from a horizon in the hero art, widens to full size at Start, then
     // winds down the page through every card's empty side.
     const layoutPage = () => {
-      W = innerWidth
+      W = document.documentElement.clientWidth
       H = document.documentElement.scrollHeight
       sizeSvgs(W, H)
       const heroRect = stops[0].getBoundingClientRect()
@@ -227,7 +230,7 @@ export function TrackScene({ mainId, stopSelector, cardSelector }: Props) {
 
     // Phones and tablets: the road is a fixed horizontal bar, checkpoints evenly spaced along it.
     const layoutBar = () => {
-      W = innerWidth
+      W = document.documentElement.clientWidth
       H = BAR_HEIGHT
       sizeSvgs(W, H)
       centre.current!.setAttribute('d', barPath(W, BAR_HEIGHT, 22))

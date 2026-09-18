@@ -985,10 +985,17 @@ h2,
   margin: 0 auto 14px;
 }
 .loader-road .tp-road {
+  fill: none;
+  stroke: #19262a;
   stroke-width: 22;
+  stroke-linecap: round;
 }
 .loader-road .tp-kerb {
+  fill: none;
+  stroke: #577077;
   stroke-width: 26;
+  stroke-linecap: round;
+  opacity: 0.55;
 }
 .loader-road .tp-dash {
   stroke-width: 1.6;
@@ -1319,15 +1326,33 @@ h2,
   pointer-events: none;
   z-index: 0;
 }
-.tp-road { fill: none; stroke: #19262a; stroke-width: 54; stroke-linecap: round; stroke-linejoin: round; }
-.tp-kerb { fill: none; stroke: #577077; stroke-width: 58; stroke-linecap: round; stroke-linejoin: round; opacity: 0.55; filter: none; }
-.tp-dash { fill: none; stroke: #758b8f; stroke-width: 3; stroke-dasharray: 18 22; stroke-linecap: round; animation: tp-flow 1.6s linear infinite; }
-@keyframes tp-flow { to { stroke-dashoffset: -40; } }
-.tp-lit { fill: none; stroke: var(--tp-amber); stroke-width: 6; stroke-linecap: round; filter: none; }
-.tp-cp { fill: var(--tp-navy); stroke: #577077; stroke-width: 3; }
-.tp-cp.on { fill: var(--tp-amber); stroke: var(--tp-amber); filter: drop-shadow(0 0 12px rgba(214, 237, 131, 0.7)); }
-.tp-cpn { font: 700 12px var(--font-body); fill: var(--tp-muted); text-anchor: middle; dominant-baseline: middle; }
-.tp-cp.on + .tp-cpn { fill: var(--tp-deep); }
+.tp-art {
+  position: absolute;
+  inset: 0 auto auto 0;
+  pointer-events: none;
+  z-index: 0;
+  -webkit-mask-image: linear-gradient(to right, transparent 26%, #000 54%), linear-gradient(to bottom, #000 60%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to right, transparent 26%, #000 54%), linear-gradient(to bottom, #000 60%, transparent 100%);
+  mask-composite: intersect;
+}
+.tp-kerb { fill: #0d1518; }
+.tp-road { fill: #1a262a; }
+.tp-grain { fill: url(#tp-grain); }
+.tp-dash { fill: none; stroke: #8ea0a3; stroke-width: 2.4; stroke-dasharray: 16 20; stroke-linecap: round; animation: tp-flow 1.8s linear infinite; }
+@keyframes tp-flow { to { stroke-dashoffset: -36; } }
+.tp-edge { fill: none; stroke-width: 2; stroke-linecap: round; opacity: 0.32; }
+.tp-edge.l { stroke: var(--tp-amber); }
+.tp-edge.r { stroke: var(--tp-cobalt); }
+.tp-lit { fill: none; stroke-width: 3; stroke-linecap: round; filter: url(#tp-glow); }
+.tp-lit.l { stroke: var(--tp-amber); }
+.tp-lit.r { stroke: var(--tp-cobalt); }
+.tp-cp { fill: var(--tp-navy); stroke: #577077; stroke-width: 2.5; }
+.tp-cp.on { fill: var(--tp-amber); stroke: var(--tp-amber); filter: drop-shadow(0 0 10px rgba(214, 237, 131, 0.7)); }
+.tp-node { fill: var(--tp-navy); stroke: #577077; stroke-width: 2.5; }
+.tp-node.on { fill: var(--tp-amber); stroke: var(--tp-amber); filter: url(#tp-glow); }
+.tp-link { stroke: #577077; stroke-width: 1.5; opacity: 0.7; }
+.tp-link.on { stroke: var(--tp-amber); }
 .tp-pool { fill: url(#tp-pool); }
 .tp-car { will-change: transform; }
 .tp-car .beam { fill: url(#tp-beam); opacity: 0.9; }
@@ -1395,7 +1420,11 @@ h2,
   gap: 4px 22px;
   border-radius: var(--tp-r-ui);
   backdrop-filter: blur(6px);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.4s, transform 0.4s;
 }
+.tp-odo.shown { opacity: 1; transform: none; }
 .tp-odo b { display: block; color: var(--tp-text); font-weight: 600; font-size: 15px; letter-spacing: 0.01em; }
 .tp-odo small { display: block; font-size: 10.5px; letter-spacing: 0.06em; }
 .tp-odo .bar { grid-column: 1 / -1; position: relative; height: 5px; margin-top: 6px; background: var(--tp-line); overflow: hidden; }
@@ -1435,8 +1464,10 @@ h2,
 .tp-tiles li { border: 1px solid var(--tp-line); border-radius: var(--tp-r-card); padding: 16px 18px; background: rgba(27, 35, 38, 0.7); backdrop-filter: blur(6px); }
 .tp-tiles b { display: block; font-family: var(--font-display); font-weight: 800; font-size: clamp(22px, 2vw, 30px); line-height: 1; letter-spacing: -0.02em; color: var(--tp-amber); }
 .tp-tiles span { display: block; font-size: 13px; color: var(--tp-muted); margin-top: 8px; line-height: 1.4; }
-.tp-big { font: 800 clamp(96px, 10.5vw, 150px) var(--font-display); fill: rgba(165, 179, 181, 0.07); letter-spacing: -0.04em; }
-.tp-bigname { font: 600 13px var(--font-mono); fill: rgba(165, 179, 181, 0.42); letter-spacing: 0.08em; text-transform: uppercase; }
+.tp-big { font: 800 clamp(96px, 10.5vw, 150px) var(--font-display); letter-spacing: -0.04em; fill: none; stroke: rgba(165, 179, 181, 0.3); stroke-width: 1.5; paint-order: stroke; }
+.tp-big.on { fill: url(#tp-num); stroke: none; filter: url(#tp-glow); }
+.tp-bigname { font: 600 13px var(--font-mono); letter-spacing: 0.3em; text-transform: uppercase; fill: rgba(165, 179, 181, 0.5); }
+.tp-bigname.on { fill: var(--tp-amber); }
 .tp-stop.on .tp-card {
   opacity: 1;
   transform: none;
@@ -1527,13 +1558,13 @@ h2,
     pointer-events: none;
   }
   .tp-barbg.shown { opacity: 1; }
-  .tp-track.bar .tp-road { stroke-width: 14; }
-  .tp-track.bar .tp-kerb { stroke-width: 17; filter: none; }
   .tp-track.bar .tp-dash { stroke-width: 1.5; stroke-dasharray: 6 8; }
-  .tp-track.bar .tp-lit { stroke-width: 3; filter: drop-shadow(0 0 6px rgba(214, 237, 131, 0.6)); }
+  .tp-track.bar .tp-edge { stroke-width: 1.2; }
+  .tp-track.bar .tp-lit { stroke-width: 1.8; filter: none; }
   .tp-track.bar .tp-cp { stroke-width: 2; }
   .tp-track.bar .tp-cp.on { filter: drop-shadow(0 0 6px rgba(214, 237, 131, 0.8)); }
   .tp-track.bar .tp-pool { r: 40; }
+  .tp-art { display: none; }
   .tp-barcap {
     position: fixed;
     top: calc(var(--tp-bar-top) + 56px);
@@ -1556,8 +1587,8 @@ h2,
 
   .tp-heroroad { display: block; width: 100%; max-height: 120px; margin: 4px 0 8px; transition: opacity 0.35s ease; }
   .tp-heroroad.gone { opacity: 0; }
-  .tp-heroroad .tp-road { stroke-width: 22; }
-  .tp-heroroad .tp-kerb { stroke-width: 26; }
+  .tp-heroroad .tp-road { fill: none; stroke: #19262a; stroke-width: 22; stroke-linecap: round; }
+  .tp-heroroad .tp-kerb { fill: none; stroke: #577077; stroke-width: 26; stroke-linecap: round; opacity: 0.55; }
   .tp-heroroad .tp-dash { stroke-width: 1.6; stroke-dasharray: 7 9; }
   .tp-heroroad .tp-cp { stroke-width: 2; }
   .tp-heroroad .tp-car .lamp { animation: tp-lamp 2.4s ease-in-out infinite; }

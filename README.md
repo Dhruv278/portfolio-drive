@@ -27,6 +27,7 @@ npm run build && npm run test:e2e   # Playwright against a production build
 - `src/content/profile.ts` is the single source of truth for every word on the site and the resume page.
 - `src/content/route.ts` holds the road, the stop positions and the scenery placement table.
 - `src/lib/` holds pure, unit-tested logic (scroll mapping, road geometry, texture recolor).
+- `src/lib/heroArt.ts` draws the hero landscape behind the 2D road; `src/components/track/CarGlyph.tsx` is the car both 2D roads share.
 - `src/components/scene/` is the 3D layer. `src/components/stops/` and `src/components/hud/` are the HTML layer.
 - `public/models/` holds only the models the scene uses. See `LICENSE-ASSETS.md`.
 - `design/` holds the standalone preview that the design was approved on. It is not part of the build.

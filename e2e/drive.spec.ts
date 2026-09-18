@@ -5,7 +5,7 @@ test.describe('The Drive', () => {
     await page.goto('/drive')
     await expect(page.locator('section.stop')).toHaveCount(6)
     await expect(page.getByRole('heading', { level: 1 })).toContainText('Dhruv')
-    await expect(page.getByRole('heading', { name: /MedChron: medical records in/ })).toBeVisible()
+    await expect(page.getByRole('heading', { name: /A case arrives/ })).toBeVisible()
     await expect(page.locator('#contact a[href^="mailto:"]')).toHaveCount(1)
   })
 
@@ -184,7 +184,7 @@ test.describe('The Drive', () => {
     await expect(page.locator('#skills')).toHaveClass(/on/)
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
     expect(overflow).toBe(0)
-    await expect(page.locator('#top').getByRole('link', { name: 'Take the 3D drive' })).toHaveAttribute('href', '/drive')
+    await expect(page.locator('#projects').getByRole('link', { name: 'Take the 3D drive' })).toHaveAttribute('href', '/drive')
     // a first visit: the 3D side of the switch beats, and the page ends with the invitation
     await expect(page.locator('.view-switch a.pulse')).toHaveText('3D')
     await expect(page.locator('.tp-finish .tp-btn')).toHaveAttribute('href', '/drive')

@@ -197,12 +197,14 @@ function Afterglow() {
   )
   useEffect(() => () => tex.dispose(), [tex])
   useFrame(({ camera }) => {
-    mesh.current?.position.set(camera.position.x + 40, camera.position.y + 6, camera.position.z - 330)
+    mesh.current?.position.set(camera.position.x + 30, camera.position.y - 9, camera.position.z - 340)
   })
+  // Sized for the 36 degree desktop lens and kept faint: a warm band at the horizon line, mostly
+  // hidden behind the ground, never a wash over the sky.
   return (
     <mesh ref={mesh} frustumCulled={false} renderOrder={-1}>
-      <planeGeometry args={[520, 240]} />
-      <meshBasicMaterial map={tex} transparent depthWrite={false} blending={AdditiveBlending} fog={false} toneMapped={false} />
+      <planeGeometry args={[240, 64]} />
+      <meshBasicMaterial map={tex} transparent opacity={0.32} depthWrite={false} blending={AdditiveBlending} fog={false} toneMapped={false} />
     </mesh>
   )
 }

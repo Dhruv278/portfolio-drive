@@ -14,9 +14,9 @@ type LoadedGltf = { scene: Group }
 // Only things taller than this cast a shadow. Fence posts, rocks and small props do not need one.
 const SHADOW_MIN_HEIGHT = 3
 
-// The nature kit's palette is mint and peach. Multiplied by this it reads as green leaves and brown
-// trunks against the photographic ground.
-const NATURE_TINT = '#5f6a45'
+// The nature kit's palette is mint and peach. Multiplied by this it reads as dark leaves and trunks,
+// near silhouettes against the night ground. The kit colours are linear, so the tint must be deep.
+const NATURE_TINT = '#33402c'
 // Buildings and props from the kits: cooled and dimmed into the night.
 const KIT_TINT = '#7d8a86'
 
